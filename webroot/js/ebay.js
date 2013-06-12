@@ -414,7 +414,7 @@ function bindevents()
 		return false;
 	});
 	
-	/* Editor */
+  /* Editor */
 	$('#items').on('click', 'a.wysiwyg', function() {
 		$('textarea[name=description]', '#'+id).wysiwyg('destroy');
 		return false;
@@ -1660,7 +1660,7 @@ function getrow(idx, row)
 					//$('td.Title', dom).append(spantag);
 				} else {
 					$('td.Title', dom).append('<br/>');
-					var spantag = $('<span/>').text(v.ShortMessage);
+					var spantag = $('<span/>').text(v.ShortMessage + ' ' + v.LongMessage);
 					$(spantag).addClass('error');
 					$('td.Title', dom).append(spantag);
 				}
