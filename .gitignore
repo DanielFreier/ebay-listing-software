@@ -1,5 +1,8 @@
 # To ignore files already trucked by git.
-# git update-index --assume-unchanged
+#
+# git update-index --assume-unchanged [filename]
+# git rm -r --cached [filename]
+#
 
 build/*
 config/*
