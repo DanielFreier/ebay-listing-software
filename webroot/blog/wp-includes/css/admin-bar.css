@@ -13,6 +13,10 @@
 	-webkit-box-sizing: content-box;
 	-moz-box-sizing:    content-box;
 	box-sizing:         content-box;
+	-webkit-transition: none;
+	-moz-transition:    none;
+	-o-transition:      none;
+	transition:         none;
 }
 
 #wpadminbar ul li:before,
@@ -334,7 +338,6 @@
 }
 
 #wp-admin-bar-my-account.with-avatar > ul {
-
 	min-width: 270px;
 }
 
@@ -536,6 +539,7 @@
 	height: 16px;
 	margin-top: 6px;
 }
+
 
 #wpadminbar .ab-label {
 	margin-left: 4px;

@@ -1,7 +1,7 @@
 <?php
 /*
  Plugin Name: Digg Digg
- Version: 5.3.3
+ Version: 5.3.6
  Plugin URI: http://bufferapp.com/diggdigg
  Author: Buffer
  Author URI: http://bufferapp.com/
@@ -27,7 +27,7 @@ require_once 'include/dd-upgrade.php';
 register_activation_hook( __FILE__, 'dd_run_when_plugin_activated' );
 
 add_action('init', 'dd_enable_required_js_in_wordpress' );
-add_action( 'wp_head', 'dd_wp_enqueue_styles' );
+add_action( 'wp_enqueue_scripts', 'dd_wp_enqueue_styles' );
 add_action( 'wp_head', 'dd_get_thumbnails_for_fb' );
 add_filter( 'the_excerpt', 'dd_hook_wp_content' );
 add_filter( 'the_content', 'dd_hook_wp_content' );
@@ -330,8 +330,27 @@ function integrateFloatingButtonsIntoWpContent($dd_floating_button_for_display,$
 			$dd_lazyLoad_scheduler_script = "<script type=\"text/javascript\"> jQuery(document).ready(function($) { " . $dd_lazyLoad_scheduler_script . " }); </script>";
 		}
 
+        // See if the post has custom meta tags to override the position of the top/y coord
+        global $wp_query;
+        $post = $wp_query->post; //get post content
+        $id = $post->ID; //get post id
+        
+        // Try post overriden start_anchor_id before falling back to sitewide
+        if(get_post_meta( $id, 'dd_override_start_anchor_id', true ) || get_post_meta( $id, 'dd_override_top_offset', true )){        
+	        $dd_override_start_anchor_id = get_post_meta( $id, 'dd_override_start_anchor_id', true );
+	        $dd_override_top_offset = get_post_meta( $id, 'dd_override_top_offset', true );
+        } else if($ddFloatDisplay[DD_FLOAT_OPTION][DD_FLOAT_OPTION_INITIAL_ELEMENT] != ""){
+	        $dd_override_start_anchor_id = $ddFloatDisplay[DD_FLOAT_OPTION][DD_FLOAT_OPTION_INITIAL_ELEMENT];
+	        $dd_override_top_offset = 0;
+        }
+
 		// $floatingCSS = '<style type="text/css" media="screen">' . $ddFloatDisplay[DD_FLOAT_OPTION][DD_FLOAT_OPTION_INITIAL_POSITION] . '</style>';
-		$floatingJSOptions = '<script type="text/javascript">var dd_offset_from_content = '.(!empty($ddFloatDisplay[DD_FLOAT_OPTION][DD_FLOAT_OPTION_LEFT])?($ddFloatDisplay[DD_FLOAT_OPTION][DD_FLOAT_OPTION_LEFT]):DD_FLOAT_OPTION_LEFT_VALUE).'; var dd_top_offset_from_content = '.(!empty($ddFloatDisplay[DD_FLOAT_OPTION][DD_FLOAT_OPTION_TOP])?($ddFloatDisplay[DD_FLOAT_OPTION][DD_FLOAT_OPTION_TOP]):DD_FLOAT_OPTION_TOP_VALUE).';</script>';
+        $floatingJSOptions = '<script type="text/javascript">';
+		$floatingJSOptions .= 'var dd_offset_from_content = '.(!empty($ddFloatDisplay[DD_FLOAT_OPTION][DD_FLOAT_OPTION_LEFT]) ? ($ddFloatDisplay[DD_FLOAT_OPTION][DD_FLOAT_OPTION_LEFT]) : DD_FLOAT_OPTION_LEFT_VALUE).';';
+        $floatingJSOptions .= 'var dd_top_offset_from_content = '.(!empty($ddFloatDisplay[DD_FLOAT_OPTION][DD_FLOAT_OPTION_TOP]) ? ($ddFloatDisplay[DD_FLOAT_OPTION][DD_FLOAT_OPTION_TOP]) : DD_FLOAT_OPTION_TOP_VALUE).';';
+        $floatingJSOptions .= 'var dd_override_start_anchor_id = "'. $dd_override_start_anchor_id . '";';
+        $floatingJSOptions .= 'var dd_override_top_offset = "'. $dd_override_top_offset . '";';
+        $floatingJSOptions .= '</script>';
 		$floatingJS = '<script type="text/javascript" src="' . DD_PLUGIN_URL . '/js/diggdigg-floating-bar.js?ver=' . DD_VERSION . '"></script>';
 
 		$dd_floating_bar = "<div class='dd_outer'><div class='dd_inner'>" . $floatButtonsContainer . "</div></div>" . $floatingJSOptions . $floatingJS . $dd_lazyLoad_scheduler_script . $dd_lazyLoad_jQuery_script;
