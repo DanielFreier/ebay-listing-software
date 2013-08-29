@@ -6,6 +6,8 @@ config/*
 data/*
 dist/*
 logs/*
+node/node_modules/*
+node/config.js
 webroot/itemimage/*
 webroot/blog/wp-content/uploads
 webroot/blog/wp-config.php
