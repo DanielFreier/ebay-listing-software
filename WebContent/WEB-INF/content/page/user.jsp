@@ -22,7 +22,7 @@
 <script type="text/javascript" src="/js/jquery-ui-1.10.1.custom/js/jquery-ui-1.10.1.custom.min.js"></script>
 <script type="text/javascript" src="/js/jquery-ui-timepicker-addon/jquery-ui-timepicker-addon.js"></script>
 
-<script type="text/javascript" src="/js/ebay.js?13"></script>
+<script type="text/javascript" src="/js/ebay.js?2"></script>
 <script type="text/javascript">
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-32099440-1']);
@@ -90,6 +90,7 @@ _gaq.push(['_trackPageview']);
       
       <a href="#" id="calletsy">Etsy</a><br/>
       <a href="#" id="toggledebug">DEBUG</a><br/>
+      <a href="#" id="showorders">orders</a><br/>
       
       <div id="log"></div>
       
@@ -301,6 +302,30 @@ _gaq.push(['_trackPageview']);
           </tr>
         </tbody>
       </table><!-- #items -->
+      
+      <table id="orders">
+        <thead>
+          <tr>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="orderrowtemplate">
+            <td class="OrderStatus"></td>
+            <td class="Title"></td>
+            <td>
+              <div>
+                <a href="#" class="ItemID" target="_blank"></a>
+              </div>
+              <div class="UserID"></div>
+            </td>
+            <td class="BuyerUserID"></td>
+            <td class="QuantityPurchased"></td>
+            <td class="Total"></td>
+            <td class="CreatedTime"></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table><!-- #orders -->
       
       <div id="settings">
         <table class="detail">
@@ -850,9 +875,17 @@ _gaq.push(['_trackPageview']);
             <form method="post" action="/file/upload" target="posttarget" 
                   enctype="multipart/form-data">
               <div class="variationspecificvalue"></div>
-              <span>Add images</span>
+              Upload images from your computer
               <input type="file" name="multiplefile" multiple="multiple"/>
             </form>
+            
+            <form class="webimageform" method="post" action="/">
+              Use self hosted images
+              <input type="text" name="webimageurl" size="30"
+                     placeholder="Input url of self hosted image" />
+              <button class="webimageformbutton">UPLOAD</button>
+            </form>
+            
             <ul class="variationpictures clearfix">
               <li class="template">
                 <div>
@@ -953,9 +986,16 @@ _gaq.push(['_trackPageview']);
                 
                 <form method="post" action="/file/upload"
                       target="posttarget" enctype="multipart/form-data">
-                  Add images
+                  Upload images from your computer
                   <input type="file" name="multiplefile" multiple="multiple"/>
                   You can select multiple files at once.
+                </form>
+                
+                <form class="webimageform" method="post" action="/">
+                  Use self hosted images
+                  <input type="text" name="webimageurl" size="30" 
+                         placeholder="Input url of self hosted image" />
+                  <button class="webimageformbutton">UPLOAD</button>
                 </form>
                 
               </div>
