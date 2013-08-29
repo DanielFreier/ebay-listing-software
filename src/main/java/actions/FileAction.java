@@ -114,6 +114,7 @@ public class FileAction extends BaseAction {
     
     /* Parse CSV file */
     CSVReader csvreader = new CSVReader(new FileReader(savedir + "/" + tmpname));
+    //CSVReader csvreader = new CSVReader(new FileReader(savedir + "/" + tmpname), ';');
     String[] cols;
     String[] colnames = new String[1];
     int rowidx = 0;

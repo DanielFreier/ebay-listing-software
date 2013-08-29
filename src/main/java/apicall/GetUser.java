@@ -28,7 +28,9 @@ public class GetUser extends ApiCall implements Callable {
 		reqdbo.append("MessageID", getnewtokenmap(email) + " " + userid);
 		
 		String requestxml = convertDBObject2XML(reqdbo, "GetUser");
-		
+    
+		writelog("GetUser/" + userid + ".req.xml", requestxml);
+    
 		pool18.submit(new ApiCallTask(0, requestxml, "GetUser"));
 		
 		return "";

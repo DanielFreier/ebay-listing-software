@@ -50,8 +50,8 @@ public class PageAction extends BaseAction {
   
   /* todo: session management in useraction json request */
   
-  @Action(value="/page/index", results={@Result(name="alreadyloggedin",location="user.jsp"),
-                                      @Result(name="loggedin",type="redirect",location="/page/index")})
+  @Action(value="/page/index", results={@Result(name="alreadyloggedin",type="redirect",location="https://listers.in/"),
+                                        @Result(name="loggedin",type="redirect",location="https://listers.in/")})
   public String execute() throws Exception {
     
     /*
@@ -163,6 +163,16 @@ public class PageAction extends BaseAction {
     return SUCCESS;
   }
   
+  @Action(value="/page/nodelogin", results={@Result(name="success",location="nodelogin.jsp"),
+                                            @Result(name="failed",type="redirect",location="/page/index")})
+  public String nodelogin() {
+    if (session.get("email") != null) {
+      return SUCCESS;
+    } else {
+      return "failed";
+    }
+  }
+  
   @Action(value="/page/signup_confirm", results={@Result(name="success",location="signup.jsp"),
                                                @Result(name="signup_complete",type="redirect",location="/page/index")})
   public String signup_confirm() {
@@ -221,13 +231,37 @@ public class PageAction extends BaseAction {
     return SUCCESS;
   }
   
-  @Action(value="/page/logout", results={@Result(name="success",type="redirect",location="/page/index")})
+  @Action(value="/page/login", results={@Result(name="success",type="redirect",location="https://listers.in/")})
+  public String login() {
+		
+    DBCollection coll = db.getCollection("users");
+    
+    BasicDBObject query = new BasicDBObject();
+    
+    String email    = ((String[]) parameters.get("email"))[0];
+    String password = ((String[]) parameters.get("password"))[0];
+      
+    query.put("email",    email);
+    query.put("password", password);
+    
+    user = (BasicDBObject) coll.findOne(query);
+    
+    if (user != null) {
+      session.put("email", user.get("email").toString());
+    }
+    
+    return SUCCESS;
+  }
+  
+  @Action(value="/page/logout", results={@Result(name="success",type="redirect",location="https://listers.in/")})
   public String logout() {
 		
-		db.getCollection("users")
-			.update(new BasicDBObject("email", session.get("email").toString()),
-							new BasicDBObject("$unset", new BasicDBObject("JSESSIONID", "")));
-		
+    if (session.get("email") != null) {
+      db.getCollection("users")
+        .update(new BasicDBObject("email", session.get("email").toString()),
+                new BasicDBObject("$unset", new BasicDBObject("JSESSIONID", "")));
+		}
+    
     session.remove("email");
     
     return SUCCESS;

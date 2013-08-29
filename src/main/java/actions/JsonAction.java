@@ -112,6 +112,8 @@ public class JsonAction extends BaseAction {
           cal.add(Calendar.HOUR, 24);
           String tmptoken_expiration = sdf.format(cal.getTime());
           
+          Date now = new Date();
+          
           BasicDBObject field = new BasicDBObject();
           field.put("email",     email);
           field.put("password",  password);
@@ -119,10 +121,12 @@ public class JsonAction extends BaseAction {
           field.put("tmptoken_expiration", tmptoken_expiration);
           field.put("status",    "temporary registration");
           field.put("language",  "English");
-          field.put("timezone",  "PST8PDT");
+          field.put("timezone",  "GMT-08:00");
           field.put("itemlimit", "100");
           field.put("created",   basetimestamp);
           field.put("lastused",  basetimestamp);
+          field.put("created_at",  now);
+          field.put("lastused_at", now);
           
           db.getCollection("users").insert(field, WriteConcern.SAFE);
           
@@ -248,7 +252,7 @@ public class JsonAction extends BaseAction {
        + "\n"
        + "Please click following link and complete sign up.\n"
        + "\n"
-       + "http://" + configdbo.getString("hostname") + "/page/signup_confirm?t=" + tmptoken + "\n"
+       + "https://" + configdbo.getString("hostname") + "/node/signup_confirm?t=" + tmptoken + "\n"
        + "\n"
        + "\n"
        + "We would like to hear from you!\n"
@@ -617,13 +621,28 @@ public class JsonAction extends BaseAction {
         
       }
       
+      /* adjust timezone of membermessages */
+      if (item.containsField("membermessages")) {
+        for (Object mme : (BasicDBList) item.get("membermessages")) {
+          BasicDBObject membermessage = (BasicDBObject) mme;
+          
+          String classname = membermessage.get("CreationDate").getClass().toString();
+          if (classname.equals("class java.util.Date")) {
+            Date creationdate = (Date) membermessage.get("CreationDate");
+            sdf.setTimeZone(TimeZone.getTimeZone(user.getString("timezone")));
+            sdf.applyPattern("yyyy-MM-dd HH:mm");
+            membermessage.put("CreationDate", sdf.format(creationdate));
+          }
+        }
+      }
+      
       item.put("tmp", tmp);
       item.removeField("_id");
       
       //items.put(id, item);
       items.add((BasicDBObject) item);
       
-    }
+    } // while
     
     itemjson.put("items", items);
     itemjson.put("paths", paths);
@@ -1588,6 +1607,45 @@ public class JsonAction extends BaseAction {
         */
     
         return SUCCESS;
+  }
+  
+  @Action(value="/json/orders")
+  public String orders() throws Exception {
+    
+    LinkedHashMap<String,Object> orderjson = new LinkedHashMap<String,Object>();
+    
+    ArrayList<BasicDBObject> orders = new ArrayList<BasicDBObject>();
+    
+    int limit = 100;
+    int offset = 0;
+    if (parameters.containsKey("limit"))
+      limit = Integer.parseInt(((String[]) parameters.get("limit"))[0]);
+    if (parameters.containsKey("offset"))
+      offset = Integer.parseInt(((String[]) parameters.get("offset"))[0]);
+    
+    DBCollection coll = db.getCollection("orders."+user.getString("_id"));
+    
+    BasicDBObject query = new BasicDBObject();
+    
+    BasicDBObject field = new BasicDBObject();
+    
+    BasicDBObject sort = new BasicDBObject();
+    sort.put("org.CreatedTime", -1);
+    
+    /* each orders */
+    DBCursor cur = coll.find(query, field).limit(limit).skip(offset).sort(sort);
+    orderjson.put("cnt", cur.count());
+    while (cur.hasNext()) {
+      
+      DBObject order = cur.next();
+      
+      
+      orders.add((BasicDBObject) order);
+    }    
+    
+    json.put("orders", orders);
+    
+    return SUCCESS;
   }
   
   @Action(value="/json/addmembermessagertq")

@@ -58,7 +58,11 @@ public class SetNotificationPreferences extends ApiCall implements Callable {
                            "ItemRevised",
                            "ItemSold",
                            "ItemUnsold",
+                           "ItemSuspended",
+                           "ItemLost",
                            "AskSellerQuestion",
+                           "TokenRevocation",
+                           "UserIDChanged",
                            "MyMessageseBayMessage",
                            "MyMessagesM2MMessage"};
 				for (String event : events) {

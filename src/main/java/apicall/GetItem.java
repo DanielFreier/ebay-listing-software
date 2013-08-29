@@ -209,7 +209,8 @@ public class GetItem extends ApiCall implements Callable {
 		String[] path = field.split("\\.", 2);
 		
 		if (!dbo.containsField(path[0])) return;
-		
+    if (dbo.get(path[0]) == null) return;
+    
 		String classname = dbo.get(path[0]).getClass().toString();
 		
 		/* leaf */

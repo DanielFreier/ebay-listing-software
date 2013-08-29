@@ -70,6 +70,7 @@ public class RelistItem extends ApiCall {
 			String uuid = uuidprefix + item.get("_id").toString();
 			uuid = uuid.toUpperCase();
 			//mod.put("UUID", uuid);
+      mod.removeField("UUID");
 			mod.put("ItemID", org.get("ItemID").toString());
 			
       String banner = readfile(basedir + "/data/banner.html");

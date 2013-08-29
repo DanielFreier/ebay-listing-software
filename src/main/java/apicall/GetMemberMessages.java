@@ -141,6 +141,9 @@ public class GetMemberMessages extends ApiCall implements Callable {
 			
       mme.removeField("Item");
       
+      mme.put("CreationDate",     convertdate(mme.getString("CreationDate")));
+      mme.put("LastModifiedDate", convertdate(mme.getString("LastModifiedDate")));
+      
       /* Remove existing message */
       BasicDBObject update = new BasicDBObject();
       update.put("$pull", new BasicDBObject("membermessages",
@@ -156,5 +159,16 @@ public class GetMemberMessages extends ApiCall implements Callable {
     
     return;
   }
-
+  
+  private Date convertdate(String datestr) throws Exception {
+    
+    datestr = datestr.replace("T", " ").replace(".000Z", "");
+    
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    sdf.setLenient(false);
+    sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+    Date date = sdf.parse(datestr);
+    
+    return date;
+  }
 }

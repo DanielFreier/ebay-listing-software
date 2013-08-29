@@ -101,12 +101,23 @@ public class BaseAction extends ActionSupport implements ServletContextAware,
 				query.put("email", session.get("email").toString());
 				user = (BasicDBObject) db.getCollection("users").findOne(query);
         
+        boolean isadmin = false;
+        for (Cookie c : request.getCookies()) {
+          if (!c.getName().equals("admin")) continue;
+          isadmin = true;
+          break;
+        }
         if (session.get("admin") != null) {
+          isadmin = true;
+        }
+        
+        if (isadmin) {
           
         } else {
 					
           BasicDBObject set = new BasicDBObject();
           set.put("lastused", basetimestamp);
+          set.put("lastused_at", now);
           set.put("useragent", request.getHeader("user-agent"));
 					
           db.getCollection("users").update(query, new BasicDBObject("$set", set));
