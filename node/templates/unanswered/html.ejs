@@ -1,0 +1,39 @@
+<html>
+<body>
+  <%= user.email %>
+  <div class="header">
+    You have <%= qcnt %> questions in <%= items.length %> items.
+  </div>
+  <div class="message">
+    You can respond to these questions from 
+    "Unanswered" menu of <a href="https://listers.in/">ListersIn</a>.
+  </div>
+  
+  <% for (var i=0; i<items.length; i++) { %>
+    <div class="title">
+      <%= items[i].org.Title %>
+    </div>
+    <% for (var j=0; j<items[i].membermessages.length; j++) { %>
+      <div class="question">
+        <div class="sender"><%= items[i].membermessages[j].Question.SenderID %></div>
+        <div class="date">
+          <%= items[i].membermessages[j].CreationDate_local %><br/>
+        </div>
+        <div class="body">
+          <%- items[i].membermessages[j].Question.Body.replace(/\n/, '<br/>') %>
+        </div>
+      </div>
+    <% } %>
+  <% } %>
+  
+  <div class="message">
+    You can respond to these questions from 
+    "Unanswered" menu of <a href="https://listers.in/">ListersIn</a>.
+  </div>
+  
+  <div class="footer">
+    ListersIn - eBay Listing Software
+  </div>
+  
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>admin</title>
+<link rel="stylesheet" type="text/css" href="/css/admin.css">
+<script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="/js/jquery.dump.js"></script>
+<script type="text/javascript" src="/js/admin.js"></script>
+</head>
+<body>
+	
+	<ul>
+		<li><a href="https://listers.in/admin/">Production</a></li>
+		<li><a href="http://sandbox.listers.in/admin/">Sandbox</a></li>
+    <li><a href="http://forum.listers.in/" target="_blank">Forum</a></li>
+    <li><a href="http://listers.in/blog/wp-admin/" target="_blank">Blog</a></li>
+    <li><a href="http://zabbix.devweb.in/" target="_blank">Zabbix</a></li>
+    <li><a href="http://www.tapatalk.com/forum_owner.php" target="_blank">Tapatalk</a></li>
+    <li>
+      <a href="https://www.google.com/search?q=%22ListersIn%22+site:ebay.com" 
+         target="_blank">Google</a>
+    </li>
+    <li><a href="/admin/listeditems" target="_blank">Listed</a></li>
+	</ul>
+  
+  <table>
+    <thead>
+      <tr>
+        <td colspan="5">
+          <%= users.length %> accounts
+        </td>
+        <td><%= summarytotal.Active.truez %></td>
+        <td><%= summarytotal.Active.falsez %></td>
+        <td><%= summarytotal.Completed.truez %></td>
+        <td><%= summarytotal.empty.truez %></td>
+      </tr>
+      <tr>
+        <th>E</th>
+        <th>C</th>
+        <th>L</th>
+        <th>Z</th>
+        <th>I</th>
+        <th>P</th>
+        <th>A</th>
+        <th>C</th>
+        <th>S</th>
+        <th>U</th>
+        <th>A</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for (var i=0; i<users.length; i++) { %>
+         
+      <% if (users[i].userids2 && users[i].userids2.length > 0) {  %>
+         
+         <% for (var j=0; j<users[i].userids2.length; j++) { %>
+         <tr>
+           
+           <% if (j == 0) { %>
+           <td rowspan="<%= users[i].userids2.length %>">
+             <a href="/admin/signin?email=<%= users[i].email %>" target="usersignin">
+               <%= users[i].email.replace(/@.+$/, '') %>
+             </a>
+             <% if (users[i].status != 'free trial') { %>
+             <div><%= users[i].status %></div>
+             <% } %>
+           </td>
+           <td rowspan="<%= users[i].userids2.length %>">
+             <% if (users[i].hasOwnProperty('created_at')) { %>
+             <%= users[i].created_at %>
+             <% } %>
+           </td>
+           <td rowspan="<%= users[i].userids2.length %>">
+             <%= users[i].lastused_at %>
+           </td>
+           <td rowspan="<%= users[i].userids2.length %>">
+             <%= users[i].timezone.replace('GMT', '').replace(':00', '') %>
+           </td>
+           <% } %>
+           
+					 <td>
+             <%= users[i].userids2[j].username %>
+             <% if (users[i].userids2[j].hasOwnProperty('TokenStatus')
+                 && users[i].userids2[j].TokenStatus.Status != 'Active') { %>
+             <div style="color:red;">(<%= users[i].userids2[j].TokenStatus.Status %>)</div>
+             <% } %>
+           </td>
+					 <td align="right" style="color:#f00;">
+             <% if (users[i].userids2[j].hasOwnProperty('summary')
+                 && users[i].userids2[j].summary.hasOwnProperty('Active')
+                 && users[i].userids2[j].summary.Active.hasOwnProperty('truez')) { %>
+             <%= users[i].userids2[j].summary.Active.truez %>
+             <% } %>
+           </td>
+					 <td align="right">
+             <% if (users[i].userids2[j].hasOwnProperty('summary')
+                 && users[i].userids2[j].summary.hasOwnProperty('Active')
+                 && users[i].userids2[j].summary.Active.hasOwnProperty('falsez')) { %>
+             <%= users[i].userids2[j].summary.Active.falsez %>
+             <% } %>
+           </td>
+					 <td align="right">
+             <% if (users[i].userids2[j].hasOwnProperty('summary')
+                 && users[i].userids2[j].summary.hasOwnProperty('Completed')
+                 && users[i].userids2[j].summary.Completed.hasOwnProperty('truez')) { %>
+             <%= users[i].userids2[j].summary.Completed.truez %>
+             <% } %>
+           </td>
+					 <td align="right">
+             <% if (users[i].userids2[j].hasOwnProperty('summary')
+                 && users[i].userids2[j].summary.hasOwnProperty('empty')
+                 && users[i].userids2[j].summary.empty.hasOwnProperty('truez')) { %>
+             <%= users[i].userids2[j].summary.empty.truez %>
+             <% } %>
+           </td>
+					 <td align="right">
+             <% if (users[i].userids2[j].hasOwnProperty('membermessages')
+                 && users[i].userids2[j].membermessages.hasOwnProperty('Unanswered')) { %>
+             <%= users[i].userids2[j].membermessages.Unanswered %>
+             <% } %>
+           </td>
+					 <td align="right">
+             <% if (users[i].userids2[j].hasOwnProperty('membermessages')
+                 && users[i].userids2[j].membermessages.hasOwnProperty('Answered')) { %>
+             <%= users[i].userids2[j].membermessages.Answered %>
+             <% } %>
+           </td>
+           
+         </tr>
+         <% } %>
+         
+      <% } else { %>
+         
+         <tr>
+           <td>
+             <a href="/admin/signin?email=<%= users[i].email %>" target="usersignin">
+               <%= users[i].email.replace(/@.+$/, '') %>
+             </a>
+             <% if (users[i].status != 'free trial') { %>
+             <div><%= users[i].status %></div>
+             <% } %>
+           </td>
+           <td>
+             <% if (users[i].hasOwnProperty('created_at')) { %>
+             <%= users[i].created_at %>
+             <% } %>
+           </td>
+           <td>
+             <%= users[i].lastused_at %>
+           </td>
+           <td>
+             <%= users[i].timezone.replace('GMT', '').replace(':00', '') %>
+           </td>
+					 <td>-</td>
+					 <td align="right">-</td>
+					 <td align="right">-</td>
+					 <td align="right">-</td>
+					 <td align="right">-</td>
+					 <td align="right">-</td>
+					 <td align="right">-</td>
+         <tr>
+         
+      <% } %>
+           
+      <% } %>
+      
+    </tbody>
+  </table>
+  
+  <div id="apicallbuttons">
+    <button>GeteBayDetails</button>
+    <button>GetCategories</button>
+    <button>GetCategoryFeatures</button>
+    <button>GetDescriptionTemplates</button>
+    <button>GetCategorySpecifics</button>
+  </div>
+  
+  <button id="notify">NOTIFY</button>
+  
+  <a href="/node/json/import" target="_blank">GetSellerList</a>
+  
+  <a href="/node/json/getitem">GetItem</a>
+  
+</body>
+</html>

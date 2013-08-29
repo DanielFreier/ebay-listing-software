@@ -1,0 +1,11 @@
+<html>
+<body>
+  <form method="post" action="/node/login">
+    <input type="hidden" name="email" value="<%= email %>"/>
+    <input type="hidden" name="password" value="<%= password %>"/>
+  </form>
+  <script>
+    document.forms[0].submit()
+  </script>
+</body>
+</html>

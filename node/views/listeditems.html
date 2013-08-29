@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>listeditems</title>
+<script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="/js/jquery.dump.js"></script>
+<style type="text/css">
+<!--
+td {
+  /*font-size: 10pt;*/
+}
+-->
+</style>
+</head>
+<body>
+
+<%= items.length %>
+
+<table border="1" bordercolor="#ccc" cellspacing="0" cellpadding="3">
+  <% for (var i=0; i<items.length; i++) { %>
+  <tr>
+    <td><%= items[i].starttime %></td>
+    <td><%= items[i].endtime %></td>
+    <td><%= items[i].userid %></td>
+    <td><%= items[i].status %></td>
+    <td>
+      <a href="<%= items[i].url %>">
+        <%= items[i].title %>
+      </a>
+    </td>
+  </tr>
+  <% } %>
+</table>
+  
+</body>
+</html>

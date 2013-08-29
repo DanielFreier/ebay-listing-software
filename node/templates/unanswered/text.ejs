@@ -1,0 +1,15 @@
+You have <%= qcnt %> questions in <%= items.length %> items.
+
+You can respond to these questions from "Unanswered" menu of ListersIn. https://listers.in/
+---------------------------------
+<% for (var i=0; i<items.length; i++) { %>
+<%= items[i].org.Title %>
+<% for (var j=0; j<items[i].membermessages.length; j++) { %>
+[<%= items[i].membermessages[j].Question.SenderID %>] (<%= items[i].membermessages[j].CreationDate_local %>)
+<%= items[i].membermessages[j].Question.Body %>
+<% } %>
+---------------------------------
+<% } %>
+You can respond to these questions from "Unanswered" menu of ListersIn. https://listers.in/
+---------------------------------
+ListersIn - eBay Listing Software
