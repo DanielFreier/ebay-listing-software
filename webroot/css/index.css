@@ -107,7 +107,8 @@ h2 {
   margin: 0 0 0 20px;
 }
 
-#logos div {
+#ebaylogo,
+#godaddylogo {
   float: left;
   margin: 0 20px 0 0;
 }
@@ -234,6 +235,15 @@ input[type=submit] {
   background-repeat: no-repeat;
   padding-left: 15px;
   margin-bottom: 5px;
+}
+
+#facebook {
+  clear: both;
+  padding: 20px 0 0 0;
+}
+
+#plusone {
+  margin: 10px 0 0;
 }
 
 #trydemo {

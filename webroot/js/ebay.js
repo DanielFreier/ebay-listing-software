@@ -376,6 +376,20 @@ function bindevents()
     return;
   });
   
+  $('#items').on('click', 'button.webimageformbutton', function() {
+    
+		var id = $(this).closest('tbody.itemrow').attr('id');
+    var form = $(this).closest('form');
+    var imageurl = $('input[name="webimageurl"]', form).val();
+    var divclass = $(this).closest('div').attr('class');
+    
+    addimage(id, divclass, [imageurl]);
+    
+    $('input[name="webimageurl"]', form).val('');
+    
+    return false;
+  });
+  
   /* ListingType -> update duration set */
 	$('#items').on('change', 'select[name="mod.ListingType"]', function() {
     
@@ -1163,6 +1177,40 @@ function bindevents()
     $('span.title-character-count', '#'+id).html('(' + $(this).val().length + ' characters)');
   });
   
+  /* Orders */
+  $('#showorders').click(function() {
+    
+		showcontent('#orders');
+    
+    $.post('/json/orders', 
+           '',
+           function(data) {
+             dump(data.json.orders);
+             $.each(data.json.orders, function(idx, order) {
+               
+               var tr = $('#orderrowtemplate').clone().attr('id', order.org.OrderID);
+               
+               $('td.OrderStatus', tr).html(order.org.OrderStatus);
+               $('div.UserID',     tr).html(order.UserID);
+               $('td.Total',       tr).html(order.org.Total['#text']);
+               $('td.CreatedTime', tr).html(order.org.CreatedTime);
+               $('td.BuyerUserID', tr).html(order.org.BuyerUserID);
+               
+               /* TransactionArray */
+               order.org.TransactionArray = arrayize(order.org.TransactionArray);
+               $.each(order.org.TransactionArray, function(j, t) {
+                 $('td.Title', tr).append(t.Transaction.Item.Title + '<br/>');
+                 $('a.ItemID', tr).append(t.Transaction.Item.ItemID + '<br/>');
+                 $('td.QuantityPurchased', tr).append(t.Transaction.QuantityPurchased + '<br/>');
+               });
+               
+               $('tbody', '#orders').append(tr);
+               
+             });
+           },
+           'json');
+  });
+  
 } // end of bindevents
 
 function togglebulkbuttons() {
@@ -1668,13 +1716,13 @@ function getrow(idx, row)
 		});
 	}
 	if (row.message) {
-		$('td.Title', dom).append(row.message);
+		//$('td.Title', dom).append(row.message);
 	}
   
 	/* Opt */
   if (row.opt) {
     /* Auto Relist Label */
-    if (row.opt.AutoRelist) {
+    if (row.opt.AutoRelist && row.opt.AutoRelist == 'true') {
 		  if (row.opt.AutoRelistAddBestOffer) {
 	      var label = $('<div/>').addClass('normallabel').html('Auto Relist With Best Offer');
       } else {

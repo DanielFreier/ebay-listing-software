@@ -163,7 +163,8 @@ a:visited {
 }
 
 
-table.items {
+table.items,
+#orders {
   margin: 0px 0px 0px 0px;
   border-spacing: 0px;
   border-collapse: collapse;
@@ -174,12 +175,17 @@ table.items {
   width: 100%;
 }
 
+#orders {
+  display: none;
+}
+
 table.items tr.row1:hover {
   background-color: #f7f7f7;
   cursor: pointer;
 }
 
-table.items tr.row2 {
+table.items tr.row2,
+#orders tr td {
   border-bottom: 1px solid #999;
 }
 
@@ -1421,4 +1427,8 @@ div[class^="VariationPictures"] {
 div.variationspecificvalue {
   display: inline;
   font-weight: bold;
+}
+
+#showorders {
+  color: #f7f7f7;
 }

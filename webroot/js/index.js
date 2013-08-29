@@ -8,7 +8,7 @@ function bindevents()
 	$('#trydemo').click(function() {
 		$('input[name="email"]',    '#signinbox').val('demo@listers.in');
 		$('input[name="password"]', '#signinbox').val('demo');
-		$('button', '#signinbox').click();
+		$('#signinbutton').click();
 	});
 	
 	/* Sign up button */

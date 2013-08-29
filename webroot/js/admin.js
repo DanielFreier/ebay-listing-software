@@ -16,4 +16,31 @@ $(function() {
     return false;
   });
   
+  $('button', '#apicallbuttons').click(function() {
+    
+    var postdata = 'callname=' + $(this).html();
+    
+    $.post('/node/admin/callapi',
+           postdata,
+           function() {
+             
+           },
+           'json');
+    
+    return false;
+  });
+  
+  $('#notify').click(function() {
+    
+    var postdata = 'callname=test';
+    
+    $.post('/page/receivenotify',
+           postdata,
+           function() {
+             
+           },
+           'json');
+    
+  });
+  
 });
