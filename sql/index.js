@@ -24,7 +24,7 @@ db.getCollectionNames().forEach(
 			db[coll].ensureIndex({'org.SellingStatus.QuantitySold':1});
 			db[coll].ensureIndex({'org.ListingDetails.EndTime':1});
 			db[coll].ensureIndex({'membermessages.MessageStatus':1});
-
+      
 			db[coll].ensureIndex(
         {
           'org.SellingStatus.ListingStatus': 1,

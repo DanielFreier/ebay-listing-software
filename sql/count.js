@@ -1,9 +1,10 @@
-/*
 db.getCollectionNames().forEach(
 	function(coll) {
-		print('count '+coll+' ('+db[coll].count()+' records)');
+		print('count '+coll+' ('+db.getCollection(coll).count()+' records)');
 	}
 );
+
+/*
 
 db.getCollectionNames().forEach(
 	function(coll) {
@@ -12,6 +13,7 @@ db.getCollectionNames().forEach(
 );
 */
 
+/*
 db.items.group(
 	{key: {
 		"ext.status": 1
@@ -23,6 +25,7 @@ db.items.group(
 		 csum:0}
 	}
 ).forEach(printjson);
+*/
 
 /*
 db.US.Category2CS.Category.group(
