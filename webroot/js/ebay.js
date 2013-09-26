@@ -109,7 +109,7 @@ function bindevents()
 			.html('<img src="/img/indicator.gif"/> please wait, redirecting to eBay site...');
 		$(this).after(loadingtext);
     
-		$.post('/json/addaccount',
+		$.post('/node/json/addaccount',
 			     null,
 			     function(data) {
 				     window.location.href = data.json.url;
@@ -252,8 +252,13 @@ function bindevents()
       }
 		});
 		
+    var postpath = '/json/' + action;
+    if (action == 'delete' || action == 'copy' || action == 'end' || action == 'relist') {
+      postpath = '/node/json/' + action;
+    }
+    
 		$.post
-		('/json/'+action,
+		(postpath,
 		 postdata,
 		 function(data) {
 			 
@@ -581,7 +586,7 @@ function bindevents()
 		
 		var postdata = 'userid=' + userid;
 		
-		$.post('/json/removeaccount',
+		$.post('/node/json/removeaccount',
 			     postdata,
 			     function(data) {
 				     $(trtag).remove();
@@ -615,7 +620,7 @@ function bindevents()
 		var tmppath = ('0.'+idpath).split('.');
 		
 		$.getJSON
-		('/json/gc2?site=' + site + '&path=0.' + categorypath.join('.'),
+		('/node/json/gc2?site=' + site + '&path=0.' + categorypath.join('.'),
 		 function(data) {
 			 
 			 dump(data);
@@ -688,7 +693,7 @@ function bindevents()
 	// Settings button
 	$('#settingsbutton').click(function() {
     
-		$.post('/json/settings',
+		$.post('/node/json/settings',
 			     null,
 			     function(data) {
 				     
@@ -750,10 +755,9 @@ function bindevents()
     
     var postdata = 'timezone='+encodeURIComponent($(this).val());
     
-    $.post('/json/settings',
+    $.post('/node/json/settings',
            postdata,
            function (data) {
-             
            },
            'json');
     
@@ -819,10 +823,23 @@ function bindevents()
 		// todo: don't hard code 'US'
 		var site = 'US';
 		
+    // for java version debug
 		$.getJSON
-		('/json/site?site='+site,
+		('/json/site?site=' + site,
+	   function(data) {
+       $.post('/node/json/savedebugjson',
+              'filename=site.'+site+'.java&json=' + encodeURIComponent(JSON.stringify(data)),
+              function() {}, 'json');
+     });
+    
+		$.getJSON
+		('/node/json/site?site=' + site,
 		 function(data) {
 			 
+       $.post('/node/json/savedebugjson',
+              'filename=site.'+site+'.node&json=' + encodeURIComponent(JSON.stringify(data)),
+              function() {}, 'json');
+       
 			 hash[site] = new Object;
 			 hash[site].eBayDetails      = data.json.eBayDetails;
 			 hash[site].Categories       = data.json.Categories;
@@ -1452,8 +1469,25 @@ function summary(initflag)
 {
 	var ulorg = $('ul.accounts').clone();
 	
-	$.getJSON('/json/summary', function(data) {
+  // for java version debug
+  /*
+	$.getJSON
+	('/json/summary',
+	 function(data) {
+     $.post('/node/json/savedebugjson',
+            'filename=summary.java&json=' + encodeURIComponent(JSON.stringify(data)),
+            function() {}, 'json');
+   });
+  */
+  
+	$.getJSON('/node/json/summary', function(data) {
 		
+    /*
+    $.post('/node/json/savedebugjson',
+           'filename=summary.node&json=' + encodeURIComponent(JSON.stringify(data)),
+           function() {}, 'json');
+    */
+    
 		if (!data.json.summary.alluserids) {
 			showcontent('#help');
 			return;
@@ -1529,11 +1563,30 @@ function items(clearitems)
 	if ($('select[name="mod.ListingType"]', '#headersearchform').val() == '') {
 	}
 	
+  // for java version debug
+  /*
 	$.post
 	('/json/items',
 	 postdata + '&json=' +　postjson,
 	 function(data) {
+     $.post('/node/json/savedebugjson',
+            'filename=items.java&json=' + encodeURIComponent(JSON.stringify(data)),
+            function() {}, 'json');
+   },
+   'json');
+  */
+  
+	$.post
+	('/node/json/items',
+	 postdata + '&json=' +　postjson,
+	 function(data) {
 		 
+     /*
+     $.post('/node/json/savedebugjson',
+            'filename=items.node&json=' + encodeURIComponent(JSON.stringify(data)),
+            function() {}, 'json');
+     */
+     
 		 if (clearitems) {
 			 $('tbody:gt(1)', '#items').remove();
 		   $('#content').scrollTop(0);
@@ -1755,10 +1808,30 @@ var clickTitle = function() {
 	
 	showmessage('Loading item data...');
 	
+  // for java version debug
+  /*
 	$.post
 	('/json/item',
-	 'id='+id,
+	 'id=' + id,
 	 function(data) {
+     $.post('/node/json/savedebugjson',
+            'filename=' + id + '.java&json=' + encodeURIComponent(JSON.stringify(data)),
+            function() {}, 'json');
+   },
+   'json');
+  */
+  
+	$.post
+	('/node/json/item',
+	 'id=' + id,
+	 function(data) {
+     
+     /*
+     $.post('/node/json/savedebugjson',
+            'filename=' + id + '.node&json=' + encodeURIComponent(JSON.stringify(data)),
+            function() {}, 'json');
+     */
+     
 		 var item = data.json.item;
      
      item = extract_shippingtype(item);
@@ -1795,7 +1868,7 @@ var clickTitle = function() {
      
 		 setformelements(item);
 		 showformvalues(item);
-		 $('div.productsearchform', '#'+id).remove();
+		 $('div.productsearchform', '#' + id).remove();
 		 
 		 $('table.detail > tbody > tr > td', detail).show();
 		 //$('td:nth-child(2)', '#'+id).show();
@@ -2737,7 +2810,7 @@ var changeCategory = function() {
 	}
 	
 	$.getJSON
-	('/json/gc2?site='+site+'&path=0.'+joined,
+	('/node/json/gc2?site='+site+'&path=0.'+joined,
 	 function(data) {
 		 
      //dump(data);
@@ -3102,10 +3175,27 @@ var changeSite = function() {
 	var id   = $(this).closest('tbody.itemrow').attr('id');
 	var site = $(this).val();
 	
+  // for java version debug
+  /*
 	$.getJSON
-	('/json/site?site='+site,
+	('/json/site?site=' + site,
+	 function(data) {
+     $.post('/node/json/savedebugjson',
+            'filename=site.' + site + '.java&json=' + encodeURIComponent(JSON.stringify(data)),
+            function() {}, 'json');
+   });
+  */
+  
+	$.getJSON
+	('/node/json/site?site=' + site,
 	 function(data) {
 		 
+     /*
+     $.post('/node/json/savedebugjson',
+            'filename=site.' + site + '.node&json=' + encodeURIComponent(JSON.stringify(data)),
+            function() {}, 'json');
+     */
+     
 		 hash[site] = new Object;
 		 hash[site].eBayDetails      = data.json.eBayDetails;
 		 hash[site].Categories       = data.json.Categories;
@@ -3246,7 +3336,7 @@ function refresh()
 	}
 	
 	$.post
-	('/json/refresh',
+	('/node/json/refresh',
 	 postdata,
 	 function(data) {
 		 
@@ -3273,17 +3363,16 @@ function refresh()
 		 /* items */
 		 if (data.json.items) {
 			 if (postdata != '') {
-				 
 				 $.each(data.json.items, function(idx, row) {
-					 dom = getrow(idx, row);
-					 $('#'+idx).replaceWith(dom);
+					 dom = getrow(row.id, row);
+					 $('#'+row.id).replaceWith(dom);
 					 if (typeof(row.status) == 'string' && row.status != '') {
 						 //
 					 } else {
 						 //$('input:checkbox', dom).css('visibility', '').removeAttr('checked');
 						 $('input:checkbox', dom).parent().removeClass('loading');
 					 }
-					 rowsdata[idx] = row;
+					 rowsdata[row.id] = row;
 				 });
 				 
 			 } else {
@@ -3338,7 +3427,7 @@ function dismissmessage()
 	
 	clearTimeout(timeout);
 	
-	$.post('/json/dismissmessage',
+	$.post('/node/json/dismissmessage',
 			   null,
 			   function(data) {
 					 
@@ -3479,7 +3568,7 @@ function showformvalues(item)
 		});
 	}
 	
-	var detail = $('div.detail', '#'+item.id);
+	var detail = $('div.detail', '#' + item.id);
 	
 	/* text */
 	$.each($('input[type="text"][name^="mod"]', detail), function(i, form) {

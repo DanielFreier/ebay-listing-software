@@ -1,53 +1,66 @@
-var mongo = require('../mongoconnect');
-var taskmodule = require('./task');
+var mongo  = require('../mongoconnect');
+var task   = require('./task');
 var config = require('../../config');
+var async  = require('async');
 
 module.exports = {
 	
   call: function(request, callback) {
 		
-    taskmodule.getnewtokenmap(request.email, function(token) {
+    async.waterfall([
       
-      var requestjson = {
-        email: request.email,
-        callname: 'GetSessionID',
-        site: 'US',
-        siteid: 0,
-        params: {
-          RequesterCredentials: {
-            eBayAuthToken: config.admintoken
-          },
-          WarningLevel: 'High',
-          RuName: config.runame,
-          MessageID: token
-        }
-      };
+      function(callback) {
+        task.getnewtokenmap(request.email, callback);
+      },
       
-      taskmodule.addqueue(requestjson, function(resultjson) {
+      function(token, callback) {
         
-        var sessionid = resultjson.SessionID;
+        var requestjson = {
+          email: request.email,
+          callname: 'GetSessionID',
+          site: 'US',
+          siteid: 0,
+          params: {
+            RequesterCredentials: {
+              eBayAuthToken: config.admintoken
+            },
+            WarningLevel: 'High',
+            RuName: config.runame,
+            MessageID: token
+          }
+        };
         
-        taskmodule.getemailfromtokenmap(resultjson.CorrelationID, function(email) {
-          
-          mongo(function(db) {
-            db.collection('users', function(err, collection) {
-              
-              collection.update(
-                {email: email},
-                {$set: {sessionid: sessionid}},
-                function(err, result) {
-			            callback(sessionid);
+        task.addqueue(requestjson, callback);
+      },
+      
+      function(resultjson, callback) {
+        
+        mongo(function(db) {
+          db.collection('users', function(err, collection) {
+            
+            collection.update(
+              {
+                email: request.email
+              },
+              {
+                $set: {
+                  sessionid: resultjson.SessionID
                 }
-              );
-              
-            });
-          }); // mongo
-          
-        }); // getemailfromtokenmap
+              }
+            );
+            
+            callback(null, resultjson.SessionID);
+            
+          });
+        }); // mongo
         
-		  }); // addqueue
+      }
+        
+    ], function(err, result) {
       
-    }); // getnewtokenmap
+      callback(null, result);
+      
+    }); // async.waterfall
     
   } // call
 	

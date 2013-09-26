@@ -26,7 +26,8 @@ exports.index = function(req, res) {
     res.render('user', { 
       user: req.user,
       locale: req.locale,
-      mischash: JSON.stringify(mischash)
+      mischash: JSON.stringify(mischash),
+      remoteaddr: req.headers['x-forwarded-for']
     });
     
   } else {

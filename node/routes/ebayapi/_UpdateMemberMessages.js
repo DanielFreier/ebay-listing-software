@@ -41,13 +41,14 @@ var methods = {
           
           db.collection('items.' + user._id, function(err, itemscoll) {
             
-            //'membermessages.MessageStatus': 'Unanswered'
             
             itemscoll.find(
               {
                 org: {
                   $exists: true
-                }
+                },
+                'membermessages.MessageStatus': 'Unanswered',
+                'org.SellingStatus.ListingStatus': 'Active'
               }
             ).sort(
               {

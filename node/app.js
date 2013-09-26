@@ -141,7 +141,7 @@ express.logger.token('date2', function(req, res) {
 });
 
 app.use(express.logger(':date2 :status :method :url HTTP/:http-version :referrer :user-agent'));
-
+app.use(express.compress());
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.cookieParser('alseia9s87e6afaKHDKSIUfqwelkja'));
@@ -170,19 +170,38 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
+
+app.post('/receivenotify', index.receivenotify);
+
 //app.get('/users', user.list);
-app.get('/admin', admin.index);
-app.get('/admin/signin', admin.signin);
+
+app.get('/admin',             admin.index);
+app.get('/admin/signin',      admin.signin);
 app.get('/admin/listeditems', admin.listeditems);
-app.get('/admin/unanswered', admin.unanswered);
-app.post('/admin/callapi', admin.callapi);
+app.get('/admin/unanswered',  admin.unanswered);
+app.post('/admin/callapi',    admin.callapi);
+
 app.get('/user/items', user.items);
 app.get('/image', image.index);
 
-app.post('/receivenotify', index.receivenotify);
+app.post('/json/items',         json.items);
+app.post('/json/item',          json.item);
 app.post('/json/addaccount',    json.addaccount);
 app.post('/json/removeaccount', json.removeaccount);
-app.get('/json/import',        json.import);
+app.post('/json/delete',        json.delete);
+app.post('/json/copy',          json.copy);
+app.post('/json/end',           json.end);
+app.post('/json/relist',        json.relist);
+app.post('/json/savedebugjson', json.savedebugjson);
+app.post('/json/refresh',       json.refresh);
+app.post('/json/settings',      json.settings);
+app.post('/json/dismissmessage', json.dismissmessage);
+
+app.get('/json/import',         json.import);
+app.get('/json/site',           json.site);
+app.get('/json/gc2',            json.gc2);
+app.get('/json/summary',        json.summary);
+
 app.get('/signup_confirm', index.signup_confirm);
 
 app.post('/login', passport.authenticate('local', {successRedirect: '/node/javalogin',

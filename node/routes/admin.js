@@ -23,7 +23,9 @@ exports.index = function(req, res) {
         var summarytotal = {
           empty:     {truez: 0, falsez: 0,},
           Active:    {truez: 0, falsez: 0,},
-          Completed: {truez: 0, falsez: 0,}
+          Completed: {truez: 0, falsez: 0,},
+          Unanswered: 0,
+          Answered: 0
         };
         
         users.forEach(function(user) {
@@ -36,20 +38,31 @@ exports.index = function(req, res) {
           
           if (user.hasOwnProperty('userids2')) {
             user.userids2.forEach(function(userid) {
-              if (!userid.hasOwnProperty('summary')) return;
-              Object.keys(userid.summary).forEach(function(key) {
-                Object.keys(userid.summary[key]).forEach(function(key2) {
-                  summarytotal[key][key2] += userid.summary[key][key2];
+              
+              if (userid.hasOwnProperty('summary')) {
+                Object.keys(userid.summary).forEach(function(key) {
+                  Object.keys(userid.summary[key]).forEach(function(key2) {
+                    summarytotal[key][key2] += userid.summary[key][key2];
+                  });
                 });
-              });
-            })
+              }
+              
+              if (userid.hasOwnProperty('membermessages')) {
+                Object.keys(userid.membermessages).forEach(function(key) {
+                  if (key == '') return;
+                  summarytotal[key] += userid.membermessages[key];
+                });
+              }
+              
+            });
           }
           
         }); // forEach
         
-        res.render('admin', {
+        res.render('admin_bootstrap', {
           users: users,
-          summarytotal: summarytotal
+          summarytotal: summarytotal,
+          remoteaddr: req.headers['x-forwarded-for']
         });
         
       }); // find
@@ -156,7 +169,7 @@ exports.unanswered = function(req, res) {
               var nowhour = moment().zone(zonestr).format('H');
               
               // filter users "local time is am9:00"
-              if (nowhour == 9) {
+              if (true || nowhour == 9) {
                 console.log(nowhour + ' <-[' + zonestr + '] ' + user.email);
                 targetusers.push(user);
               }
@@ -222,7 +235,7 @@ exports.unanswered = function(req, res) {
               console.log('[' + user.email + ']'
                           + ' ' + items.length + ' items,'
                           + ' ' + qcnt + ' questions.');
-              
+              return;
               emailTemplates(templatedir, function(err, template) {
                 
                 var smtpTransport = nodemailer.createTransport("SMTP", {
