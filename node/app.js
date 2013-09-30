@@ -174,6 +174,7 @@ app.get('/', routes.index);
 app.get('/signup_confirm', index.signup_confirm);
 app.get('/reset_password', index.reset_password);
 app.get('/cancelaccount',  index.cancelaccount);
+app.get('/accept',         index.accept);
 
 app.post('/receivenotify', index.receivenotify);
 

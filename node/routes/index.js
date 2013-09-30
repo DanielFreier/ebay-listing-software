@@ -1,4 +1,6 @@
 var mongo      = require('./mongoconnect');
+var moment     = require('moment');
+var net        = require('net');
 var config     = require('../config');
 var nodemailer = require('nodemailer');
 var fs         = require('fs');
@@ -347,3 +349,97 @@ exports.cancelaccount = function(req, res) {
   res.redirect('/');
   
 } // cancelaccount
+
+exports.accept = function(req, res) {
+  
+  var url = require('url');
+  var url_parts = url.parse(req.url, true);
+  var query = url_parts.query;
+  
+  var username  = query.username;
+  var email     = req.user.email;
+  var sessionid = req.user.sessionid;
+  
+  /* FetchToken */
+  var args = ['FetchToken', email, sessionid, username];
+  writesocket(args, function() {}); // wait
+  
+  /* SetNotificationPreferences */
+  var args = ['SetNotificationPreferences', email, username];
+  writesocket_async(args); // not wait
+  
+  updatemessage(email, true, 'Importing ' + username + '\'s items from eBay'
+                + ' which end between ' + moment().subtract('days', 59).format('YYYY-MM-DD')
+                + ' and ' + moment().add('days', 60).format('YYYY-MM-DD') + '.');
+  
+  /* GetSellerList */
+  var args = [
+    'GetSellerList',
+    email,
+    username,
+    'End',
+    moment().subtract('days', 59).format('YYYY-MM-DD'),
+    moment().add('days', 60).format('YYYY-MM-DD'),
+    'ReturnAll'
+  ];
+  writesocket_async(args); // not wait
+  
+  res.redirect('/');
+}
+
+function writesocket_async(args) {
+  
+  var net = require('net');
+  
+  var socket = new net.Socket();
+  socket.connect(config.daemonport, 'localhost');
+  socket.on('connect', function() {
+    socket.write(args.join("\n") + "\n", function() {
+      socket.end();
+    });
+  });
+  
+}
+
+function writesocket(args, callback) {
+  
+  var net = require('net');
+  
+  var socket = new net.Socket();
+  socket.connect(config.daemonport, 'localhost');
+  socket.on('connect', function() {
+    socket.write(args.join("\n") + "\n", function(err, result) {
+      socket.end();
+    });
+  });
+  
+  socket.on('close', function() {
+    callback(null, null);
+  });
+  
+}
+
+function updatemessage(email, hasnext, message) {
+  
+  var now = new Date();
+  
+  mongo(function(db) {
+    db.collection('users', function(err, coll) {
+      coll.update(
+        {
+          email: email
+        },
+        {
+          $set: {
+            message: {
+              datetime: now,
+              hasnext: hasnext,
+              message: message
+            }
+          }
+        }
+      ); // update
+    }); // collection
+  }); // mongo
+  
+} // updatemessage()
