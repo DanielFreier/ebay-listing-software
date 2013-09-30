@@ -300,3 +300,50 @@ exports.receivenotify = function(req, res) {
   });
   
 }
+
+exports.index_bootstrap = function(req, res) {
+  
+  res.render('index_bootstrap', {
+  });
+  
+} // index_bootstrap
+
+exports.reset_password = function(req, res) {
+  
+  var url = require('url');
+  var url_parts = url.parse(req.url, true);
+  var query = url_parts.query;
+  
+  var query = {
+    tmptoken: query.t
+  };
+  
+  mongo(function(db) {
+    db.collection('users', function(err, coll) {
+      coll.findOne(query, function(err, user) {
+        if (user) {
+          res.render('resetpassword', {
+            user: user
+          });
+        } else {
+          res.redirect('/');
+        }
+      }); // findOne
+    }); // collection
+  }); // mongo
+        
+} // reset_password
+
+exports.cancelaccount = function(req, res) {
+  
+  mongo(function(db) {
+    db.collection('users', function(err, coll) {
+      coll.remove({
+        email: req.user.email
+      });
+    }); // collection
+  }); // mongo
+  
+  res.redirect('/');
+  
+} // cancelaccount

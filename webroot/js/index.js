@@ -24,7 +24,7 @@ function bindevents()
 		
 		var postdata = $('input', $(this).closest('form')).serialize();
 		
-		$.post('/json/signup',
+		$.post('/node/json/signup',
 			     postdata,
 			     function(data) {
 				     if (data.json.result == true) {
@@ -55,7 +55,7 @@ function bindevents()
 		
 		var postdata = $('input', $(this).closest('form')).serialize();
 		
-		$.post('/json/forgotpassword',
+		$.post('/node/json/forgotpassword',
 					 postdata,
 					 function(data) {
 				     if (data.json.result == true) {
@@ -81,7 +81,7 @@ function bindevents()
     
 		var postdata = $('input', $(this).closest('form')).serialize();
 		
-		$.post('/json/resetpassword',
+		$.post('/node/json/resetpassword',
 			     postdata,
 			     function(data) {
 				     if (data.json.result == true) {
@@ -92,7 +92,7 @@ function bindevents()
 				     } else {
 					     $('#resetpasswordmessage')
 						     .css('color', 'red')
-						     .html(data.json.message);
+						     .html(data.json.resultmessage);
 				     }
 			     },
 			     'json');

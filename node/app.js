@@ -10,6 +10,7 @@ var express = require('express')
   , routes = require('./routes')
   , user   = require('./routes/user')
   , json   = require('./routes/json')
+  , file   = require('./routes/file')
   , admin  = require('./routes/admin')
   , image  = require('./routes/image')
   , index  = require('./routes/index')
@@ -128,7 +129,7 @@ app.locals({
 });
 
 // all environments
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || config.nodeport);
 app.set('views', __dirname + '/views');
 
 app.engine('.html', require('ejs').__express);
@@ -148,8 +149,8 @@ app.use(express.cookieParser('alseia9s87e6afaKHDKSIUfqwelkja'));
 
 app.use(express.session({
   store: new mongoStore({ 
-    host: '10.156.17.98',
-    db: 'ebay' 
+    host: config.mongohost,
+    db: config.database,
   }),
 }));
 
@@ -170,6 +171,9 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
+app.get('/signup_confirm', index.signup_confirm);
+app.get('/reset_password', index.reset_password);
+app.get('/cancelaccount',  index.cancelaccount);
 
 app.post('/receivenotify', index.receivenotify);
 
@@ -184,42 +188,54 @@ app.post('/admin/callapi',    admin.callapi);
 app.get('/user/items', user.items);
 app.get('/image', image.index);
 
+app.post('/file/upload',    file.upload);
+app.post('/file/csvupload', file.csvupload);
+
+app.post('/json/signup',        json.signup);
+app.post('/json/forgotpassword', json.forgotpassword);
+app.post('/json/resetpassword', json.resetpassword);
 app.post('/json/items',         json.items);
 app.post('/json/item',          json.item);
 app.post('/json/addaccount',    json.addaccount);
 app.post('/json/removeaccount', json.removeaccount);
+app.post('/json/save',          json.save);
 app.post('/json/delete',        json.delete);
 app.post('/json/copy',          json.copy);
 app.post('/json/end',           json.end);
 app.post('/json/relist',        json.relist);
+app.post('/json/revise',        json.revise);
+app.post('/json/verifyadditem', json.verifyadditem);
+app.post('/json/add',           json.add);
+app.post('/json/import_java',   json.import_java);
 app.post('/json/savedebugjson', json.savedebugjson);
 app.post('/json/refresh',       json.refresh);
 app.post('/json/settings',      json.settings);
+app.post('/json/findproducts',  json.findproducts);
 app.post('/json/dismissmessage', json.dismissmessage);
+app.post('/json/addmembermessagertq', json.addmembermessagertq);
 
+app.get('/json/descriptiontemplate', json.descriptiontemplate);
 app.get('/json/import',         json.import);
 app.get('/json/site',           json.site);
 app.get('/json/gc2',            json.gc2);
 app.get('/json/summary',        json.summary);
 
-app.get('/signup_confirm', index.signup_confirm);
 
-app.post('/login', passport.authenticate('local', {successRedirect: '/node/javalogin',
+//app.post('/login', passport.authenticate('local', {successRedirect: '/node/javalogin',
+app.post('/login', passport.authenticate('local', {successRedirect: '/',
                                                    failureRedirect: '/',
                                                    failureFlash: false }));
 
 app.get('/javalogin', function(req, res) {
-  
   res.render('javalogin', {
     user: req.user
   })
-  
 });
-
 
 app.get('/logout', function(req, res) {
   req.logout();
-  res.redirect('/page/logout');
+  //res.redirect('/page/logout');
+  res.redirect('/');
 });
 
 http.createServer(app).listen(app.get('port'), function(){

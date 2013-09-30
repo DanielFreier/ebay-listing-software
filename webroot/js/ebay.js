@@ -253,7 +253,14 @@ function bindevents()
 		});
 		
     var postpath = '/json/' + action;
-    if (action == 'delete' || action == 'copy' || action == 'end' || action == 'relist') {
+    if (action == 'delete'
+        || action == 'copy'
+        || action == 'end'
+        || action == 'add'
+        || action == 'relist'
+        || action == 'verifyadditem'
+        || action == 'revise') {
+      
       postpath = '/node/json/' + action;
     }
     
@@ -564,7 +571,7 @@ function bindevents()
 		
     var postdata = $('select,input', '#syncitemsform').serialize();
     
-		$.post('/json/import',
+		$.post('/node/json/import_java',
 			     postdata,
 			     function(data) {
 				     
@@ -774,9 +781,13 @@ function bindevents()
 		}
 		
 		$.getJSON
-		('/json/descriptiontemplate?site='+site+'&groupid='+$(this).val(),
+		('/node/json/descriptiontemplate?site='+site+'&groupid='+$(this).val(),
 		 function(data) {
-			 dump(data);
+       
+       $.post('/node/json/savedebugjson',
+              'filename=descriptiontemplate.'+site+'.node'
+              + '&json=' + encodeURIComponent(JSON.stringify(data)),
+              function() {}, 'json');
 			 
 			 $('select[name="mod.ListingDesigner.ThemeID"]', '#'+id).empty();
 			 var emptyoptiontag = $('<option/>').val('').text('(not selected)');
@@ -945,7 +956,7 @@ function bindevents()
     
 		showmessage('Sending answer to ' + sender + '...');
 		
-    $.post('/json/addmembermessagertq',
+    $.post('/node/json/addmembermessagertq',
            postdata,
            function (data) {
 						 $(div).fadeOut('slow', function() {
@@ -1279,7 +1290,8 @@ var findproducts = function() {
 	$('li.suggestedcategory-template', td).nextAll().remove();
 	$('li.product-template',    td).nextAll().remove();
   
-	var site = $('select[name="mod.Site"]', '#'+id).val();
+	var site   = $('select[name="mod.Site"]', '#'+id).val();
+  var userid = $('select[name="UserID"]',   '#'+id).val();
   
 	var keyword = $('input[name="ProductSearch.QueryKeywords"]', td).val();
   if (keyword == '') {
@@ -1289,9 +1301,26 @@ var findproducts = function() {
   
   $('div.productsearchmessage', td).html('<img src="/img/indicator.gif"/> Searching...');
 	
-	$.post('/json/findproducts',
-		     'site=' + site + '&findtype=QueryKeywords&keyword=' + encodeURIComponent(keyword),
+  // for java version debug
+	$.post
+  ('/json/findproducts',
+	 'site=' + site + '&findtype=QueryKeywords&keyword=' + encodeURIComponent(keyword),
+   function(data) {
+     $.post('/node/json/savedebugjson',
+            'filename=findproducts.'+keyword+'.java'
+            + '&json=' + encodeURIComponent(JSON.stringify(data)),
+            function() {}, 'json');
+   }, 'json');
+  
+	$.post('/node/json/findproducts',
+		     'userid=' + userid + '&site=' + site
+         + '&findtype=QueryKeywords&keyword=' + encodeURIComponent(keyword),
 		     function(data) {
+           
+           $.post('/node/json/savedebugjson',
+                  'filename=findproducts.'+keyword+'.node'
+                  + '&json=' + encodeURIComponent(JSON.stringify(data)),
+                  function() {}, 'json');
            
            if (data.json.result.Ack == 'Failure') {
              $('div.productsearchmessage', td).html('No product found for "'+keyword+'".');
@@ -3060,7 +3089,7 @@ var save = function() {
 	
 	showmessage('Saving and verifing the item...');
 	
-	$.post('/json/save',
+	$.post('/node/json/save',
 		     'id='+id+'&json='+postdata,
 		     function(data) {
 			     var item = data.json.item;

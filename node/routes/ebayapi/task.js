@@ -13,7 +13,7 @@ var queue      = [];
 var userqueue  = {};
 var currentidx = 0;
 
-module.exports = {
+var methods = {
   
   addqueue: function(requestjson, callback) {
     
@@ -90,9 +90,29 @@ module.exports = {
       }); // collection
     }); // mongo
     
+  },
+  
+  convertattr: function(o) {
+    
+    Object.keys(o).forEach(function(key) {
+      
+      if (key == '@') {
+        Object.keys(o[key]).forEach(function(attrkey) {
+          o['@' + attrkey] = o[key][attrkey];
+        });
+        delete o[key];
+      } else if (typeof(o[key]) == 'object') {
+        methods.convertattr(o[key]);
+      }
+      
+    });
+    
+    return o;
   }
   
-}
+} // methods
+
+module.exports = methods;
 
 function docall() {
   
@@ -130,7 +150,12 @@ function docall() {
       
     } else {
       
-      dopost(queueelm.requestjson, function(err, resultjson) {
+      var openapiflag = false;
+      if (queueelm.requestjson.callname == 'FindProducts') {
+        openapiflag = true;
+      }
+      
+      dopost(queueelm.requestjson, openapiflag, function(err, resultjson) {
         
         running--;
         done++;
@@ -151,7 +176,7 @@ function docall() {
   }
 }
 
-function dopost(postjson, callback) {
+function dopost(postjson, openapiflag, callback) {
   
   var fs = require('fs');
   var js2xmlparser = require('js2xmlparser');
@@ -164,25 +189,51 @@ function dopost(postjson, callback) {
    '<' + postjson.callname + ' xmlns="urn:ebay:apis:eBLBaseComponents">');
   
   /* post request */
-  var https = require('https');
+  var http_or_https;
+  var options;
   
-  var options = {
-    host: config.apihost,
-    port: 443,
-    path: config.apipath,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'text/xml',
-      'X-EBAY-API-COMPATIBILITY-LEVEL': config.compatlevel,
-      'X-EBAY-API-CALL-NAME': postjson.callname,
-      'X-EBAY-API-SITEID':    postjson.siteid,
-      'X-EBAY-API-DEV-NAME':  config.devname,
-      'X-EBAY-API-APP-NAME':  config.appname,
-      'X-EBAY-API-CERT-NAME': config.certname
-    }
-  };
+  if (openapiflag) {
+    
+    http_or_https = require('http');
+    
+    options = {
+      host: config.openapihost,
+      port: 80,
+      path: config.openapipath,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/xml',
+        'X-EBAY-API-VERSION':   config.compatlevel,
+        'X-EBAY-API-CALL-NAME': postjson.callname,
+        'X-EBAY-API-SITEID':    postjson.siteid,
+        'X-EBAY-API-APP-ID':    config.appname,
+        'X-EBAY-API-REQUEST-ENCODING': 'XML'
+      }
+    };
+    
+  } else {
+    
+    http_or_https = require('https');
+    
+    options = {
+      host: config.apihost,
+      port: 443,
+      path: config.apipath,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/xml',
+        'X-EBAY-API-COMPATIBILITY-LEVEL': config.compatlevel,
+        'X-EBAY-API-CALL-NAME': postjson.callname,
+        'X-EBAY-API-SITEID':    postjson.siteid,
+        'X-EBAY-API-DEV-NAME':  config.devname,
+        'X-EBAY-API-APP-NAME':  config.appname,
+        'X-EBAY-API-CERT-NAME': config.certname
+      }
+    };
+    
+  }
   
-  var req = https.request(options, function(apires) {
+  var req = http_or_https.request(options, function(apires) {
     
     apires.setEncoding('utf8');
     
@@ -209,7 +260,7 @@ function dopost(postjson, callback) {
         
         if (resultjson[callname+'Response'].hasOwnProperty('CorrelationID')) {
           
-          var logdir = '/var/www/listers.in/logs/apicall/' + callname;
+          var logdir = '/var/www/' + config.hostname + '/logs/apicall/' + callname;
           if (!fs.existsSync(logdir)) fs.mkdirSync(logdir);
           
           if (resultjson[callname+'Response'].hasOwnProperty('Timestamp')) {
@@ -219,13 +270,6 @@ function dopost(postjson, callback) {
           }
           
           var correlationid = resultjson[callname+'Response'].CorrelationID.split(' ');
-          
-          /*
-          if (callname == 'GetMemberMessages') {
-            var logfile = logdir + '/' + correlationid.join('_') + '.xml';
-            fs.writeFile(logfile, resultxml);
-          }
-          */
           
           getemailfromtokenmap(correlationid[0], function(email) {
             correlationid[0] = email;
@@ -237,17 +281,18 @@ function dopost(postjson, callback) {
           
         } else {
           
-          console.dir(resultjson);
+          var logdir = '/var/www/' + config.hostname + '/logs/apicall/' + callname;
+          if (!fs.existsSync(logdir)) fs.mkdirSync(logdir);
+          
+          var logfile = logdir + '/error.xml';
+          fs.writeFile(logfile, resultxml);
+          
           callback(null, resultjson[callname+'Response']);
           
         }
       });  
     });
   });
-  
-  var logdir = '/var/www/listers.in/logs/apicall';
-  var logfile = logdir + '/' + postjson.callname + '/req.xml';
-  fs.writeFile(logfile, requestxml);
   
   req.write(requestxml);
   

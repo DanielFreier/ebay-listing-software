@@ -6,6 +6,9 @@ var async  = require('async');
 var clone  = require('clone');
 var fs     = require('fs');
 var ObjectID = require('mongodb').ObjectID;
+var nodemailer = require('nodemailer');
+var emailTemplates = require('email-templates')
+var crypto = require('crypto');
 
 var now = new Date();
 
@@ -63,273 +66,11 @@ exports.items = function(req, res) {
 
 exports.item = function(req, res) {
   
-  var zonestr = req.user.timezone.replace(/^GMT/, '');
-  
-  var json = {};
-  var item = {};
-  var mod  = {};
-  var org  = {};
-  var opt  = {};
-  
-  /* handling post parameters */
-  var id = req.body.id;
-  
-  /* query */
-  var query = {
-    _id: ObjectID(id)
-  };
-  
-  async.series([
-    
-    function(callback) {
-      mongo(function(db) {
-        db.collection('items.' + req.user._id, function(err, itemcoll) {
-          itemcoll.findOne(query, function(err, doc) {
-            
-            item = doc;
-            item.id = item._id;
-            
-            if (!item.hasOwnProperty('org')) item.org = {};
-            if (!item.hasOwnProperty('opt')) item.opt = {};
-            org = item.org;
-            opt = item.opt;
-            
-            callback(null, 'item');
-          });
-        }); // collection
-      }); // mongo
-    },
-    
-    /* PrimaryCategory */
-    function(callback) {
-      if (item.mod.hasOwnProperty('PrimaryCategory')) {
-        mapcategoryid(item.mod.Site, item.mod.PrimaryCategory.CategoryID, 
-                      function(err, categoryid) {
-                        item.mod.PrimaryCategory.CategoryID = categoryid;
-                        callback(null, 'PrimaryCategory');
-                      });
-      } else {
-        callback(null, 'PrimaryCategory');
-      }
-    },
-    
-    /* SecondaryCategory */
-    function(callback) {
-      if (item.mod.hasOwnProperty('SecondaryCategory')) {
-        mapcategoryid(item.mod.Site, item.mod.SecondaryCategory.CategoryID, 
-                      function(err, categoryid) {
-                        item.mod.SecondaryCategory.CategoryID = categoryid;
-                        callback(null, 'SecondaryCategory');
-                      });
-      } else {
-        callback(null, 'SecondaryCategory');
-      }
-    },
-    
-    function(callback) {
-      
-      if (item.mod.hasOwnProperty('PrimaryCategory')) {
-        
-        /* categorypath */
-        // todo: update old categoryid to current active categoryid
-        categorypath(item.mod.Site, item.mod.PrimaryCategory.CategoryID, function(err, path) {
-          
-          console.dir(path);
-          item.categorypath = path;
-          
-          /* grandchildren */
-          var pathstr = clone(path);
-          pathstr.unshift('0');
-          for (var i = 0; i < path.length; i++) {
-            pathstr[i+1] = path[i].toString();
-          }
-          
-          children2(item.mod.Site, pathstr, function(err, children2result) {
-            
-            json.Categories = children2result.Categories;
-            
-            categorypath2(item.mod.Site, item.mod.PrimaryCategory.CategoryID, function(err, path2) {
-              
-              item.categorypath2 = path2;
-              
-              callback(null, 'PrimaryCategory-path');
-            });
-          });
-          
-        });
-        
-      } else {
-        
-        /* grandchildren */
-        var pathstr = ['0'];
-        children2(item.mod.Site, pathstr, function(err, children2result) {
-          json.Categories = children2result.Categories;
-          callback(null, 'PrimaryCategory-0');
-        });
-      }
-    },
-    
-    function(callback) {
-      
-      if (item.mod.hasOwnProperty('SecondaryCategory')) {
-        
-        /* categorypath */
-        // todo: update old categoryid to current active categoryid
-        categorypath(item.mod.Site, item.mod.SecondaryCategory.CategoryID, function(err, path) {
-          
-          console.dir(path);
-          item.categorypath = path;
-          
-          /* grandchildren */
-          var pathstr = clone(path);
-          pathstr.unshift('0');
-          for (var i = 0; i < path.length; i++) {
-            pathstr[i+1] = path[i].toString();
-          }
-          
-          children2(item.mod.Site, pathstr, function(err, children2result) {
-            json.SecondaryCategories = children2result.Categories;
-            callback(null, 'SecondaryCategory-path');
-          });
-        });
-        
-      } else {
-        
-        /* grandchildren */
-        var pathstr = ['0'];
-        children2(item.mod.Site, pathstr, function(err, children2result) {
-          json.SecondaryCategories = children2result.Categories;
-          callback(null, 'SecondaryCategory-0');
-        });
-      }
-    },
-    
-    function(callback) {
-      
-      /* ListingDesigner */
-      json.DescriptionTemplate = '';
-      if (item.mod.hasOwnProperty('ListingDesigner')) {
-        if (item.mod.ListingDesigner.hasOwnProperty("ThemeID")) {
-          
-          var themeid = item.mod.ListingDesigner.ThemeID.toString();
-          var colldtname = item.mod.Site + '.DescriptionTemplates.DescriptionTemplate';
-          
-          mongo(function(db) {
-            db.collection(colldtname, function(err, colldt) {
-              colldt.findOne({ID: themeid}, function(err, doc) {
-                
-                item.ListingDesigner = {
-                  GroupID: doc.GroupID
-                }
-                
-                _descriptiontemplate(item.mod.Site, doc.GroupID, function(err, dtres) {
-                  json.DescriptionTemplate = dtres;
-                  callback(null, 'ListingDesigner');
-                  return;
-                });
-                
-              }); // findOne
-            }); // collection
-          }); // mongo
-        } else {
-          callback(null, 'ListingDesigner');
-        }
-      } else {
-        callback(null, 'ListingDesigner');
-      }
-    },
-    
-    /* ScheduleTime */
-    function(callback) {
-      
-      if (item.mod.hasOwnProperty('ScheduleTime')) {
-        
-        /* Scheduled on eBay but not submitted yet */
-        item.mod.ScheduleTime = 
-          moment(item.mod.ScheduleTime).zone(zonestr).format('YYYY-MM-DD HH:mm');
-        
-      } else if (item.org.hasOwnProperty('ListingDetails')) {
-        
-        /* Imported scheduled item from ebay */
-        var listingdetails = item.org.ListingDetails;
-        
-        if (listingdetails.hasOwnProperty('StartTime')) {
-          var starttime = moment(listingdetails.StartTime);
-          var now = moment();
-          if (starttime.isAfter(now)) {
-            item.mod.ScheduleTime = starttime.zone(zonestr).format('YYYY-MM-DD HH:mm');
-            item.opt.ScheduleType = 'ebay';
-          }
-        }
-        
-      } else if (item.opt.hasOwnProperty('ScheduleTime')) {
-        
-        /* Scheduled on ListersIn */
-        item.mod.ScheduleTime = 
-          moment(item.opt.ScheduleTime).zone(zonestr).format('YYYY-MM-DD HH:mm');
-        
-      }
-      
-      callback(null, 'ScheduleTime');
-    },
-    
-    /* eBayDetails */
-    function(callback) {
-      mongo(function(db) {
-        db.collection(item.mod.Site + '.eBayDetails', function(err, coll) {
-          coll.findOne({}, function(err, document) {
-            console.log('eBayDetails site:' + item.mod.Site);
-            json.eBayDetails = document;
-            callback(null, 'eBayDetails');
-          }); // findOne
-        }); // collection
-      }); // mongo
-    },
-    
-    /* CategoryFeatures */
-    function(callback) {
-      mongo(function(db) {
-        db.collection(item.mod.Site + '.CategoryFeatures', function(err, coll) {
-          coll.findOne({}, function(err, document) {
-            json.CategoryFeatures = document;
-            callback(null, 'CategoryFeatures');
-          }); // findOne
-        }); // collection
-      }); // mongo
-    },
-    
-    /* ThemeGroup */
-    function(callback) {
-      
-      var rows = {}
-      
-      mongo(function(db) {
-        db.collection(item.mod.Site + '.DescriptionTemplates.ThemeGroup', function(err, coll) {
-          coll.find().toArray(function(err, docs) {
-            
-            docs.forEach(function(doc) {
-              rows[doc._id] = doc;
-            });
-            json.ThemeGroup = rows;
-            
-            callback(null, 'DescriptionTemplates');
-          }); // find
-        }); // collection
-      }); // mongo
-    }
-    
-  ], function(err, results) {
-    
-    //console.log('last callback');
-    //console.dir(results);
-    
-    json.item = item;
-    json.message = req.user.message;
-    
+  _item(req.user, req.body.id, function(err, result) {
+    result.message = req.user.message;
     res.json({
-      json: json
+      json: result
     });
-    
   });
   
 } // item()
@@ -1046,8 +787,186 @@ exports.relist = function(req, res) {
   
 } // relist()
 
+exports.revise = function(req, res) {
+  
+  if (req.body.hasOwnProperty('id')) {
+    
+    var ids = [];
+    
+    if (Array.isArray(req.body.id)) {
+      for (var i = 0; i < req.body.id.length; i++) {
+        ids.push(ObjectID(req.body.id[i]));
+      }
+    } else {
+      ids.push(ObjectID(req.body.id));
+    }
+    
+    var taskid = 'revise_' + moment().format('YYYY-MM-DD_HH-mm-ss');
+    
+    var query = {
+      _id: {
+        $in: ids
+      }
+    };
+    
+    var update = {
+      $set: {
+        status: taskid
+      }
+    };
+    
+    mongo(function(db) {
+      db.collection('items.' + req.user._id, function(err, itemcoll) {
+        
+        itemcoll.find(query).count(function(err, count) {
+          
+          updatemessage(req.user.email, true, 'Revising ' + count + ' items.');
+          
+          res.json({
+            json: {
+              message: {
+                datetime: now,
+                hasnext: true,
+                message: 'Revising ' + count + ' items.'
+              }
+            }
+          });
+          
+          itemcoll.update(query, update, {multi: true});
+          
+          var args = ['ReviseItem', req.user.email, taskid];
+          writesocket_async(args);
+          
+        });
+        
+      }); // collection
+    }); // mongo
+    
+  } // if (req.body.hasOwnProperty('id'))
+  
+} // revise()
+
+exports.verifyadditem = function(req, res) {
+  
+  if (req.body.hasOwnProperty('id')) {
+    
+    var ids = [];
+    
+    if (Array.isArray(req.body.id)) {
+      for (var i = 0; i < req.body.id.length; i++) {
+        ids.push(ObjectID(req.body.id[i]));
+      }
+    } else {
+      ids.push(ObjectID(req.body.id));
+    }
+    
+    var taskid = 'verify_' + moment().format('YYYY-MM-DD_HH-mm-ss');
+    
+    var query = {
+      _id: {
+        $in: ids
+      }
+    };
+    
+    var update = {
+      $set: {
+        status: taskid
+      }
+    };
+    
+    mongo(function(db) {
+      db.collection('items.' + req.user._id, function(err, itemcoll) {
+        
+        itemcoll.find(query).count(function(err, count) {
+          
+          updatemessage(req.user.email, true, 'Verifing ' + count + ' items.');
+          
+          res.json({
+            json: {
+              message: {
+                datetime: now,
+                hasnext: true,
+                message: 'Verifing ' + count + ' items.'
+              }
+            }
+          });
+          
+          itemcoll.update(query, update, {multi: true});
+          
+          var args = ['VerifyAddItem', req.user.email, taskid];
+          writesocket_async(args);
+          
+        });
+        
+      }); // collection
+    }); // mongo
+    
+  } // if (req.body.hasOwnProperty('id'))
+  
+} // verifyadditem()
+
+exports.add = function(req, res) {
+  
+  if (req.body.hasOwnProperty('id')) {
+    
+    var ids = [];
+    
+    if (Array.isArray(req.body.id)) {
+      for (var i = 0; i < req.body.id.length; i++) {
+        ids.push(ObjectID(req.body.id[i]));
+      }
+    } else {
+      ids.push(ObjectID(req.body.id));
+    }
+    
+    var taskid = 'add_' + moment().format('YYYY-MM-DD_HH-mm-ss');
+    
+    var query = {
+      _id: {
+        $in: ids
+      }
+    };
+    
+    var update = {
+      $set: {
+        status: taskid
+      }
+    };
+    
+    mongo(function(db) {
+      db.collection('items.' + req.user._id, function(err, itemcoll) {
+        
+        itemcoll.find(query).count(function(err, count) {
+          
+          updatemessage(req.user.email, true, 'Listing ' + count + ' items.');
+          
+          res.json({
+            json: {
+              message: {
+                datetime: now,
+                hasnext: true,
+                message: 'Listing ' + count + ' items.'
+              }
+            }
+          });
+          
+          itemcoll.update(query, update, {multi: true});
+          
+          var args = ['AddItems', req.user.email, taskid];
+          writesocket_async(args);
+          
+        });
+        
+      }); // collection
+    }); // mongo
+    
+  } // if (req.body.hasOwnProperty('id'))
+  
+} // add
+
 exports.import_java = function(req, res) {
   
+  /* GetSellerList */
   var args = [
     'GetSellerList',
     req.user.email,
@@ -1056,6 +975,17 @@ exports.import_java = function(req, res) {
     req.body.datestart,
     req.body.dateend,
     'ReturnAll'
+  ];
+  
+  writesocket_async(args);
+  
+  /* GetMemberMessages */
+  args = [
+    'GetMemberMessages',
+    req.user.email,
+    req.body.userid,
+    req.body.datestart + 'T00:00:00.000Z',
+    req.body.dateend + 'T00:00:00.000Z'
   ];
   
   writesocket_async(args);
@@ -1082,13 +1012,551 @@ exports.descriptiontemplate = function(req, res) {
   
 } // descriptiontemplate
 
+exports.signup = function(req, res) {
+  
+  if (!req.body.hasOwnProperty('email')
+      || !req.body.hasOwnProperty('password')
+      || !req.body.hasOwnProperty('password2')) {
+    
+    res.json({
+      json: {
+        resultmessage: 'Please fill forms.',
+        result: false
+      }
+    });
+    
+    return;
+  }  
+  
+  if (req.body.email == '' || req.body.password == '' || req.body.password2 == '') {
+    res.json({
+      json: {
+        resultmessage: 'Please fill forms.',
+        result: false
+      }
+    });
+    
+    return;
+  } 
+  
+  if (req.body.password != req.body.password2) {
+    
+    res.json({
+      json: {
+        resultmessage: 'Password mismatch.',
+        result: false
+      }
+    });
+    
+    return;
+  }
+  
+  /* check existing user */
+  mongo(function(db) {
+    db.collection('users', function(err, coll) {
+      coll.findOne({email: req.body.email}, function(err, user) {
+        
+        if (user != null) {
+          
+          res.json({
+            json: {
+              resultmessage: 'Sorry, this email already exists.',
+              result: false
+            }
+          });
+          
+        } else {
+          
+          // todo: password encryption
+          crypto.randomBytes(20, function(err, buf) {
+            
+            var tmptoken = buf.toString('hex');
+            //console.log('random: ' + tmptoken);
+            
+            var tmptoken_expiration = '';
+            
+            var field = {
+              email: req.body.email,
+              password: req.body.password,
+              tmptoken: tmptoken,
+              tmptoken_expiration: tmptoken_expiration,
+              status: 'temporary registration',
+              language: 'English',
+              timezone: 'GMT-08:00',
+              itemlimit: '100',
+              created_at: now,
+              lastused_at: now
+            };
+            
+            coll.insert(field);
+            
+            res.json({
+              json: {
+                resultmessage: req.body.email,
+                result: true
+              }
+            });
+            
+            var emaildata = {
+              tmptoken: tmptoken
+            };
+            
+            send_signup_confirm_mail(req.body.email, emaildata);
+            
+          }); // randomBytes
+          
+        }
+        
+      }); // findOne
+    }); // collection
+  }); // mongo
+  
+} // signup
+
+exports.forgotpassword = function(req, res) {
+  
+  /* check existing user */
+  mongo(function(db) {
+    db.collection('users', function(err, coll) {
+      coll.findOne({email: req.body.fpemail}, function(err, user) {
+        
+        if (user == null) {
+          
+          res.json({
+            json: {
+              message: 'The email address is not registered.',
+              result: false
+            }
+          });
+          
+        } else {
+          
+          // todo: password encryption
+          crypto.randomBytes(20, function(err, buf) {
+            
+            var tmptoken = buf.toString('hex');
+            var tmptoken_expiration = '';
+            
+            coll.update(
+              {
+                email: req.body.fpemail
+              },
+              {
+                $set : {
+                  tmptoken: tmptoken
+                }
+              }
+            );
+            
+            res.json({
+              json: {
+                message: req.body.fpemail,
+                result: true
+              }
+            });
+            
+            var emaildata = {
+              tmptoken: tmptoken
+            };
+            
+            sendmail('Password reset for ListersIn',
+                     'forgotpassword',
+                     req.body.fpemail, 
+                     emaildata);
+            
+          }); // randomBytes
+          
+        }
+        
+      }); // findOne
+    }); // collection
+  }); // mongo
+  
+} // forgotpassword
+
+exports.resetpassword = function(req, res) {
+  
+  if (!req.body.hasOwnProperty('email')
+      || !req.body.hasOwnProperty('password')
+      || !req.body.hasOwnProperty('password2')) {
+    
+    res.json({
+      json: {
+        resultmessage: 'Please fill forms.',
+        result: false
+      }
+    });
+    
+    return;
+  }  
+  
+  if (req.body.email == '' || req.body.password == '' || req.body.password2 == '') {
+    res.json({
+      json: {
+        resultmessage: 'Please fill forms.',
+        result: false
+      }
+    });
+    
+    return;
+  } 
+  
+  if (req.body.password != req.body.password2) {
+    
+    res.json({
+      json: {
+        resultmessage: 'Password mismatch.',
+        result: false
+      }
+    });
+    
+    return;
+  }
+  
+  var query = {
+    email: req.body.email
+  };
+  
+  mongo(function(db) {
+    db.collection('users', function(err, coll) {
+      coll.findOne(query, function(err, user) {
+        
+        if (user != null) {
+          coll.update(
+            query,
+            {
+              $set: {
+                password: req.body.password,
+                tmptoken: ''
+              }
+            },
+            function(err, result) {
+              res.json({
+                json: {
+                  result: true
+                }
+              });
+            }
+          );
+        }
+        
+      }); // findOne
+    }); // collection
+  }); // mongo
+  
+} // resetpassword
+
+exports.save = function(req, res) {
+  
+  var id   = req.body.id;
+  var form = req.body.json;
+  
+  var item = JSON.parse(form);
+  var mod  = item.mod;
+  var opt  = item.opt;
+  var setting = item.setting;
+  var shippingdetails = item.ShippingDetails;
+  
+  /* ScheduleTime */
+  if (mod.hasOwnProperty('ScheduleTime')) {
+    
+    var scheduletimestr = mod.ScheduleTime;
+    
+    var zonestr = req.user.timezone.replace(/^GMT/, '');
+    
+    var scheduletime = moment(scheduletimestr + zonestr);
+    
+    console.log(scheduletimestr);
+    console.dir(scheduletime);
+    
+    if (opt.ScheduleType == 'ebay') {
+      mod.ScheduleTime = scheduletime._d;
+      delete opt.ScheduleTime;
+    } else if (opt.ScheduleType == 'listersin') {
+      delete mod.ScheduleTime;
+      opt.ScheduleTime = scheduletime._d;
+    } else {
+      delete mod.ScheduleTime;
+      delete opt.ScheduleTime;
+      delete opt.ScheduleType;
+    }
+    
+  } else {
+    delete mod.ScheduleTime;
+    delete opt.ScheduleTime;
+    delete opt.ScheduleType;
+  } // mod.hasOwnProperty('ScheduleTime')
+  
+  /* int */
+  for (var i=0; i<config.intfield.length; i++) {
+    
+    var modref = mod;
+    var path = config.intfield[i].split('.');
+    while (path.length > 0) {
+      if (!modref.hasOwnProperty(path[0])) break;
+      
+      if (path.length == 1) {
+        modref[path[0]] = parseInt(modref[path[0]]);
+        break;
+      }
+      
+      var shifted = path.shift();
+      modref = modref[shifted];
+    }
+  }
+  
+  /* double */
+  for (var i=0; i<config.doublefield.length; i++) {
+    
+    var modref = mod;
+    var path = config.doublefield[i].split('.');
+    while (path.length > 0) {
+      if (!modref.hasOwnProperty(path[0])) break;
+      
+      if (path.length == 1) {
+        modref[path[0]] = parseFloat(modref[path[0]]);
+        break;
+      }
+      
+      var shifted = path.shift();
+      modref = modref[shifted];
+    }
+  }
+  
+  /* date */
+  /*
+  for (var i=0; i<config.datefield.length; i++) {
+    
+    var modref = mod;
+    var path = config.datefield[i].split('.');
+    while (path.length > 0) {
+      if (!modref.hasOwnProperty(path[0])) break;
+      
+      if (path.length == 1) {
+        //modref[path[0]] = 'ISODate(' + modref[path[0]] + ')';
+        modref[path[0]] = moment(modref[path[0]])._d;
+        break;
+      }
+      
+      var shifted = path.shift();
+      modref = modref[shifted];
+    }
+  }
+  */
+  
+  var orgexists = false;
+  var taskid = 'verifyadditem_' + moment().format('YYYY-MM-DD_HH-mm-ss');
+  
+  mongo(function(db) {
+    db.collection('items.' + req.user._id, function(err, coll) {
+      
+      async.series([
+        
+        /* Save sorted json before update */
+        function(callback) {
+          
+          if (id == 'newitem0') {
+            callback(null, null);
+            return;
+          }
+          
+          coll.findOne({_id: ObjectID(id)}, function(err, before) {
+            
+            if (before.hasOwnProperty('org')) {
+              orgexists = true;
+            }
+            
+            fs.writeFile('/var/www/' + config.hostname + '/logs/diff/'
+                         + item.UserID + '.' + id + '.0.org.js',
+                         JSON.stringify(sortObject(before), null, 2));
+            
+            callback(null, null);
+          });
+        },
+        
+        /* Save posted item data */
+        function(callback) {
+          
+          if (id == 'newitem0') {
+            
+            /* save new item */
+            var newid = ObjectID();
+            id = newid.toString();
+            
+            var newitem = {
+              _id: newid,
+              mod: mod,
+              opt: opt,
+              UserID: item.UserID,
+              status: taskid
+            };
+            
+            coll.insert(newitem, callback);
+            
+          } else {
+            
+            /* update existing item */
+            var set = {
+              mod: mod,
+              opt: opt,
+              UserID: item.UserID
+            }
+            if (!orgexists) {
+              set.status = taskid;
+            }
+            
+            coll.update({_id: ObjectID(id)}, {$set: set}, callback);
+          }
+        },
+        
+        /* Save sorted json after update */
+        function(callback) {
+          
+          callback(null, null);
+          
+          coll.findOne({
+            _id: ObjectID(id)
+          }, function(err, after) {
+            
+            fs.writeFile('/var/www/' + config.hostname + '/logs/diff/'
+                         + item.UserID + '.' + id + '.1.new.js',
+                         JSON.stringify(sortObject(after), null, 2));
+            
+          });
+        },
+        
+        /* VerifyAddItem */
+        function(callback) {
+          
+          if (req.user.email == 'demo@listers.in') {
+            callback(null, null);
+            return;
+          }
+          if (orgexists) {
+            callback(null, null);
+            return;
+          }
+          
+          /* VerifyAddItem */
+          var args = ['VerifyAddItem', req.user.email, taskid];
+          writesocket(args, function() {
+            console.log('verify callback');
+            callback(null, null);
+          });
+        }
+        
+      ], function(err, results) {
+        
+        console.dir(results);
+        
+        _item(req.user, id, function(err, result) {
+          result.message = req.user.message;
+          res.json({
+            json: result
+          });
+        });
+        
+      }); // async.series
+      
+    }); // collection
+  }); // mongo
+  
+} // exports.save
+
+exports.orders = function(req, res) {
+  
+} // exports.orders
+
+exports.addmembermessagertq = function(req, res) {
+  
+  /* AddMemberMessageRTQ */
+  var args = [
+    'AddMemberMessageRTQ',
+    req.user.email,
+    req.body.userid,
+    req.body.itemid,
+    req.body.parent,
+    req.body.body.replace(/\n/g, "\\n")
+  ];
+  
+  writesocket(args, function(err, result) {
+    
+    /* GetMemberMessage */
+    args = [
+      'GetMemberMessages',
+      req.user.email,
+      req.body.userid,
+      req.body.itemid
+    ];
+    
+    writesocket(args, function(err, result) {
+      res.json({
+        json: {
+          result: result
+        }
+      });
+    });
+    
+  }); // writesocket
+  
+} // addmembermessagertq
+
+exports.findproducts = function(req, res) {
+  
+  async.parallel({
+    
+    categories: function(callback) {
+      
+      var apimodule = require('./ebayapi/GetSuggestedCategories');
+      
+	    var reqjson = {
+        email:   req.user.email,
+        userid:  req.body.userid,
+        site:    req.body.site,
+        keyword: req.body.keyword
+      };
+      
+      apimodule.call(reqjson, callback);
+      
+    }, // categories
+    
+    products: function(callback) {
+      
+      var apimodule = require('./ebayapi/FindProducts');
+      
+	    var reqjson = {
+        email:    req.user.email,
+        userid:   req.body.userid,
+        site:     req.body.site,
+        findtype: req.body.findtype,
+        keyword:  req.body.keyword
+      };
+      
+      apimodule.call(reqjson, callback);
+      
+    } // products
+    
+  }, function(err, results) {
+    
+		res.json({
+			json: {
+        categories: results.categories,
+        result:     results.products,
+        message:    req.user.message
+      }
+		});
+    
+  }); // async.parallel
+  
+} // findproducts
+
 exports.savedebugjson = function(req, res) {
   
   var org = JSON.parse(req.body.json);
   
   var sorted = sortObject(org.json);
   
-  var filename = '/var/www/listers.in/logs/diff/';
+  var filename = '/var/www/' + config.hostname + '/logs/diff/';
   filename += req.user.email.replace(/@.+$/, '') + '.' + req.body.filename + '.json';
   
   fs.writeFile(filename, JSON.stringify(sorted, null, 2));
@@ -1444,7 +1912,271 @@ function _items(req, callback) {
       }); // count
     }); // collection
   }); // mongo
-}
+  
+} // _items()
+
+function _item(user, id, callback) {
+  
+  var zonestr = user.timezone.replace(/^GMT/, '');
+  
+  var json = {};
+  var item = {};
+  var mod  = {};
+  var org  = {};
+  var opt  = {};
+  
+  /* query */
+  var query = {
+    _id: ObjectID(id)
+  };
+  
+  async.series([
+    
+    function(callback) {
+      mongo(function(db) {
+        db.collection('items.' + user._id, function(err, itemcoll) {
+          itemcoll.findOne(query, function(err, doc) {
+            
+            item = doc;
+            item.id = item._id;
+            
+            if (!item.hasOwnProperty('org')) item.org = {};
+            if (!item.hasOwnProperty('opt')) item.opt = {};
+            org = item.org;
+            opt = item.opt;
+            
+            callback(null, 'item');
+          });
+        }); // collection
+      }); // mongo
+    },
+    
+    /* PrimaryCategory */
+    function(callback) {
+      if (item.mod.hasOwnProperty('PrimaryCategory')) {
+        mapcategoryid(item.mod.Site, item.mod.PrimaryCategory.CategoryID, 
+                      function(err, categoryid) {
+                        item.mod.PrimaryCategory.CategoryID = categoryid;
+                        callback(null, 'PrimaryCategory');
+                      });
+      } else {
+        callback(null, 'PrimaryCategory');
+      }
+    },
+    
+    /* SecondaryCategory */
+    function(callback) {
+      if (item.mod.hasOwnProperty('SecondaryCategory')) {
+        mapcategoryid(item.mod.Site, item.mod.SecondaryCategory.CategoryID, 
+                      function(err, categoryid) {
+                        item.mod.SecondaryCategory.CategoryID = categoryid;
+                        callback(null, 'SecondaryCategory');
+                      });
+      } else {
+        callback(null, 'SecondaryCategory');
+      }
+    },
+    
+    function(callback) {
+      
+      if (item.mod.hasOwnProperty('PrimaryCategory')) {
+        
+        /* categorypath */
+        // todo: update old categoryid to current active categoryid
+        categorypath(item.mod.Site, item.mod.PrimaryCategory.CategoryID, function(err, path) {
+          
+          console.dir(path);
+          item.categorypath = path;
+          
+          /* grandchildren */
+          var pathstr = clone(path);
+          pathstr.unshift('0');
+          for (var i = 0; i < path.length; i++) {
+            pathstr[i+1] = path[i].toString();
+          }
+          
+          children2(item.mod.Site, pathstr, function(err, children2result) {
+            
+            json.Categories = children2result.Categories;
+            
+            categorypath2(item.mod.Site, item.mod.PrimaryCategory.CategoryID, function(err, path2) {
+              
+              item.categorypath2 = path2;
+              
+              callback(null, 'PrimaryCategory-path');
+            });
+          });
+          
+        });
+        
+      } else {
+        
+        /* grandchildren */
+        var pathstr = ['0'];
+        children2(item.mod.Site, pathstr, function(err, children2result) {
+          json.Categories = children2result.Categories;
+          callback(null, 'PrimaryCategory-0');
+        });
+      }
+    },
+    
+    function(callback) {
+      
+      if (item.mod.hasOwnProperty('SecondaryCategory')) {
+        
+        /* categorypath */
+        // todo: update old categoryid to current active categoryid
+        categorypath(item.mod.Site, item.mod.SecondaryCategory.CategoryID, function(err, path) {
+          
+          console.dir(path);
+          item.categorypath = path;
+          
+          /* grandchildren */
+          var pathstr = clone(path);
+          pathstr.unshift('0');
+          for (var i = 0; i < path.length; i++) {
+            pathstr[i+1] = path[i].toString();
+          }
+          
+          children2(item.mod.Site, pathstr, function(err, children2result) {
+            json.SecondaryCategories = children2result.Categories;
+            callback(null, 'SecondaryCategory-path');
+          });
+        });
+        
+      } else {
+        
+        /* grandchildren */
+        var pathstr = ['0'];
+        children2(item.mod.Site, pathstr, function(err, children2result) {
+          json.SecondaryCategories = children2result.Categories;
+          callback(null, 'SecondaryCategory-0');
+        });
+      }
+    },
+    
+    function(callback) {
+      
+      /* ListingDesigner */
+      json.DescriptionTemplate = '';
+      if (item.mod.hasOwnProperty('ListingDesigner')) {
+        if (item.mod.ListingDesigner.hasOwnProperty("ThemeID")) {
+          
+          var themeid = item.mod.ListingDesigner.ThemeID.toString();
+          var colldtname = item.mod.Site + '.DescriptionTemplates.DescriptionTemplate';
+          
+          mongo(function(db) {
+            db.collection(colldtname, function(err, colldt) {
+              colldt.findOne({ID: themeid}, function(err, doc) {
+                
+                item.ListingDesigner = {
+                  GroupID: doc.GroupID
+                }
+                
+                _descriptiontemplate(item.mod.Site, doc.GroupID, function(err, dtres) {
+                  json.DescriptionTemplate = dtres;
+                  callback(null, 'ListingDesigner');
+                  return;
+                });
+                
+              }); // findOne
+            }); // collection
+          }); // mongo
+        } else {
+          callback(null, 'ListingDesigner');
+        }
+      } else {
+        callback(null, 'ListingDesigner');
+      }
+    },
+    
+    /* ScheduleTime */
+    function(callback) {
+      
+      if (item.mod.hasOwnProperty('ScheduleTime')) {
+        
+        /* Scheduled on eBay but not submitted yet */
+        item.mod.ScheduleTime = 
+          moment(item.mod.ScheduleTime).zone(zonestr).format('YYYY-MM-DD HH:mm');
+        
+      } else if (item.org.hasOwnProperty('ListingDetails')) {
+        
+        /* Imported scheduled item from ebay */
+        var listingdetails = item.org.ListingDetails;
+        
+        if (listingdetails.hasOwnProperty('StartTime')) {
+          var starttime = moment(listingdetails.StartTime);
+          var now = moment();
+          if (starttime.isAfter(now)) {
+            item.mod.ScheduleTime = starttime.zone(zonestr).format('YYYY-MM-DD HH:mm');
+            item.opt.ScheduleType = 'ebay';
+          }
+        }
+        
+      } else if (item.opt.hasOwnProperty('ScheduleTime')) {
+        
+        /* Scheduled on ListersIn */
+        item.mod.ScheduleTime = 
+          moment(item.opt.ScheduleTime).zone(zonestr).format('YYYY-MM-DD HH:mm');
+        
+      }
+      
+      callback(null, 'ScheduleTime');
+    },
+    
+    /* eBayDetails */
+    function(callback) {
+      mongo(function(db) {
+        db.collection(item.mod.Site + '.eBayDetails', function(err, coll) {
+          coll.findOne({}, function(err, document) {
+            console.log('eBayDetails site:' + item.mod.Site);
+            json.eBayDetails = document;
+            callback(null, 'eBayDetails');
+          }); // findOne
+        }); // collection
+      }); // mongo
+    },
+    
+    /* CategoryFeatures */
+    function(callback) {
+      mongo(function(db) {
+        db.collection(item.mod.Site + '.CategoryFeatures', function(err, coll) {
+          coll.findOne({}, function(err, document) {
+            json.CategoryFeatures = document;
+            callback(null, 'CategoryFeatures');
+          }); // findOne
+        }); // collection
+      }); // mongo
+    },
+    
+    /* ThemeGroup */
+    function(callback) {
+      
+      var rows = {}
+      
+      mongo(function(db) {
+        db.collection(item.mod.Site + '.DescriptionTemplates.ThemeGroup', function(err, coll) {
+          coll.find().toArray(function(err, docs) {
+            
+            docs.forEach(function(doc) {
+              rows[doc._id] = doc;
+            });
+            json.ThemeGroup = rows;
+            
+            callback(null, 'DescriptionTemplates');
+          }); // find
+        }); // collection
+      }); // mongo
+    }
+    
+  ], function(err, results) {
+    
+    json.item = item;
+    callback(null, json);
+    
+  });
+  
+} // _item()
 
 function updatemessage(email, hasnext, message) {
   
@@ -1474,11 +2206,105 @@ function writesocket_async(args) {
   var net = require('net');
   
   var socket = new net.Socket();
-  socket.connect(8282, 'localhost');
+  socket.connect(config.daemonport, 'localhost');
   socket.on('connect', function() {
     socket.write(args.join("\n") + "\n", function() {
       socket.end();
     });
   });
+  
+}
+
+function writesocket(args, callback) {
+  
+  var net = require('net');
+  
+  var socket = new net.Socket();
+  socket.connect(config.daemonport, 'localhost');
+  socket.on('connect', function() {
+    socket.write(args.join("\n") + "\n", function(err, result) {
+      socket.end();
+    });
+  });
+  
+  socket.on('close', function() {
+    callback(null, null);
+  });
+  
+}
+
+function send_signup_confirm_mail(emailto, emaildata) {
+  
+  /* Send confirmation mail */
+  var templatedir = '/var/www/' + config.hostname + '/node/templates';
+  
+  emailTemplates(templatedir, function(err, template) {
+    
+    var smtpTransport = nodemailer.createTransport("SMTP", {
+      host: 'localhost'
+    });
+    
+    template('signup', emaildata, function(err, html, text) {
+      
+      smtpTransport.sendMail(
+        {
+          from: 'ListersIn <support@' + config.hostname + '>',
+          to: emailto,
+          subject: 'Thank you for signing up for ListersIn!',
+          text: text,
+          html: html
+        }, 
+        function(error, response) {
+          
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Message sent: " + response.message);
+          }
+          
+          smtpTransport.close();
+        }
+      ); // sendMail
+    }); // template
+    
+  }); // emailTemplates
+  
+}
+
+function sendmail(subject, templatename, emailto, emaildata) {
+  
+  /* Send confirmation mail */
+  var templatedir = '/var/www/' + config.hostname + '/node/templates';
+  
+  emailTemplates(templatedir, function(err, template) {
+    
+    var smtpTransport = nodemailer.createTransport("SMTP", {
+      host: 'localhost'
+    });
+    
+    template(templatename, emaildata, function(err, html, text) {
+      
+      smtpTransport.sendMail(
+        {
+          from: 'ListersIn <support@' + config.hostname + '>',
+          to: emailto,
+          subject: subject,
+          text: text,
+          html: html
+        }, 
+        function(error, response) {
+          
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Message sent: " + response.message);
+          }
+          
+          smtpTransport.close();
+        }
+      ); // sendMail
+    }); // template
+    
+  }); // emailTemplates
   
 }

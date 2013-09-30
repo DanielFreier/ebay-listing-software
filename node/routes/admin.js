@@ -15,8 +15,8 @@ exports.index = function(req, res) {
     db.collection('users', function(err, collection) {
       
       collection.find().sort({
-        lastused: -1,
-        created: -1,
+        lastused_at: -1,
+        created_at: -1,
         _id: -1
       }).toArray(function(err, users) {
         
@@ -30,10 +30,10 @@ exports.index = function(req, res) {
         
         users.forEach(function(user) {
           if (user.hasOwnProperty('created_at')) {
-            user.created_at = moment(user.created_at).format('MM/DD HH:mm');
+            user.created_at = moment(user.created_at).format('YYYY/MM/DD HH:mm');
           }
           if (user.hasOwnProperty('lastused_at')) {
-            user.lastused_at = moment(user.lastused_at).format('MM/DD HH:mm');
+            user.lastused_at = moment(user.lastused_at).format('YYYY/MM/DD HH:mm');
           }
           
           if (user.hasOwnProperty('userids2')) {
