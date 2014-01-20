@@ -66,6 +66,18 @@ module.exports = {
                       }
                     );
                   }
+                  
+                  collection.update(
+                    {
+                      email: user.email,
+                      'userids2.username': userid.username
+                    },
+                    {
+                      $set: {
+                        'userids2.$.User': resultjson.User
+                      }
+                    }
+                  );
                 }
                 
                 callback(null, null);

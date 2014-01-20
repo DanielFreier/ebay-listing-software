@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+
+    <title>listers.in - eBay Listing Software</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Custom styles for this template -->
+    <link href="/bootstrap-3.0.3/examples/carousel/carousel.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/css/index_bootstrap.css">
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-32099440-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+  </head>
+<!-- NAVBAR
+================================================== -->
+  <body>
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=158640537634051";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+    <div class="navbar-wrapper">
+      <div class="container">
+
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="/">listers.in</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li class="active"><a href="/">Home</a></li>
+                <li><a href="http://listers.in/blog/" target="_blank">Blog</a></li>
+                <li><a href="http://forum.listers.in/" target="_blank">Forum</a></li>
+              </ul>
+              
+              <form method="post" action="/node/login/"
+                    class="navbar-form navbar-right" role="search"
+                    id="signinbox">
+                <div class="form-group" style="margin-right:5px;">
+                  <label class="sr-only" for="exampleInputEmail2">Email address</label>
+                  <input type="email" name="email"
+                         class="form-control input-sm"
+                         id="exampleInputEmail2" placeholder="Email">
+                </div>
+                <div class="form-group" style="margin-right:5px;">
+                  <label class="sr-only" for="exampleInputPassword2">Password</label>
+                  <input type="password" name="password"
+                         class="form-control input-sm"
+                         id="exampleInputPassword2" placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-default btn-sm" id="signinbutton">Sign in</button>
+                <a id="forgotpasswordlink" href="#">Forgot password</a>
+              </form>
+              
+            </div>
+
+				<div id="forgotpassworddiv" style="background-color:#fff; padding:5px; display:none;" class="pull-right">
+					<form method="post" action="">
+						Please input your email address and click button.<br />
+						<input type="text" id="fpemail" name="fpemail" size="40" value=""><br />
+						<button><%= __('SendPasswordResetMail') %></button>
+					</form>
+					<div id="forgotpasswordmessage"></div>
+				</div>
+        
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- Carousel
+    ================================================== -->
+    <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="300000">
+      <!-- Indicators -->
+      <ol class="carousel-indicators">
+        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+      </ol>
+      <div class="carousel-inner">
+        <div class="item active">
+          <img src="/img/screenshot.jpg" style="opacity:0.5">
+          <div class="container">
+            <div class="carousel-caption" style="margin-bottom:60px;">
+              <h1 style="color:black; font-size:40px; font-weight:800;">Light Weight eBay Listing Software</h1>
+              <p style="color:#666;">Manage your listings with simple and easy tool.</p>
+              <p style="margin-top:60px;">
+                <a class="btn btn-lg btn-primary" href="#" role="button" id="trydemo">Try demo</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a class="left carousel-control" href="#myCarousel" data-slide="prev"></a>
+      <a class="right carousel-control" href="#myCarousel" data-slide="next"></a>
+    </div><!-- /.carousel -->
+
+
+
+    <!-- Marketing messaging and featurettes
+    ================================================== -->
+    <!-- Wrap the rest of the page in another container to center all the content. -->
+    
+    <div class="container marketing" style="width:1000px;">
+
+      <div class="row">
+        <div class="col-md-6">
+          
+          <h3 style="margin-top:0;"><%= __('Features') %></h3>
+          <ul>
+		        <li>Manage multiple eBay accounts.</li>
+		        <li>Reply to messages from multiple eBay accounts.</li>
+					  <li>Add "Best Offer" option when unsold item is auto relisted.</li>
+		        <li>Upload 12 pictures for one item to eBay server at once.</li>
+		        <li>Simple and easy user interface.</li>
+		        <li>Find duplicate items by title.</li>
+            <li>FREE.</li>
+          </ul>
+          
+          <h3 style="margin-top:0;"><%= __('Blog') %></h3>
+	    <ul class="blog">
+        <% for (var i=0; i<feeds.blogjson.length; i++) { %>
+		    <li>
+			    <a href="<%= feeds.blogjson[i].link %>" target="_blank">
+            <%= feeds.blogjson[i].title %>
+          </a>
+					<div style="text-align:right; color:#aaa;">
+            <%= feeds.blogjson[i].pubDate %>
+          </div>
+          <% if (locale == 'ja') { %>
+					<p><%- feeds.blogjson[i].description.replace(/<[^>]+>/g, '') %></p>
+          <% } else { %>
+					<p><%- feeds.blogjson[i].description %></p>
+          <% } %>
+		    </li>
+        <% } %>
+	    </ul>
+          
+
+        </div>
+        <div class="col-md-6">
+
+          <div class="panel panel-primary">
+            <div class="panel-heading"><%= __('SignUp') %></div>
+            <div class="panel-body">
+          <form method="post" action="#" class="form-horizontal" role="form"
+                id="signupbox">
+            <div class="form-group">
+              <label for="inputEmail3" class="col-sm-5 control-label">Email</label>
+              <div class="col-sm-7">
+                <input type="email" name="email" class="form-control" id="inputEmail3">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputPassword3" class="col-sm-5 control-label">Password</label>
+              <div class="col-sm-7">
+                <input type="password" name="password" class="form-control" id="inputPassword3">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputPassword3" class="col-sm-5 control-label"><%= __('ConfirmPassword') %></label>
+              <div class="col-sm-7">
+                <input type="password" name="password2" class="form-control" id="inputPassword3">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-5 col-sm-7">
+		            <div id="signupmessage"></div>
+                <button type="submit" class="btn btn-default"><%= __('SignUp') %></button>
+              </div>
+            </div>
+          </form>
+              
+            </div>
+          </div>
+          
+			<div id="logos" class="clearfix">
+				
+				<div id="ebaylogo">
+					<img src="/img/developersprogrammember_vert.png" />
+				</div>
+				
+				<div id="godaddylogo">
+					<span id="siteseal"><script type="text/javascript" src="https://seal.godaddy.com/getSeal?sealID=yll915qgMP7yndpJAjqzM9yakbiWYQYo1WTrUzmLPbgYnnprdG"></script></span>
+				</div>
+				
+				<div id="facebook">
+          <div class="fb-like" data-href="http://listers.in/" data-send="true" 
+               data-width="400" data-show-faces="true"></div>
+				</div>
+				
+				<div id="plusone">
+          
+          <!-- Place this tag where you want the +1 button to render. -->
+          <div class="g-plusone" data-annotation="inline" data-width="400"></div>
+          
+          <!-- Place this tag after the last +1 button tag. -->
+          <script type="text/javascript">
+            (function() {
+            var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+            po.src = 'https://apis.google.com/js/plusone.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+            })();
+          </script>
+          
+				</div>
+				
+			</div>
+          
+      <div id="ebayannoucement">
+	      <h3>eBay Announcement</h3>
+        <a href="/ebay-announcement.php">Sellers should check this information.</a>
+      </div>
+      
+      <div id="githubfeed">
+	      <h3><%= __('DevelopmentTimeline') %></h3>
+        <ul>
+          <% for (var i=0; i<feeds.githubjson.length; i++) { %>
+          <li>
+            <div><%= feeds.githubjson[i].title %></div>
+						<div style="text-align:right; color:#aaa;">
+              <%= feeds.githubjson[i].updated.replace(/-07:00/, '').replace(/2013-/, '').replace(/T/, ' ') %>
+            </div>
+          </li>
+          <% } %>
+        </ul>
+      </div>
+      
+          
+        </div>
+      </div>
+      
+      <!-- FOOTER -->
+      <footer>
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>listers.in - eBay Listing Software</p>
+      </footer>
+
+    </div><!-- /.container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/bootstrap-3.0.3/docs-assets/js/holder.js"></script>
+    <script type="text/javascript" src="/js/index.js"></script>
+  </body>
+</html>

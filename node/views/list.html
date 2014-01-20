@@ -1,43 +1,150 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<link rel="stylesheet" type="text/css" href="/css/index.css">
-<link rel="shortcut icon" href="/img/favicon.png">
-<link rel="canonical" href="http://listers.in/"/>
-<script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
-<script type="text/javascript" src="/js/jquery.dump.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js"></script>
+<html lang="en">
+  <head>
+    <% include list/head %>
+  </head>
+  <body class="navbar-fixed breadcrumbs-fixed">
 
-<script type="text/javascript" src="/js/node/list.js"></script>
-</head>
-<body>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=158640537634051";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+    
+    <div class="navbar navbar-default navbar-fixed-top" id="navbar">
+			<div class="navbar-container" id="navbar-container">
+        <div id="message"></div>
+        <% include list/navbar %>
+      </div>
+    </div>
+    
+		<div class="main-container" id="main-container">
+			<div class="main-container-inner">
+        
+				<div class="sidebar sidebar-fixed" id="sidebar">
+          <% include list/sidebar %>
 
-<div id="container">
-  
-  [<%= __('blog') %>]<br/>
-  [list.html]<br/>
-  [<%= user.email %>]<br/>
-  
-  <table id="items">
-  </table>
-  
-  <% for (var i=0; i<user.userids2.length; i++) { %>
-     [<%= user.userids2[i].username %>]<br/>
-  <% } %>
-  
-</div><!-- container -->
-
-<script id="itemTemplate" type="text/template">
-  <tr>
-    <td>{{mod.Title}}</td>
-    <td>
-      {{mod.StartPrice['@currencyID']}}
-      {{mod.StartPrice['#text']}}
-    </td>
-  </tr>
-</script>
-
-</body>
+          <div id="facebook" style="margin:50px 10px 10px;">
+            <div class="fb-like" data-href="http://listers.in/" 
+                 data-send="true" data-layout="button_count" data-width="150" 
+                 data-show-faces="false"></div>
+          </div>
+          
+        </div>
+        
+				<div class="main-content">
+          <div class="page-content" id="page-content">
+            
+            <div class="breadcrumbs breadcrumbs-fixed" id="breadcrumbs">
+              
+              <div class="pull-left" id="bulkbuttons">
+                
+                <div class="btn-group">
+                  <button class="btn btn-sm disabled" data-action="copy">
+                    <i class="icon-copy"></i>
+                    <%= __('Copy') %>
+                  </button>
+                  <button class="btn btn-sm disabled" data-action="delete">
+                    <i class="icon-remove"></i>
+                    <%= __('Delete') %>
+                  </button>
+                </div>
+                <div class="btn-group">
+                  <button class="btn btn-sm disabled btn-yellow" data-action="add">
+                    <i class="icon-legal"></i>
+                    <%= __('List') %>
+                  </button>
+                  <button class="btn btn-sm disabled btn-yellow" data-action="relist">
+                    <i class="icon-refresh"></i>
+                    <%= __('Relist') %>
+                  </button>
+                  <!--
+                  <button class="btn btn-sm disabled btn-yellow" data-action="revise">
+                    <i class="icon-edit"></i>
+                    <%= __('Revise') %>
+                  </button>
+                  <button class="btn btn-sm disabled btn-yellow" data-action="verifyadditem">
+                    <i class="icon-check"></i>
+                    <%= __('Verify') %>
+                  </button>
+                  -->
+                  <button class="btn btn-sm disabled btn-yellow" data-action="end">
+                    <i class="icon-stop"></i>
+                    <%= __('End') %>
+                  </button>
+                </div>
+                
+						    <div class="nav-search" id="nav-search">
+								  <span class="input-icon">
+									  <input type="text" placeholder="Search ..." 
+                           class="nav-search-input" 
+                           id="nav-search-input" 
+                           autocomplete="off" />
+									  <i class="icon-search nav-search-icon"></i>
+								  </span>
+                </div>
+                
+              </div><!-- /.pull-left -->
+              
+              <div style="display:none;">
+                <% include list/filter %>
+              </div>
+              <div id="listcount" class="pull-right">
+              </div>
+            </div>
+            
+						<!--div class="page-header">
+							<h1>
+								Items
+								<small>
+									<i class="icon-double-angle-right"></i>
+									Mailbox with some customizations as described in docs
+								</small>
+							</h1>
+						</div--><!-- /.page-header -->
+            
+						<div class="row">
+							<div class="col-xs-12">
+                
+                <% include list/items-table %>
+								
+                <div id="settings">
+                  <div class="page-header">
+                    <h1><i class="icon-cog"></i> Settings</h1>
+                  </div>
+                  <% include list/settings %>
+                </div>
+                
+                <div id="help">
+                  <div class="page-header">
+                    <h1><i class="icon-cog"></i> Help</h1>
+                  </div>
+                  <% include list/help %>
+                </div>
+                
+                <div id="debug">
+                  DEBUG
+                </div>
+                
+								<div class="message-loading-overlay hide" id="loading">
+									<i class="icon-spin icon-spinner orange2 bigger-160"></i>
+								</div>
+								
+              </div>
+            </div>
+            
+            <iframe name="posttarget" src="/blank.html"></iframe>
+    
+          </div><!-- /.page-content -->
+        </div><!-- /.main-content -->
+        
+      </div><!-- /.main-container-inner -->
+    </div><!-- /.main-container -->
+    
+    <% include list/foot.ejs %>
+    
+	</body>
 </html>

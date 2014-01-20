@@ -7,6 +7,20 @@ module.exports = {
 	
   call: function(request, callback) {
 		
+    var query = {
+      'userids2.TokenStatus.Status': 'Active'
+    };
+    
+    if (request.hasOwnProperty('email')) {
+      query.email = request.email;
+    }
+    
+    if (request.hasOwnProperty('username')) {
+      query['userids2.username'] = request.username;
+    }
+    
+    console.dir(query);
+    
     async.waterfall([
       
       function(callback) {
@@ -14,9 +28,7 @@ module.exports = {
           db.collection('users', function(err, collection) {
             collection
               .find(
-                {
-                  'userids2.TokenStatus.Status': 'Active'
-                },
+                query,
                 {
                   email: true,
                   userids2: true
@@ -25,24 +37,33 @@ module.exports = {
               .sort({
                 _id: -1
               })
-              .limit(5)
               .toArray(function(err, users) {
-              
-              callback(null, users, collection);
-              
-            }); // find
+                
+                callback(null, users, collection);
+                
+              }); // find
           }); // collection
         }); // mongo
       },
       
       function(users, collection, callback) {
         
+        console.dir(users);
+        
         users.forEach(function(user) {
+          
+          if (request.hasOwnProperty('email') && user.email != request.email) return;
+          
           user.userids2.forEach(function(userid) {
+            
             if (!userid.hasOwnProperty('eBayAuthToken')) return;
             if (!userid.hasOwnProperty('TokenStatus')) return;
             if (userid.eBayAuthToken == 'dummytoken') return;
             if (userid.TokenStatus.Status == 'RevokedByUser') return;
+            
+            if (request.hasOwnProperty('username')) {
+              if (userid.username != request.username) return;
+            }
             
             task.getnewtokenmap(user.email, function(err, token) {
               
@@ -59,17 +80,13 @@ module.exports = {
                   MessageID: token + ' ' + userid.username
                 }
               };
-              console.dir(requestjson);
               
               task.addqueue(requestjson, function(err, resultjson) {
                 
                 if (!resultjson.hasOwnProperty('UserDeliveryPreferenceArray')) return;
                 
-                console.dir(resultjson.UserDeliveryPreferenceArray.NotificationEnable);
-                
                 var udpane = resultjson.UserDeliveryPreferenceArray.NotificationEnable;
                 
-                /*
                 collection.update(
                   {
                     email: user.email,
@@ -81,7 +98,6 @@ module.exports = {
                     }
                   }
                 );
-                */
               });
               
             }); // getnewtokenmap

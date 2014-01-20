@@ -31,6 +31,14 @@ db.getCollectionNames().forEach(
           'org.ListingDetails.EndTime': 1
         }
       );
+
+			db[coll].ensureIndex(
+        {
+          'mod.ScheduleTime': 1,
+          'opt.ScheduleTime': 1,
+          'org.ListingDetails.StartTime': 1
+        }
+      );
 		}
 	}
 );

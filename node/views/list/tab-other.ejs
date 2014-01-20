@@ -1,0 +1,207 @@
+<div class="form-group">
+	<label for="UserID" class="col-sm-3 control-label no-padding-right">
+    <%= __('BuyerRequirements') %>
+  </label>
+	<div class="col-sm-8">
+    <div>
+	    <label>
+		    <input type="checkbox" class="ace" value="true"
+               name="mod.BuyerRequirementDetails.LinkedPayPalAccount"
+               id="_id.BuyerRequirementDetails.LinkedPayPalAccount" />
+		    <span class="lbl">Don't have a PayPal account</span>
+	    </label>
+    </div>
+    <div>
+	    <label>
+		    <input type="checkbox" class="ace" value="true"
+               name="mod.BuyerRequirementDetails.MaximumUnpaidItemStrikesInfo.checkbox"
+               id="_id.BuyerRequirementDetails.MaximumUnpaidItemStrikesInfo.checkbox" />
+		    <span class="lbl">
+          Have received
+          
+          <select name="mod.BuyerRequirementDetails.MaximumUnpaidItemStrikesInfo.Count">
+            <option value=""></option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+          
+          Unpaid item case(s) within
+          
+          <select name="mod.BuyerRequirementDetails.MaximumUnpaidItemStrikesInfo.Period">
+            <option value=""></option>
+            <option value="Days_30">1</option>
+            <option value="Days_180">6</option>
+            <option value="Days_360">12</option>
+          </select>
+          
+          month(s)
+          
+        </span>
+	    </label>
+    </div>
+    <div>
+      <label>
+		    <input type="checkbox" class="ace" value="true"
+               name="mod.BuyerRequirementDetails.ShipToRegistrationCountry"
+                 id="_id.BuyerRequirementDetails.ShipToRegistrationCountry"/>
+		    <span class="lbl">
+          Have a primary shipping address in countries that I don't ship to
+        </span>
+      </label>
+    </div>
+    <div>
+      <label>
+		    <input type="checkbox" class="ace" value="true"
+               name="BuyerRequirementDetails.MaximumBuyerPolicyViolations.checkbox"
+                 id="_id.BuyerRequirementDetails.MaximumBuyerPolicyViolations.checkbox"/>
+		    <span class="lbl">
+          Have
+          <select name="mod.BuyerRequirementDetails.MaximumBuyerPolicyViolations.Count">
+            <option value=""></option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+          </select>
+          Policy violation report(s) within
+          <select name="mod.BuyerRequirementDetails.MaximumBuyerPolicyViolations.Period">
+            <option value=""></option>
+            <option value="Days_30">1</option>
+            <option value="Days_180">6</option>
+          </select>
+          month(s)
+        </span>
+      </label>
+    </div>
+    <div>
+      <label>
+		    <input type="checkbox" class="ace" value="true"
+               name="mod.BuyerRequirementDetails.MinimumFeedbackScore.checkbox"
+                 id="_id.BuyerRequirementDetails.MinimumFeedbackScore.checkbox" />
+		    <span class="lbl">
+          Have a feedback score equal to or lower than
+          <select name="mod.BuyerRequirementDetails.MinimumFeedbackScore">
+            <option value=""></option>
+            <option value="-1">-1</option>
+            <option value="-2">-2</option>
+            <option value="-3">-3</option>
+          </select>
+        </span>
+      </label>
+    </div>
+    <div>
+      <label>
+		    <input type="checkbox" class="ace" value="true"
+               name="mod.BuyerRequirementDetails.MaximumItemRequirements.checkbox"
+                 id="_id.BuyerRequirementDetails.MaximumItemRequirements.checkbox"/>
+		    <span class="lbl">
+          Have bid on or bought my items within the last 10 days and met my limit of
+          <select name="mod.BuyerRequirementDetails.MaximumItemRequirements.MaximumItemCount">
+            <option value=""></option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="75">75</option>
+            <option value="100">100</option>
+          </select>
+        </span>
+      </label>
+    </div>
+    <div>
+      <label>
+        &nbsp;&nbsp;&nbsp;
+		    <input type="checkbox" class="ace" value="true"
+         name="mod.BuyerRequirementDetails.MaximumItemRequirements.MinimumFeedbackScore.checkbox"
+           id="_id.BuyerRequirementDetails.MaximumItemRequirements.MinimumFeedbackScore.checkbox"/>
+		    <span class="lbl">
+          Only apply this block to buyers who have a feedback score equal to or lower than
+          <select name="mod.BuyerRequirementDetails.MaximumItemRequirements.MinimumFeedbackScore">
+            <option value=""></option>
+            <option value="5">5</option>
+            <option value="4">4</option>
+            <option value="3">3</option>
+            <option value="2">2</option>
+            <option value="1">1</option>
+            <option value="0">0</option>
+          </select>
+        </span>
+      </label>
+    </div>
+	</div>
+</div>
+
+<div class="form-group">
+	<label for="UserID" class="col-sm-3 control-label no-padding-right">
+    <%= __('SalesTax') %>
+  </label>
+	<div class="col-sm-8">
+    <div>
+      <select name="mod.SalesTax.ShippingIncludedInTax">
+        <option value=""></option>
+      </select>
+      <input type="text" name="mod.SalesTax.SalesTaxPercent">%<br/>
+      <label>
+		    <input type="checkbox" class="ace" value="true"
+               name="mod.BuyerRequirementDetails.y" />
+		    <span class="lbl">
+          Also apply to shipping & handling costs
+        </span>
+      </label>
+    </div>
+	</div>
+</div>
+
+<div class="form-group">
+	<label for="UserID" class="col-sm-3 control-label no-padding-right">
+    <%= __('ReturnPolicy') %>
+  </label>
+	<div class="col-sm-8">
+    <div>
+      <select name="mod.ReturnPolicy.ReturnsAcceptedOption">
+        <option value=""></option>
+      </select>
+    </div>
+    <div>
+      After receiving the item, your buyer should contact you within:
+      <select name="mod.ReturnPolicy.ReturnsWithinOption">
+        <option value=""></option>
+      </select>
+    </div>
+    <div>
+      Refund will be given as
+      <select name="mod.ReturnPolicy.RefundOption">
+        <option value=""></option>
+      </select>
+    </div>
+    <div>
+      Return shipping will be paid by
+      <select name="mod.ReturnPolicy.ShippingCostPaidByOption">
+        <option value=""></option>
+      </select>
+    </div>
+    <div>
+      Additional return policy details<br/>
+      <textarea name="mod.ReturnPolicy.Description" cols="60" rows="3"></textarea>
+    </div>
+	</div>
+</div>
+
+<div class="form-group">
+	<label for="BuyItNowPrice" class="col-sm-3 control-label no-padding-right">
+    <%= __('AdditionalCheckoutInstructions') %>
+  </label>
+	<div class="col-sm-6">
+    <textarea name="mod.ShippingDetails.PaymentInstructions" cols="60" rows="3"></textarea>
+	</div>
+</div>

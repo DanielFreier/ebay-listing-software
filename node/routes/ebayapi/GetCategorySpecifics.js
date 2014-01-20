@@ -27,7 +27,7 @@ module.exports = {
               
               document.SiteDetails.forEach(function(doc) {
                 
-                //if (doc.Site != 'US') return;
+                if (doc.Site != 'US') return;
                 
                 var requestjson = {
                   email: 'admin@listers.in',
@@ -45,9 +45,8 @@ module.exports = {
                   }
                 };
                 
-                var logdir = '/var/www/sandbox.listers.in/logs/apicall/downloadFile';
+                var logdir = '/var/www/listers.in/logs/apicall/downloadFile';
                 var xmlfile = logdir + '/' + requestjson.email + '_' + requestjson.site + '.xml';
-                var jsonfile = logdir + '/' + requestjson.email + '_' + requestjson.site + '.json';
                 
                 /* xml -> mongodb */
                 if (fs.existsSync(xmlfile)) {
@@ -61,10 +60,34 @@ module.exports = {
                     explicitArray: false
                   });
                   
-                  /* return to callback */
-                  var xmlstr = fs.readFileSync(xmlfile);
-                  parser.parseString(xmlstr, function (err, resultjson) {
-                    fs.writeFile(jsonfile, resultjson);
+                  var input = fs.createReadStream(xmlfile, {encoding: 'utf8'});
+                  
+                  var xmlstr = '';
+                  
+                  input.on('data', function(data) {
+                    
+                    xmlstr += data.toString();
+                    xmlstr = xmlstr.replace(/\n/g, '');
+                    xmlstr = xmlstr.replace(/^.+?<\/Build>/, '');
+                    
+                    while (xmlstr.match(/<Recommendations>.+?<\/Recommendations>/)) {
+                      
+                      var chunk = xmlstr.replace(/^.+(<Recommendations>.+?<\/Recommendations>).+$/, 
+                                                 '$1');
+                      //console.log('chunk: ' + chunk);
+                      
+                      parser.parseString(chunk, function (err, chunkjson) {
+                        
+                        //taskmodule.convertattr(chunkjson);
+                        
+                        db.collection(doc.Site + '.CategorySpecifics.ready', function(err, spcoll) {
+                          spcoll.insert(chunkjson.Recommendations);
+                        })
+                      });
+                      
+                      xmlstr = xmlstr.replace(chunk, '');
+                    }
+                    
                   });
                   
                   return;
@@ -87,6 +110,10 @@ module.exports = {
                   };
                   
                   taskmodule.addqueue(requestjson2, function(err, resultjson2) {
+                    
+                    console.log(doc.Site + '=======================');
+                    console.dir(err);
+                    console.dir(resultjson2);
                     
                     var unzip = require('unzip');
                     var zip = fs.createReadStream(resultjson2.zipfile);

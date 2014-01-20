@@ -1,0 +1,21 @@
+#logos {
+  margin: 0 0 0 20px;
+}
+
+#ebaylogo,
+#godaddylogo {
+  float: left;
+  margin: 0 20px 0 0;
+}
+
+#ebaylogo img {
+  width: 150px;
+}
+#facebook {
+  clear: both;
+  padding: 20px 0 0 0;
+}
+
+#plusone {
+  margin: 20px 0 0;
+}

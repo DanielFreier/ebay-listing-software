@@ -1,0 +1,125 @@
+<% if (locale == 'ja') { %>
+
+まだListersInにeBayアカウントを追加されていない場合は、以下の説明をお読みください。<br/>
+<br/>
+
+<span style="font-weight:bold;">eBayアカウントの追加方法</span><br/>
+<ol>
+  <li>
+    「<%= __('AddeBayAccount') %>」ボタンをクリックしてください。
+    <button class="addebayaccount">
+      <%= __('AddeBayAccount') %>
+    </button>
+  </li>
+  <li>
+    eBayのログイン画面にジャンプしますので、
+    ListersInに追加したいeBayアカウントでログインしてください。<br />
+  </li>
+  <li>
+    「I agree」ボタンをクリックしてください。<br/>
+  </li>
+  <li>
+    自動的にListersInの画面に戻ります。<br />
+    ListersInの画面の左側に、追加したeBayアカウントが表示されます。<br/>
+  </li>
+</ol>
+
+何かご不明な点がございましたら、
+<a href="mailto:support@listers.in">support@listers.in</a>
+までメールでご質問ください。<br/>
+
+または
+<a href="http://forum.listers.in/" target="_blank">このフォーラム</a>
+にコメントを投稿してください。(フォーラムにログインしなくても匿名で投稿できます)<br/>
+
+<% } else { %>
+
+If you don't add eBay account to ListersIn yet, please read following instruction.<br/>
+<br/>
+
+<div style="font-weight:bold; margin-top:10px; font-size:110%;">
+  <img src="/icon/01/16/44.png"/>
+  How to import your existing items from eBay to ListersIn
+</div>
+<ol>
+  <li>
+    Click &quot;<%= __('AddeBayAccount') %>&quot; button.
+    <button class="btn btn-primary btn-sm addebayaccount">
+      <i class="icon-plus"></i>
+      <%= __('AddeBayAccount') %>
+    </button>
+    <span style="display:none;">
+      <img src="/img/indicator.gif"/> please wait, redirecting to eBay site...
+    </span>
+  </li>
+  <li>
+    You will be redirected to eBay sign in page.<br/>
+    Please sign in to eBay with the account which you want to add to ListersIn.<br/>
+    <div style="color:red;">
+      You don't give your eBay user id and password to ListersIn.<br/>
+      You just allow ListersIn to access eBay data via its API.
+    </div>
+  </li>
+  <li>
+    Click &quot;I agree&quot; button.<br/>
+  </li>
+  <li>
+    You will be back to ListersIn site, and the eBay account will be shown at left side.
+  </li>
+  <li>
+    Your existing items will be imported from eBay automatically.
+  </li>
+</ol>
+
+<div style="font-weight:bold; margin-top:10px; font-size:110%;">
+  <img src="/icon/01/16/44.png"/>
+  How to prepare a new item and list to eBay
+</div>
+<ol>
+  <li>
+    Click &quot;Add New Item&quot; button on left navigation.
+    (below the ListersIn logo)
+  </li>
+  <li>
+    Fill out the item forms with information which you want to sell on eBay.
+  </li>
+  <li>
+    Click &quot;Save&quot; button to save the item data to ListersIn.
+  </li>
+  <li>
+    You can see the saved items by clicking &quot;Saved&quot; on left navigation.
+  </li>
+  <li>
+    Check the item which you want to list to eBay.
+    (Checkbox at left of each item's title)
+  </li>
+  <li>
+    Click &quot;List&quot; button on top of the page.
+  </li>
+</ol>
+
+<div style="font-weight:bold; margin-top:10px; font-size:110%;">
+  <img src="/icon/01/16/44.png"/>
+  How to relist an unsold item again
+</div>
+<ol>
+  <li>
+    Click &quot;Unsold&quot; on left navigation.
+  </li>
+  <li>
+    Check the item which you want to relist to eBay again.
+    (Checkbox at left of each item's title)
+  </li>
+  <li>
+    Click &quot;Relist&quot; button on top of the page.
+  </li>
+</ol>
+
+If you have any problems, please send an email to
+<a href="mailto:support@listers.in">support@listers.in</a> :)<br/>
+Or please post your comment to
+<a href="http://forum.listers.in/" target="_blank">this forum</a>.
+(You can post without forum account)<br/>
+
+<% } %>
+        

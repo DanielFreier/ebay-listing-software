@@ -18,7 +18,7 @@ var methods = {
             collection
               .find(
                 {
-                  'email': 'carmenava11@gmail.com',
+                  'email': 'thtech2010@gmail.com',
                   'userids2.TokenStatus.Status': 'Active'
                 },
                 {
@@ -31,7 +31,7 @@ var methods = {
                   _id: 1
                 }
               )
-              .limit(10)
+              .limit(1000)
               .toArray(function(err, users) {
                 
                 callback(null, db, users);
@@ -55,13 +55,13 @@ var methods = {
                 org: {
                   $exists: 1
                 },
-                'org.SellingStatus.ListingStatus': 'Active'
+                'org.SellingStatus.ListingStatus': 'Completed'
               }
             ).sort(
               {
                 'org.ListingDetails.EndTime': 1
               }
-            ).limit(10).toArray(function(err, items) {
+            ).limit(1000).toArray(function(err, items) {
               for (var j = 0; j < items.length; j++) {
                 
                 var item = items[j];

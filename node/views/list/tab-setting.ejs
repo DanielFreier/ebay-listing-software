@@ -1,0 +1,72 @@
+<div class="form-group">
+	<label class="col-sm-3 control-label no-padding-right" for="UserID">
+    <%= __('UserID') %>
+  </label>
+	<div class="col-sm-3">
+    <select class="form-control" name="UserID">
+      <% if (user.userids2) { %>
+      <% for (var i = 0; i < user.userids2.length; i++) { %>
+      <option value="<%= user.userids2[i].username %>">
+				<%= user.userids2[i].username %>
+			</option>
+      <% } %>
+      <% } %>
+    </select>
+	</div>
+</div>
+
+<div class="form-group">
+	<label class="col-sm-3 control-label no-padding-right" for="mod.Site">
+    <%= __('Site') %>
+  </label>
+	<div class="col-sm-3">
+    <select name="mod.Site" class="form-control">
+      <% for (var i = 0; i < US.eBayDetails.SiteDetails.length; i++) { %>
+      <option value="<%= US.eBayDetails.SiteDetails[i].Site %>">
+				<%= US.eBayDetails.SiteDetails[i].Site %>
+			</option>
+      <% } %>
+    </select>
+	</div>
+</div>
+
+<div class="form-group">
+	<label class="col-sm-3 control-label no-padding-right" for="mod.Site">
+    <%= __('Currency') %>
+  </label>
+	<div class="col-sm-3">
+    <select name="mod.Currency" class="form-control">
+      <% for (var i = 0; i < US.eBayDetails.CurrencyDetails.length; i++) { %>
+      <option><%= US.eBayDetails.CurrencyDetails[i].Currency %></option>
+      <% } %>
+    </select>
+	</div>
+</div>
+
+<div class="form-group">
+	<label class="col-sm-3 control-label no-padding-right" for="mod.ListingType">
+    <%= __('AutoRelist') %>
+  </label>
+	<div class="col-sm-8">
+    
+    <div class="form-inline" role="form">
+      <div class="col-sm-2" style="padding-left:0;">
+        <select name="opt.AutoRelist" class="form-control">
+          <option value="false">OFF</option>
+          <option value="true">ON</option>
+        </select>
+      </div>
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" value="true" class="ace"
+                 name="opt.AutoRelistAddBestOffer"
+                 id="_id.opt.AutoRelistAddBestOffer" />
+          <span class="lbl">
+            Enable best offer option when auto relist.
+          </span>
+        </label>
+      </div>
+    </div>
+    
+	</div>
+</div>

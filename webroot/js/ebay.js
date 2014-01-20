@@ -1672,6 +1672,7 @@ function getrow(idx, row)
 	}
 	
 	if (row.mod.ListingType) {
+    console.dir(typeof(row.mod.ListingType));
 		if (row.mod.ListingType.match('Fixed')) {
 			$('td.ListingType', dom).html('<img src="/img/currency_dollar.png" width="12"/>');
 		} else {
@@ -1690,7 +1691,7 @@ function getrow(idx, row)
 	if (row.schedule_local) {
 		$('div.StartTime', dom).html('<img src="/icon/02/10/37.png"/> ' + row.schedule_local);
 	}
-	if (row.org) {
+	if (row.org && row.org.ListingDetails) {
 		
 		$('a.ItemID', dom).attr('href', row.org.ListingDetails.ViewItemURL).html(row.org.ItemID);
 		$('div.EndTime', dom).html(row.endtime);
@@ -1766,7 +1767,7 @@ function getrow(idx, row)
 	
 	/* status icon */
 	var src = '/icon/04/10/10.png';
-	if (row.org) {
+	if (row.org && row.org.SellingStatus) {
 		if (row.schedule_local) {
 			src = '/icon/02/10/37.png';
 		} else if (row.org.SellingStatus.ListingStatus == 'Active') {
@@ -2430,6 +2431,7 @@ function setformelements_shipping_domestic(item)
 			&& item.mod.ShippingDetails.ShippingServiceOptions.length > 1) {
 		
 		$.each(item.mod.ShippingDetails.ShippingServiceOptions, function(k, v) {
+      if (v == null) return;
 			if (v.ShippingServicePriority == 1) return;
 			addsso(id, 'shippingservices');
 		});
@@ -2484,6 +2486,7 @@ function setformelements_shipping_international(item)
 			&& item.mod.ShippingDetails.InternationalShippingServiceOption.length > 1) {
 		
 		$.each(item.mod.ShippingDetails.InternationalShippingServiceOption, function(k, v) {
+      if (v == null) return;
 			if (v.ShippingServicePriority == 1) return;
 			addsso(id, 'internationalshippingservices');
 		});
@@ -2993,7 +2996,7 @@ var save = function() {
   // merge shippingtype domestic and international
   var dmsttype = '';
   var intltype = '';
-  if (postdata.mod.ShippingDetails) {
+  if (postdata.mod.ShippingDetails && postdata.mod.ShippingDetails.ShippingType) {
     
     dmsttype = postdata.mod.ShippingDetails.ShippingType.domestic;
     
@@ -4088,6 +4091,7 @@ function setformelements_itemspecifics_values(id, i, recomm, specific)
 			}
 		}
 		
+    recomm.ValueRecommendation = arrayize(recomm.ValueRecommendation);
 		for (j in recomm.ValueRecommendation) {
 			
 			if (checkboxidx % 3 == 0) {

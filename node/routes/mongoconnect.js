@@ -11,7 +11,7 @@ module.exports = function(callback) {
   }
   
   var db = new Db('ebay', 
-                  new Server("10.156.17.98", Connection.DEFAULT_PORT, {auto_reconnect: true}));
+                  new Server("10.146.14.171", Connection.DEFAULT_PORT, {auto_reconnect: true}));
   db.open(function(error, databaseConnection) {
     if (error) throw new Error(error);
     connectionInstance = databaseConnection;

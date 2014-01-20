@@ -1,0 +1,85 @@
+<div class="message-item clearfix" id="{{id}}">
+  
+  <div class="pull-left">
+	  <label class="inline">
+		  <input type="checkbox" class="ace" />
+		  <span class="lbl"></span>
+	  </label>
+  </div>
+  
+  <div class="pull-left">
+    [[ if (mod && mod.PictureDetails) { ]]
+    <img src="/image/?url={{mod.PictureDetails.PictureURL}}" 
+         class="img-rounded" 
+         style="min-width:40px; max-width:40px; max-height:40px; margin-left:20px;" />
+    [[ } else { ]]
+    <img src="/img/noimage.jpg"
+         class="img-rounded" 
+         style="min-width:40px; max-width:40px; max-height:40px; margin-left:20px;" />
+    [[ } ]]
+  </div>
+  
+	<div class="summary">
+		<span class="text">
+      <a href="/node/user/list_ace/#/items/{{id}}" class="Title">{{mod.Title}}</a>
+		</span>
+	</div>
+	<div class="pull-right" style="margin-right:10px;">
+    [[ if (typeof(endtime) == 'string') { ]]
+    {{endtime}}
+    [[ } ]]
+  </div>
+	<div class="pull-right" style="margin-right:10px;">
+    {{price}}
+  </div>
+	<div class="pull-right" style="margin-right:10px;">
+    {{mod.Quantity}}
+  </div>
+	<div class="pull-right" style="margin-right:10px;">
+    <div>
+      [[ if (typeof(org) == 'object') { ]]
+      {{org.SellingStatus.BidCount}}
+      [[ } else { ]]
+      -
+      [[ } ]]
+    </div>
+    <div>
+      [[ if (typeof(org) == 'object') { ]]
+      {{org.SellingStatus.QuantitySold}}
+      [[ } else { ]]
+      -
+      [[ } ]]
+    </div>
+  </div>
+	<div class="pull-right" style="margin-right:10px;">
+    <div>
+      [[ if (typeof(org) == 'object') { ]]
+      {{org.HitCount}}
+      [[ } else { ]]
+      -
+      [[ } ]]
+    </div>
+    <div>
+      [[ if (typeof(org) == 'object') { ]]
+      {{org.WatchCount}}
+      [[ } else { ]]
+      -
+      [[ } ]]
+    </div>
+  </div>
+	<div class="pull-right" style="margin-right:10px;">
+    <div>
+      [[ if (typeof(org) == 'object') { ]]
+      {{org.ItemID}}
+      [[ } else { ]]
+      -
+      [[ } ]]
+    </div>
+    <div>
+      {{UserID}}
+    </div>
+  </div>
+  
+  <div id="{{id}}-detail"></div>
+  
+</div>

@@ -108,6 +108,15 @@ var methods = {
     });
     
     return o;
+  },
+
+  writelog: function (logstr) {
+    
+    var now = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+    
+    console.log(now + ' ' + logstr);
+    
+    return;
   }
   
 } // methods
@@ -258,6 +267,8 @@ function dopost(postjson, openapiflag, callback) {
       /* return to callback */
       parser.parseString(resultxml, function (err, resultjson) {
         
+        //console.dir(resultjson);
+        
         if (resultjson[callname+'Response'].hasOwnProperty('CorrelationID')) {
           
           var logdir = '/var/www/' + config.hostname + '/logs/apicall/' + callname;
@@ -275,6 +286,11 @@ function dopost(postjson, openapiflag, callback) {
             correlationid[0] = email;
             var logfile = logdir + '/' + correlationid.join('_') + '.xml';
             fs.writeFile(logfile, resultxml);
+            
+            /*
+            fs.writeFile(logfile.replace(/xml$/, 'json'),
+                         JSON.stringify(resultjson, null, 2));
+            */
           });
           
           callback(null, resultjson[callname+'Response']);
@@ -328,7 +344,7 @@ function dopost2(postjson, callback) {
     }
   };
   
-  var logdir = '/var/www/sandbox.listers.in/logs/apicall/downloadFile';
+  var logdir = '/var/www/listers.in/logs/apicall/downloadFile';
   var rawfile = logdir + '/' + postjson.email + '_' + postjson.site + '.raw';
   var zipfile = logdir + '/' + postjson.email + '_' + postjson.site + '.zip';
   
@@ -385,3 +401,4 @@ function getemailfromtokenmap(tokenid, callback) {
   }); // mongo
   
 }
+

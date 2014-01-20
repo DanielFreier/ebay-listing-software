@@ -1,0 +1,72 @@
+<div class="sidebar-shortcuts" id="sidebar-shortcuts">
+  <div class="btn-group">
+	  <button class="btn btn-sm newitem">
+		  <i class="icon-edit"></i>
+      <%= __('AddNewItem') %>
+	  </button>
+  </div>
+</div>
+  
+<ul class="nav nav-list" id="summaries">
+  
+  <script id="summaryTemplate" type="text/template">
+    <li>
+		  <a href="/#/items/{{userid}}" class="dropdown-toggle"
+         data-userid="{{userid}}" data-sellingstatus="allitems">
+			  <span class="menu-text">{{userid}}</span>
+        <span class="badge badge-inverse">{{allitems}}</span>
+			  <b class="arrow icon-angle-down"></b>
+		  </a>
+		  <ul class="submenu">
+			  <li>
+				  <a href="/#/items/{{userid}}/scheduled"
+             data-userid="{{userid}}" data-sellingstatus="scheduled">
+					  <i class="icon-double-angle-right"></i>
+					  Scheduled
+            <span class="badge badge-inverse">{{scheduled}}</span>
+				  </a>
+			  </li>
+			  <li>
+				  <a href="/#/items/{{userid}}/active"
+             data-userid="{{userid}}" data-sellingstatus="active">
+					  <i class="icon-double-angle-right"></i>
+            Active
+            <span class="badge badge-inverse">{{active}}</span>
+				  </a>
+			  </li>
+			  <li>
+				  <a href="/#/items/{{userid}}/sold"
+             data-userid="{{userid}}" data-sellingstatus="sold">
+					  <i class="icon-double-angle-right"></i>
+            Sold
+            <span class="badge badge-inverse">{{sold}}</span>
+				  </a>
+			  </li>
+			  <li>
+				  <a href="/#/items/{{userid}}/unsold"
+             data-userid="{{userid}}" data-sellingstatus="unsold">
+					  <i class="icon-double-angle-right"></i>
+            Unsold
+            <span class="badge badge-inverse">{{unsold}}</span>
+				  </a>
+			  </li>
+			  <li>
+				  <a href="/#/items/{{userid}}/unanswered"
+             data-userid="{{userid}}" data-sellingstatus="unanswered">
+					  <i class="icon-double-angle-right"></i>
+            Unanswered
+            <span class="badge badge-inverse">{{unanswered}}</span>
+				  </a>
+			  </li>
+			  <li>
+				  <a href="/#/items/{{userid}}/saved"
+             data-userid="{{userid}}" data-sellingstatus="saved">
+					  <i class="icon-double-angle-right"></i>
+            Saved
+            <span class="badge badge-inverse">{{saved}}</span>
+				  </a>
+			  </li>
+      </ul>
+    </li>
+  </script>
+</ul>

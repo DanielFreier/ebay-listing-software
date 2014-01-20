@@ -1,0 +1,190 @@
+<script id="settingTemplate" type="text/template">
+
+  <div class="form-horizontal" role="form">
+    
+    <div class="form-group">
+	    <label for="Email" class="col-sm-2 control-label no-padding-right">
+        <%= __('Email') %>
+      </label>
+	    <div class="col-sm-10" style="padding-top:4px; fnot-size:14px; font-weight:bold;">
+        {{email}}
+	    </div>
+    </div>
+    
+    <div class="form-group">
+	    <label for="Email" class="col-sm-2 control-label no-padding-right">
+        Time zone
+      </label>
+	    <div class="col-sm-5">
+        
+<select name="TimeZone" class="form-control">
+  <option value="GMT-12:00">UTC -12:00 (Eniwetok, Kwajalein)</option>
+  <option value="GMT-11:00">UTC -11:00 (Midway Island, Samoa)</option>
+  <option value="GMT-10:00">UTC -10:00 (Hawaii)</option>
+  <option value="GMT-09:00">UTC -09:00 (Alaska)</option>
+  <option value="GMT-08:00">UTC -08:00 (Pacific Time - US &amp; Canada; Tijuana)</option>
+  <option value="GMT-07:00">UTC -07:00 (Mountain Time - US &amp; Canada)</option>
+  <option value="GMT-06:00">UTC -06:00 (Central Time; Central America; Mexico City)</option>
+  <option value="GMT-05:00">UTC -05:00 (Eastern Time - US &amp; Canada; Bogota, Lima)</option>
+  <option value="GMT-04:00">UTC -04:00 (Atlantic Time - Canada; Caracas, Santiago)</option>
+  <option value="GMT-03:00">UTC -03:00 (Greenland, Buenos Aires, Brasilia)</option>
+  <option value="GMT-02:00">UTC -02:00 (Mid-Atlantic)</option>
+  <option value="GMT-01:00">UTC -01:00 (Azores, Cape Verde Is.)</option>
+  <option value="GMT+00:00">UTC -00:00 (GMT, London, Dublin, Casablanca, Edinburgh)</option>
+  <option value="GMT+01:00">UTC +01:00 (Rome, Berlin, Paris, Amsterdam, Stockholm)</option>
+  <option value="GMT+02:00">UTC +02:00 (Athens, Helsinki, Cairo)</option>
+  <option value="GMT+03:00">UTC +03:00 (Moscow, Nairobi, Kuwait)</option>
+  <option value="GMT+04:00">UTC +04:00 (Baku, Abu Dhabi, Tbilisi)</option>
+  <option value="GMT+05:00">UTC +05:00 (Karachi, Islamabad, )</option>
+  <option value="GMT+06:00">UTC +06:00 (Astana, Sri Jayawardenepura)</option>
+  <option value="GMT+07:00">UTC +07:00 (Bangkok, Hanoi, Jakarta, Krasnoyarsk)</option>
+  <option value="GMT+08:00">UTC +08:00 (Hong Kong, Beijing, Singapore, Taipei)</option>
+  <option value="GMT+09:00">UTC +09:00 (Tokyo, Osaka, Seoul, Yakutsk)</option>
+  <option value="GMT+10:00">UTC +10:00 (Sydney, Guam, Melbourne, Brisbane, Hobart)</option>
+  <option value="GMT+11:00">UTC +11:00 (Solomon Is., New Caledonia, Magadan)</option>
+  <option value="GMT+12:00">UTC +12:00 (Fiji, Marshall Is., Kamchatka)</option>
+  <option value="GMT+13:00">UTC +13:00 (Nuku'alofa)</option>
+</select>
+
+	    </div>
+    </div>
+    
+    <div class="form-group">
+	    <label for="Email" class="col-sm-2 control-label no-padding-right">
+        eBay accounts
+      </label>
+	    <div class="col-sm-5">
+        
+        <table class="table table-bordered" style="margin:0;">
+          [[ _.each(userids2, function(userid) { ]]
+          <tr>
+            <td>
+              {{userid.username}}
+            </td>
+            <td>
+              <button class="btn btn-xs removeaccount" data-userid="{{userid.username}}">
+                <i class="icon-remove"></i>
+                Remove from ListersIn
+              </button>
+            </td>
+          </tr>
+          [[ }); ]]
+          <tr>
+            <td colspan="2" style="text-align:center;">
+              
+              <button class="btn btn-primary btn-sm addebayaccount">
+                <i class="icon-plus"></i>
+                <%= __('AddeBayAccount') %>
+              </button>
+              <span class="loading" style="display:none;">
+                <br/><img src="/img/indicator.gif"/> please wait, redirecting to eBay site...
+              </span>
+              
+            </td>
+          </tr>
+        </table>
+        
+	    </div>
+    </div>
+    
+    <div class="form-group" id="syncitemsform">
+	    <label for="Email" class="col-sm-2 control-label no-padding-right">
+        Sync items from eBay
+      </label>
+	    <div class="col-sm-6">
+        
+        <table class="table table-bordered" style="margin:0;">
+          <tr>
+            <td>
+              
+              eBay User ID
+              <select name="userid">
+                [[ _.each(userids2, function(userid) { ]]
+                <option value="{{userid.username}}">{{userid.username}}</option>
+                [[ }); ]]
+              </select>
+              
+              <div style="margin:5px 0;">
+                Items which
+                <select name="daterange">
+                  <option value="Start">start</option>
+                  <option value="End" selected="selected">end</option>
+                </select>
+                between
+                <input type="text" name="datestart" value="<%= mischash.datestart %>"
+                       class="input-small" />
+                and
+                <input type="text" name="dateend"   value="<%= mischash.dateend %>"
+                       class="input-small" />
+                (Max: 120 days)
+                
+              </div>
+              
+              <button id="syncbutton" class="btn btn-sm">
+                Sync items from eBay
+              </button>
+              
+          </td>
+        </tr>
+        </table>
+        
+	    </div>
+    </div>
+    
+    <div class="form-group">
+	    <label for="Email" class="col-sm-2 control-label no-padding-right">
+        Import items from CSV
+      </label>
+	    <div class="col-sm-6">
+        
+        <table class="table table-bordered" style="margin:0;">
+          <tr>
+            <td>
+              
+        <form method="post" action="/node/file/csvupload" id="csvform"
+              target="posttarget" enctype="multipart/form-data">
+          
+          Import items from Turbo Lister &quot;File Exchange Format(CSV file)&quot;<br/>
+          <img src="/img/turbolistercsvexport.png" />
+          <br/>
+          <br/>
+          Import to
+          <select name="userid">
+            [[ _.each(userids2, function(userid) { ]]
+            <option value="{{userid.username}}">{{userid.username}}</option>
+            [[ }); ]]
+          </select>
+          <br/>
+          CSV file
+          <input type="file" id="csvfile" name="fileUpload" />
+          
+          <button class="btn btn-sm">
+            <%= __('Import') %>
+          </button>
+        </form>
+        <div id="csvimportmessage"></div>
+        
+          </td>
+        </tr>
+        </table>
+        
+	    </div>
+    </div>
+    
+    <div class="form-group">
+	    <label for="Email" class="col-sm-2 control-label no-padding-right">
+        Cancel account
+      </label>
+	    <div class="col-sm-3">
+        
+        <a href="/node/cancelaccount" class="btn btn-danger btn-sm" id="cancelaccountlink">
+          <i class="icon-remove"></i>
+          Cancel account
+        </a>
+        
+	    </div>
+    </div>
+    
+  </div><!-- /.form-horizontal -->
+  
+</script>

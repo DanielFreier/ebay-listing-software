@@ -1,0 +1,352 @@
+/* overwrite ace.css */
+.sidebar-shortcuts {
+  height: 41px;
+}
+
+.breadcrumbs {
+  padding: 0 20px;
+}
+
+.nav-search {
+  position: static;
+  display: inline;
+}
+
+.checkbox {
+  padding-left: 0;
+}
+
+/*
+.ace-thumbnails > li {
+  width: 154px;
+  height: 154px;
+}
+*/
+
+/* listers.in custom css */
+body {
+  overflow-y: scroll;
+}
+
+/*
+.newitem {
+  line-height: 24px;
+  margin-top: -2px;
+  padding: 0 20px;
+  border-width: 4px;
+  text-align: center;
+}
+*/
+
+/* copy from ebay.css */
+ul.pictures li.template,
+ul.variationpictures li.template {
+  display: none;
+}
+
+ul.pictures img {
+  max-width: 150px;
+  max-height: 150px;
+}
+
+td.Quantity,
+div.Quantity,
+div.StartPrice,
+div.CurrentPrice,
+div.WatchCount,
+div.HitCount,
+div.SoldCount,
+div.BidCount,
+div.StartTime,
+div.EndTime {
+  text-align: right;
+  white-space: nowrap;
+}
+
+#items > thead td > div:hover {
+  text-decoration: underline;
+	cursor: pointer;
+}
+#items > thead > tr > td {
+  padding: 5px 10px;
+}
+.row1 > td {
+  padding: 5px 10px 0;
+}
+.row2 > td {
+  padding: 0 10px 5px;
+}
+
+iframe.description {
+  width: 100%;
+  background-color: #fff;
+}
+
+div.description {
+  padding: 10px;
+  border: 1px dotted #999;
+}
+
+div.description > iframe {
+  border: 0px none;
+}
+
+iframe[name=posttarget] {
+  display: none;
+}
+
+#settings {
+  display: none;
+}
+
+#help {
+  display: none;
+}
+
+select.primarycategory {
+  /*float: left;*/
+}
+
+
+/* product search form */
+div.foundproducts {
+  /*
+  max-height: 500px;
+  overflow: scroll;
+  position: absolute;
+  */
+  display: none;
+    /*
+  background-color: #fff;
+  border: 1px solid #999;
+  padding: 5px 0 0 5px;
+  border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+	margin: 0 0 0 2px;
+  */
+}
+
+div.foundproducts div.header {
+  font-weight: bold;
+  margin: 5px 5px 5px 0;
+	padding: 5px;
+	background-color: #ccc;
+}
+
+ul.suggestedcategories,
+ul.product-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+li.suggestedcategory-template,
+li.product-template {
+  display: none;
+}
+
+li.suggestedcategory input {
+  margin: 0;
+  padding: 0;
+}
+
+li.product {
+  display: block;
+  float: left;
+  width: 260px;
+  margin: 0 5px 5px 0;
+  padding: 3px;
+  background-color: #efefef;
+}
+
+div.product-stockphoto {
+  float: left;
+  width: 70px;
+  height: 70px;
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+div.product-text {
+  float: left;
+  width: 185px;
+	height: 70px;
+	overflow: hidden;
+}
+
+div.product-stockphoto img {
+  max-width: 70px;
+  max-height: 70px;
+}
+
+div.product {
+  border-bottom: 1px solid gray;
+  padding: 5px;
+}
+
+div.product:hover {
+  cursor: pointer;
+  background-color: #ffffcc;
+}
+
+div.producttemplate {
+  display: none;
+}
+
+div.product div.productimage {
+  float: left;
+  width: 70px;
+  text-align: center;
+}
+
+div.product div.text {
+  float: left;
+}
+
+div.product div.productid {
+  display: none;
+}
+
+#message {
+  position: fixed;
+  text-align: center;
+  font-weight: bold;
+  top: 10px;
+  color: #ff9;
+}
+
+.shippingmainrows,
+.internationalshippingmainrows,
+.ShippingService0 a.removesso,
+.InternationalShippingService0 a.removesso {
+  display: none;
+}
+
+ul.ShipToLocation,
+ul.ShipToLocations {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul.ShipToLocation li,
+ul.ShipToLocations li {
+  float: left;
+  min-width: 140px;
+}
+
+div.productlistingdetails {
+  display: none;
+}
+
+#debug {
+  display: none;
+  padding: 10px;
+  background-color: #333;
+	color: #fff;
+}
+
+div.variationstablewrapper {
+  clear: both;
+  border: 1px solid #aaa;
+	margin: 10px;
+  padding: 5px;
+}
+
+div.VariationSpecificPictureSet {
+  margin: 5px;
+}
+
+div.variationaddforms {
+}
+
+div.variationaddforms div {
+  float: left;
+  margin: 5px 10px;
+}
+
+div.variations-enabled {
+  display: none;
+}
+
+div.variations-disabled {
+  margin: 0 5px 10px;
+}
+
+table.Variations {
+  margin: 10px 0;
+}
+table.Variations input {
+  width: 90px;
+  /*display: block;*/
+}
+table.Variations th,
+table.Variations td {
+  text-align: left;
+  padding: 2px 5px;
+	position: relative;
+  white-space: nowrap;
+}
+table.Variations th div {
+  display: inline;
+}
+
+input[name^="mod.Variations.Variation"][name*="StartPrice"],
+input[name^="mod.Variations.Variation"][name*="Quantity"] {
+  text-align: right;
+  width: 50px;
+}
+
+select.selector {
+  position: absolute;
+  z-index: 10;
+  display: none;
+  margin: 0;
+  padding: 0;
+}
+
+a.removevariationname {
+  color: #aaa;
+	margin: 0 0 0 3px;
+}
+
+ul.VariationSpecificsSet {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+ul.VariationSpecificsSet li {
+  float: left;
+  padding: 3px;
+  border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border: 1px solid #cccccc;
+  background-color: #fafafa;
+  margin: 0 5px 2px 0;
+}
+ul.VariationSpecificsSet li:hover {
+  cursor: pointer;
+  background-color: #3079ed;
+  color: #fff;
+}
+
+div.currencyID {
+  display: inline;
+}
+
+div[class^="VariationPictures"] {
+  border: 1px solid #aaa;
+  padding: 10px;
+  margin: 5px;
+  display: none;
+}
+
+div.variationspecificvalue {
+  display: inline;
+  font-weight: bold;
+}
+

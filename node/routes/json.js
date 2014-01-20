@@ -9,6 +9,7 @@ var ObjectID = require('mongodb').ObjectID;
 var nodemailer = require('nodemailer');
 var emailTemplates = require('email-templates')
 var crypto = require('crypto');
+var util   = require('util');
 
 var now = new Date();
 
@@ -61,6 +62,8 @@ exports.items = function(req, res) {
       json: result
     });
   });
+  
+  console.log(req.user.email + ' ' + req.user.id);
   
 } // items()
 
@@ -140,11 +143,11 @@ exports.import = function(req, res) {
   var apimodule = require('./ebayapi/GetSellerList');
   
 	var reqjson = {
-    email:     'fd3s.boost@gmail.com',
-    userid:    'testuser_hal',
-    daterange: 'End',
-    datestart: '2013-05-04',
-    dateend:   '2013-08-01'
+    email:     req.user.email,
+    userid:    req.body.userid,
+    daterange: req.body.daterange,
+    datestart: req.body.datestart,
+    dateend:   req.body.dateend
   };
   
   apimodule.call(reqjson, function(response) {
@@ -271,21 +274,13 @@ function categorypath(site, categoryid, callback) {
           CategoryID: categoryid.toString()
         },
         function(err, doc) {
-          
-          console.dir(doc);
-          //console.log(doc.CategoryLevel + ': ' + categoryid + ' ' + doc.CategoryName);
-          
           if (doc.CategoryLevel != '1') {
-            
             categorypath(site, doc.CategoryParentID, function(err, result) {
               result.push(parseInt(doc.CategoryID));
               callback(null, result);
             });
-            
           } else {
-            
             callback(null, [parseInt(doc.CategoryID)]);
-            
           }
         }
       ); // findOne
@@ -339,6 +334,7 @@ function children2(site, path, callback) {
     [
       /* CategoryFeatures */
       function(callback) {
+        console.log('children2: site: ' + site);
         mongo(function(db) {
           db.collection(site + '.CategoryFeatures', function(err, collft) {
             collft.findOne({}, function(err, doc) {
@@ -530,6 +526,25 @@ exports.summary = function(req, res) {
   });
   
 } // summary()
+
+exports.summary_backbone = function(req, res) {
+  
+  summarydata(req.user, function(err, result) {
+    
+    var data = [];
+    
+    Object.keys(result).forEach(function(key) {
+      
+      var tmp = result[key];
+      tmp.userid = key;
+      
+      data.push(tmp);
+    });
+    
+    res.json(data);
+  });
+  
+} // summary_backbone()
 
 exports.refresh = function(req, res) {
   
@@ -1084,6 +1099,7 @@ exports.signup = function(req, res) {
               language: 'English',
               timezone: 'GMT-08:00',
               itemlimit: '100',
+              newlook: 1,
               created_at: now,
               lastused_at: now
             };
@@ -1289,60 +1305,18 @@ exports.save = function(req, res) {
   
   /* int */
   for (var i=0; i<config.intfield.length; i++) {
-    
-    var modref = mod;
-    var path = config.intfield[i].split('.');
-    while (path.length > 0) {
-      if (!modref.hasOwnProperty(path[0])) break;
-      
-      if (path.length == 1) {
-        modref[path[0]] = parseInt(modref[path[0]]);
-        break;
-      }
-      
-      var shifted = path.shift();
-      modref = modref[shifted];
-    }
+    convertint(mod, config.intfield[i]);
   }
   
   /* double */
   for (var i=0; i<config.doublefield.length; i++) {
-    
-    var modref = mod;
-    var path = config.doublefield[i].split('.');
-    while (path.length > 0) {
-      if (!modref.hasOwnProperty(path[0])) break;
-      
-      if (path.length == 1) {
-        modref[path[0]] = parseFloat(modref[path[0]]);
-        break;
-      }
-      
-      var shifted = path.shift();
-      modref = modref[shifted];
-    }
+    convertdouble(mod, config.doublefield[i]);
   }
   
   /* date */
-  /*
   for (var i=0; i<config.datefield.length; i++) {
-    
-    var modref = mod;
-    var path = config.datefield[i].split('.');
-    while (path.length > 0) {
-      if (!modref.hasOwnProperty(path[0])) break;
-      
-      if (path.length == 1) {
-        //modref[path[0]] = 'ISODate(' + modref[path[0]] + ')';
-        modref[path[0]] = moment(modref[path[0]])._d;
-        break;
-      }
-      
-      var shifted = path.shift();
-      modref = modref[shifted];
-    }
+    convertdate(mod, config.datefield[i]);
   }
-  */
   
   var orgexists = false;
   var taskid = 'verifyadditem_' + moment().format('YYYY-MM-DD_HH-mm-ss');
@@ -1360,14 +1334,20 @@ exports.save = function(req, res) {
             return;
           }
           
-          coll.findOne({_id: ObjectID(id)}, function(err, before) {
+          coll.findOne({
+            _id: ObjectID(id)
+          }, function(err, before) {
             
             if (before.hasOwnProperty('org')) {
               orgexists = true;
             }
             
-            fs.writeFile('/var/www/' + config.hostname + '/logs/diff/'
-                         + item.UserID + '.' + id + '.0.org.js',
+            var diffdir = '/var/www/' + config.hostname + '/logs/diff'
+              + '/' + moment(new Date()).format('YYYY-MM-DD');
+            
+            if (!fs.existsSync(diffdir)) fs.mkdirSync(diffdir);
+            
+            fs.writeFile(diffdir + '/' + item.UserID + '.' + id + '.0.before.js',
                          JSON.stringify(sortObject(before), null, 2));
             
             callback(null, null);
@@ -1388,8 +1368,10 @@ exports.save = function(req, res) {
               mod: mod,
               opt: opt,
               UserID: item.UserID,
-              status: taskid
             };
+            if (req.user.email != 'demo@listers.in') {
+              newitem.status = taskid;
+            }
             
             coll.insert(newitem, callback);
             
@@ -1403,25 +1385,30 @@ exports.save = function(req, res) {
             }
             if (!orgexists) {
               set.status = taskid;
+            } else {
+              set.status = taskid;
             }
             
-            coll.update({_id: ObjectID(id)}, {$set: set}, callback);
+            coll.update({_id: ObjectID(id)}, {$set: set}, {safe: true}, callback);
           }
         },
         
         /* Save sorted json after update */
         function(callback) {
           
-          callback(null, null);
-          
           coll.findOne({
             _id: ObjectID(id)
           }, function(err, after) {
             
-            fs.writeFile('/var/www/' + config.hostname + '/logs/diff/'
-                         + item.UserID + '.' + id + '.1.new.js',
+            var diffdir = '/var/www/' + config.hostname + '/logs/diff'
+              + '/' + moment(new Date()).format('YYYY-MM-DD');
+            
+            if (!fs.existsSync(diffdir)) fs.mkdirSync(diffdir);
+            
+            fs.writeFile(diffdir + '/' + item.UserID + '.' + id + '.1.after.js',
                          JSON.stringify(sortObject(after), null, 2));
             
+            callback(null, null);
           });
         },
         
@@ -1447,8 +1434,6 @@ exports.save = function(req, res) {
         
       ], function(err, results) {
         
-        console.dir(results);
-        
         _item(req.user, id, function(err, result) {
           result.message = req.user.message;
           res.json({
@@ -1462,6 +1447,32 @@ exports.save = function(req, res) {
   }); // mongo
   
 } // exports.save
+
+exports.save_backbone = function(req, res) {
+  
+  var id   = req.body.id;
+  var form = req.body.json;
+  
+  var item = JSON.parse(form);
+  var mod  = item.mod;
+  var opt  = item.opt;
+  var setting = item.setting;
+  var shippingdetails = item.ShippingDetails;
+  
+  //req.body.id = req.params.id;
+  //var obj = extractObject(req.body.form);
+  
+  //console.log('save: ' + req.params.id);
+  
+  //req.body.id = req.params.id;
+  
+  _items(req, function(err, result) {
+    result.message = req.user.message;
+    res.json({
+      json: result
+    });
+  });
+}
 
 exports.orders = function(req, res) {
   
@@ -1604,7 +1615,18 @@ function sortObject(o) {
   for (key = 0; key < a.length; key++) {
     if (a[key] == '_id') continue;
     
-    if (typeof(o[a[key]]) == 'object') {
+    if (util.isArray(o[a[key]])) {
+        sorted[a[key]] = [];
+        
+        if (typeof(o[a[key]][0]) == 'object') {
+          for (var i = 0; i < o[a[key]].length; i++) {
+            sorted[a[key]][i] = sortObject(o[a[key]][i]);
+          }
+        } else {
+          sorted[a[key]] = o[a[key]].sort();
+        }
+        
+    } else if (typeof(o[a[key]]) == 'object') {
       sorted[a[key]] = sortObject(o[a[key]]);
     } else {
       sorted[a[key]] = o[a[key]];
@@ -1753,13 +1775,13 @@ function _items(req, callback) {
   } else {
     
     query = clone(sellingquery[req.body.selling]);
-    if (req.body.UserID != '') {
+    if (req.body.hasOwnProperty('UserID') && req.body.UserID != '') {
       query['UserID'] = req.body.UserID;
     }
-    if (req.body.Title != '') {
+    if (req.body.hasOwnProperty('Title') && req.body.Title != '') {
       query['mod.Title'] = new RegExp(req.body.Title, 'i');
     }
-    if (req.body['mod.ListingType'] != '') {
+    if (req.body.hasOwnProperty('mod.ListingType') && req.body['mod.ListingType'] != '') {
       query['mod.ListingType'] = req.body['mod.ListingType'];
     }
     
@@ -1901,6 +1923,10 @@ function _items(req, callback) {
               }
             }
             
+            /* missing fields */
+            if (false) {
+            }
+            
           }); // forEach
           
           callback(null, {
@@ -1921,9 +1947,12 @@ function _item(user, id, callback) {
   
   var json = {};
   var item = {};
+  
+  /*
   var mod  = {};
   var org  = {};
   var opt  = {};
+  */
   
   /* query */
   var query = {
@@ -1940,10 +1969,12 @@ function _item(user, id, callback) {
             item = doc;
             item.id = item._id;
             
+            /*
             if (!item.hasOwnProperty('org')) item.org = {};
             if (!item.hasOwnProperty('opt')) item.opt = {};
             org = item.org;
             opt = item.opt;
+            */
             
             callback(null, 'item');
           });
@@ -2069,6 +2100,11 @@ function _item(user, id, callback) {
             db.collection(colldtname, function(err, colldt) {
               colldt.findOne({ID: themeid}, function(err, doc) {
                 
+                if (doc == null) {
+                  callback(null, 'ListingDesigner');
+                  return;
+                }
+                
                 item.ListingDesigner = {
                   GroupID: doc.GroupID
                 }
@@ -2099,7 +2135,7 @@ function _item(user, id, callback) {
         item.mod.ScheduleTime = 
           moment(item.mod.ScheduleTime).zone(zonestr).format('YYYY-MM-DD HH:mm');
         
-      } else if (item.org.hasOwnProperty('ListingDetails')) {
+      } else if (item.hasOwnProperty('org') && item.org.hasOwnProperty('ListingDetails')) {
         
         /* Imported scheduled item from ebay */
         var listingdetails = item.org.ListingDetails;
@@ -2113,7 +2149,7 @@ function _item(user, id, callback) {
           }
         }
         
-      } else if (item.opt.hasOwnProperty('ScheduleTime')) {
+      } else if (item.hasOwnProperty('opt') && item.opt.hasOwnProperty('ScheduleTime')) {
         
         /* Scheduled on ListersIn */
         item.mod.ScheduleTime = 
@@ -2122,6 +2158,18 @@ function _item(user, id, callback) {
       }
       
       callback(null, 'ScheduleTime');
+    },
+    
+    /* Misc */
+    function(callback) {
+      
+      if (item.hasOwnProperty('opt') && !item.opt.hasOwnProperty('AutoRelist')) {
+        item.opt = {
+          AutoRelist: false
+        };
+      }
+      
+      callback(null, 'Misc');
     },
     
     /* eBayDetails */
@@ -2308,3 +2356,114 @@ function sendmail(subject, templatename, emailto, emaildata) {
   }); // emailTemplates
   
 }
+
+function extractObject(formdata) {
+  
+  var mod = {};
+  
+  Object.keys(formdata).forEach(function(key) {
+    
+    var ref = mod;
+    
+    //console.log('key: ' + key);
+    var arrkey = key.split('.');
+    for (var i = 0; i < arrkey.length; i++) {
+      //console.log(' for: ' + arrkey[i]);
+      
+      if (i == arrkey.length - 1) {
+        ref[arrkey[i]] = formdata[key];
+      }
+      
+      if (!ref.hasOwnProperty(arrkey[i])) {
+        ref[arrkey[i]] = {};
+      }
+      
+      ref = ref[arrkey[i]];
+    }
+    
+  });
+  
+  return mod;
+}
+
+
+function convertint(o, field) {
+  
+  var path = field.split('.');
+  
+  if (!o.hasOwnProperty(path[0])) return;
+  if (o[path[0]] == null) return;
+  
+  /* leaf */
+  if (path.length == 1) {
+    o[path[0]] = parseInt(o[path[0]]);
+    return;
+  }
+  
+  /* not leaf */
+  var shifted = path.shift();
+  if (util.isArray(o[shifted])) {
+    for (var i = 0; i < o[shifted].length; i++) {
+      convertint(o[shifted][i], path.join('.'));
+    }
+  } else {
+    convertint(o[shifted], path.join('.'));
+  }
+  
+  return;
+  
+} // convertint
+
+function convertdouble(o, field) {
+  
+  var path = field.split('.');
+  
+  if (!o.hasOwnProperty(path[0])) return;
+  if (o[path[0]] == null) return;
+  
+  /* leaf */
+  if (path.length == 1) {
+    o[path[0]] = parseFloat(o[path[0]]);
+    return;
+  }
+  
+  /* not leaf */
+  var shifted = path.shift();
+  if (util.isArray(o[shifted])) {
+    for (var i = 0; i < o[shifted].length; i++) {
+      convertdouble(o[shifted][i], path.join('.'));
+    }
+  } else {
+    convertdouble(o[shifted], path.join('.'));
+  }
+  
+  return;
+  
+} // convertdouble
+
+function convertdate(o, field) {
+  
+  var path = field.split('.');
+  
+  if (!o.hasOwnProperty(path[0])) return;
+  if (o[path[0]] == null) return;
+  
+  /* leaf */
+  if (path.length == 1) {
+    o[path[0]] = moment(o[path[0]])._d;
+    return;
+  }
+  
+  /* not leaf */
+  var shifted = path.shift();
+  if (util.isArray(o[shifted])) {
+    for (var i = 0; i < o[shifted].length; i++) {
+      convertdate(o[shifted][i], path.join('.'));
+    }
+  } else {
+    convertdate(o[shifted], path.join('.'));
+  }
+  
+  return;
+  
+} // convertdate

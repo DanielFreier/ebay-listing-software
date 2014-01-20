@@ -1,0 +1,188 @@
+<div class="message-content">
+  
+	<div class="tabbable">
+		<ul class="nav nav-tabs" id="myTab">
+			<li class="active">
+				<a data-toggle="tab" href="#tab-{{id}}-setting">
+					<i class="icon-gear"></i>
+					Setting
+				</a>
+			</li>
+			<li>
+				<a data-toggle="tab" href="#tab-{{id}}-category">
+          <i class="icon-list-alt"></i>
+          Category and Title
+				</a>
+			</li>
+			<li>
+				<a data-toggle="tab" href="#tab-{{id}}-pictures">
+          <i class="icon-camera"></i>
+          Pictures
+				</a>
+			</li>
+			<li>
+				<a data-toggle="tab" href="#tab-{{id}}-description">
+          <i class="icon-file-text-alt"></i>
+          Description
+				</a>
+			</li>
+			<li>
+				<a data-toggle="tab" href="#tab-{{id}}-price">
+          <i class="icon-usd"></i>
+          Price
+				</a>
+			</li>
+			<li>
+				<a data-toggle="tab" href="#tab-{{id}}-payment">
+          <i class="icon-camera"></i>
+          Payment
+				</a>
+			</li>
+			<li>
+				<a data-toggle="tab" href="#tab-{{id}}-shipping">
+          <i class="icon-truck"></i>
+          Shipping
+				</a>
+			</li>
+			<li>
+				<a data-toggle="tab" href="#tab-{{id}}-other">
+          <i class="icon-camera"></i>
+          Other
+				</a>
+			</li>
+			<li>
+				<a data-toggle="tab" class="tab-all" href="#tab-{{id}}-all">
+          All
+				</a>
+			</li>
+			<li class="pull-right">
+				<button class="btn btn-xs btn-info edit">
+					<i class="icon-edit"></i>
+					Edit
+				</button>
+				<button class="btn btn-xs btn-info save">
+					<i class="icon-ok"></i>
+					Save
+				</button>
+				<button class="btn btn-xs btn-grey cancel">
+					<i class="icon-remove"></i>
+					Cancel
+				</button>
+			</li>
+		</ul>
+    
+		<div class="form-horizontal" role="form">
+		  <div class="tab-content">
+        
+				<div id="tab-{{id}}-setting" class="tab-pane in active">
+          <h5 class="header blue bolder">
+            <i class="icon-gear"></i>
+            Settings for this item
+          </h5>
+          <% include tab-setting %>
+				</div>
+        
+				<div id="tab-{{id}}-category" class="tab-pane in">
+          <h5 class="header blue bolder">
+            <i class="icon-list-alt"></i>
+            <% if (locale == 'ja') { %>
+            出品するカテゴリ
+            <% } else if (locale == 'de') { %>
+            Kategorien, in denen Ihr Angebot erscheint
+            <% } else { %>
+            Categories where your listing will appear
+            <% } %>
+          </h4>
+          <% include tab-category-and-title %>
+				</div>
+
+				<div id="tab-{{id}}-pictures" class="tab-pane in">
+          <h5 class="header blue bolder">
+            <i class="icon-camera"></i>
+            <% if (locale == 'ja') { %>
+            商品に関連する写真
+            <% } else if (locale == 'de') { %>
+            Gestalten Sie Ihr Angebot mit Bildern noch attraktiver.
+            <% } else { %>
+            Bring your item to life with pictures
+            <% } %>
+          </h4>
+          <% include tab-pictures %>
+				</div>
+        
+				<div id="tab-{{id}}-description" class="tab-pane in">
+          <h5 class="header blue bolder">
+            <i class="icon-file-text-alt"></i>
+            <% if (locale == 'ja') { %>
+            商品の詳しい説明
+            <% } else if (locale == 'de') { %>
+            Beschreiben Sie den Artikel, den Sie verkaufen möchten.
+            <% } else { %>
+            Describe the item you're selling
+            <% } %>
+          </h4>
+          <% include tab-description %>
+				</div>
+        
+				<div id="tab-{{id}}-price" class="tab-pane in">
+          <h5 class="header blue bolder">
+            <i class="icon-usd"></i>
+            <% if (locale == 'ja') { %>
+            オークションの期間や価格などの設定
+            <% } else if (locale == 'de') { %>
+            Wählen Sie aus, wie Sie Ihren Artikel verkaufen möchten
+            <% } else { %>
+            Choose how you'd like to sell your item
+            <% } %>
+          </h4>
+          <% include tab-price %>
+				</div>
+        
+				<div id="tab-{{id}}-payment" class="tab-pane in">
+          <h5 class="header blue bolder">
+            <i class="icon-list-alt"></i>
+            <% if (locale == 'ja') { %>
+            支払い方法
+            <% } else if (locale == 'de') { %>
+            Entscheiden Sie, welche Zahlungsmethoden Sie akzeptieren
+            <% } else { %>
+            Decide how you'd like to be paid
+            <% } %>
+          </h4>
+          <% include tab-payment %>
+				</div>
+        
+				<div id="tab-{{id}}-shipping" class="tab-pane in">
+          <h5 class="header blue bolder">
+            <i class="icon-truck"></i>
+            <% if (locale == 'ja') { %>
+            発送方法
+            <% } else if (locale == 'de') { %>
+            Teilen Sie Ihren Käufern die Versandinformationen mit.
+            <% } else { %>
+            Give buyers shipping details
+            <% } %>
+          </h4>
+          <% include tab-shipping %>
+				</div>
+        
+				<div id="tab-{{id}}-other" class="tab-pane in">
+          <h5 class="header blue bolder">
+            <i class="icon-list-alt"></i>
+            <% if (locale == 'ja') { %>
+            その他の情報
+            <% } else if (locale == 'de') { %>
+            Weitere Informationen für Ihre Käufer
+            <% } else { %>
+            Other things you'd like buyers to know
+            <% } %>
+          </h4>
+          <% include tab-other %>
+				</div>
+        
+			</div><!-- /.tab-content -->
+    </div><!-- /.form-horizontal -->
+    
+	</div><!-- .tabbable -->
+  
+</div><!-- .message-content -->

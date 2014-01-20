@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script language="javascript">
+	
+var files = new Array();
+<% for (var i = 0; i < savedfilenames.length; i++) { %>
+files.push('<%= savedfilenames[i] %>');
+<% } %>
+
+window.parent.addimage('<%= id %>',
+                       '<%= divclass %>',
+                       files);
+
+</script>
+</head>
+<body>
+</body>
+</html>

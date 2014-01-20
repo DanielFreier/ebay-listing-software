@@ -14,6 +14,7 @@ var express = require('express')
   , admin  = require('./routes/admin')
   , image  = require('./routes/image')
   , index  = require('./routes/index')
+  , category = require('./routes/category')
   , http = require('http')
   , path = require('path')
   , i18n = require('i18n')
@@ -170,7 +171,109 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', routes.index);
+app.all('*', function(req, res, next) {
+  
+  if (!req.cookies.hasOwnProperty('admin') && req.isAuthenticated()) {
+    
+    mongo(function(db) {
+      db.collection('users', function(err, collection) {
+        collection.findOne(
+          {
+            _id: req.user._id,
+          },
+          function(err, user) {
+            
+            var now = new Date();
+            
+            collection.update(
+              {
+                _id: req.user._id,
+              },
+              {
+                $set: {
+                  lastused_at: now
+                }
+              }
+            );
+          }
+        );
+      });
+    });
+    
+  }
+  
+  next();
+});
+
+app.get('/', function(req, res) {
+  
+  var url = require('url');
+  var url_parts = url.parse(req.url, true);
+  var query = url_parts.query;
+  
+  var newlook = 0;
+  
+  if (req.cookies.hasOwnProperty('admin')) {
+    
+    if (query.hasOwnProperty('newlook')) {
+      newlook = query.newlook;
+      res.cookie('newlook', newlook, {maxAge: 86400*365});
+    } else if (req.cookies.hasOwnProperty('newlook')) {
+      newlook = req.cookies.newlook;
+    }
+    
+  } else {
+    
+    if (query.hasOwnProperty('newlook')) {
+      
+      newlook = query.newlook;
+      
+      mongo(function(db) {
+        db.collection('users', function(err, collection) {
+          collection.findOne(
+            {
+              _id: req.user._id,
+            },
+            function(err, user) {
+              
+              collection.update(
+                {
+                  _id: req.user._id,
+                },
+                {
+                  $set: {
+                    newlook: newlook
+                  }
+                },
+                {
+                  safe: true
+                },
+                function(err) {
+                  res.redirect('/');
+                }
+              );
+            }
+          ); // findOne
+        }); // collection
+      }); // mongo
+      
+      return;
+      
+    } else if (req.isAuthenticated() && req.user.hasOwnProperty('newlook')) {
+      
+      newlook = req.user.newlook;
+      
+    }
+  }
+  
+  if (newlook == 1 && req.isAuthenticated()) {
+    index.list(req, res);
+  } else {
+    routes.index(req, res);
+  }
+  
+});
+
 app.get('/signup_confirm', index.signup_confirm);
 app.get('/reset_password', index.reset_password);
 app.get('/cancelaccount',  index.cancelaccount);
@@ -207,6 +310,7 @@ app.post('/json/relist',        json.relist);
 app.post('/json/revise',        json.revise);
 app.post('/json/verifyadditem', json.verifyadditem);
 app.post('/json/add',           json.add);
+app.post('/json/import',        json.import);
 app.post('/json/import_java',   json.import_java);
 app.post('/json/savedebugjson', json.savedebugjson);
 app.post('/json/refresh',       json.refresh);
@@ -216,11 +320,11 @@ app.post('/json/dismissmessage', json.dismissmessage);
 app.post('/json/addmembermessagertq', json.addmembermessagertq);
 
 app.get('/json/descriptiontemplate', json.descriptiontemplate);
-app.get('/json/import',         json.import);
 app.get('/json/site',           json.site);
 app.get('/json/gc2',            json.gc2);
 app.get('/json/summary',        json.summary);
 
+app.get('/category/childcategories', category.childcategories);
 
 //app.post('/login', passport.authenticate('local', {successRedirect: '/node/javalogin',
 app.post('/login', passport.authenticate('local', {successRedirect: '/',
@@ -239,6 +343,33 @@ app.get('/logout', function(req, res) {
   res.redirect('/');
 });
 
+/* backbone.js request */
+app.get('/user/list', index.list);
+
+app.get('/json/summaries', json.summary_backbone);
+
+
+/* read */
+app.get('/json/items/:id', function(req, res) {
+  req.body.id = req.params.id;
+  json.item(req, res);
+});
+
+/* save */
+//app.put('/json/items/:id', json.save_backbone);
+app.put('/json/items/:id', json.save);
+
+app.post('/rest/items', function(req, res) {
+  console.dir(req.body);
+  res.json({});
+});
+
+app.put('/rest/items', function(req, res) {
+  console.dir(req.body);
+  res.json({});
+});
+
+
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
@@ -247,3 +378,4 @@ function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
   res.redirect('/node/')
 }
+

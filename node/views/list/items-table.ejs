@@ -1,0 +1,296 @@
+<table id="items" style="width:100%;">
+  
+  <thead>
+    <tr style="background-color:#eee;">
+      <td colspan="3">
+        <div class="checkbox" style="margin:0;">
+	        <label>
+		        <input type="checkbox" class="ace" id="checkall" />
+		        <span class="lbl smaller-75"> Check all</span>
+	        </label>
+        </div>
+      </td>
+      <td>
+        <div class="title" data-field="mod.Title">
+          Title
+          <i class=""></i>
+        </div>
+      </td>
+      <td>
+        <div class="ItemID" data-field="org.ItemID">
+          ItemID
+          <i class=""></i>
+        </div>
+        <div class="UserID" data-field="UserID">
+          UserID
+          <i class=""></i>
+        </div>
+      </td>
+      <td>
+        <div class="HitCount" data-field="org.HitCount">
+          <i class=""></i>
+          Hit
+        </div>
+        <div class="WatchCount" data-field="org.WatchCount">
+          <i class=""></i>
+          Wch
+        </div>
+      </td>
+      <td>
+        <div class="BidCount" data-field="org.SellingStatus.BidCount">
+          <i class=""></i>
+          Bid
+        </div>
+        <div class="SoldCount" data-field="org.SellingStatus.QuantitySold">
+          <i class=""></i>
+          Sold
+        </div>
+      </td>
+      <td>
+        <div class="Quantity" data-field="mod.Quantity">
+          <i class=""></i>
+          Qty
+        </div>
+      </td>
+      <td>
+        <div class="StartPrice" data-field="mod.StartPrice">
+          <i class=""></i>
+          Price
+        </div>
+      </td>
+      <td>
+        <div class="EndTime" data-field="org.ListingDetails.EndTime">
+          <i class=""></i>
+          End
+        </div>
+      </td>
+    </tr>
+  </thead>
+  <tr id="notfound">
+    <td colspan="10" style="display:none; text-align:center; padding-top:100px; font-weight:bold; color:#999; font-size:150%;">
+      No item data found.
+    </td>
+  </tr>
+
+  <script id="itemTemplate" type="text/template">
+    
+    <tr id="{{id}}" class="row1">
+      <td>
+	      <label class="inline">
+          
+          [[ if (typeof(status) == 'string' && status != '') { ]]
+          
+		      <input type="checkbox" class="ace" name="id" value="{{id}}"
+                 checked="checked" style="display:none;"/>
+          <i class="icon-spinner icon-spin"></i>
+		      <span class="lbl"></span>
+          
+          [[ } else { ]]
+          
+		      <input type="checkbox" class="ace" name="id" value="{{id}}" />
+		      <span class="lbl"></span>
+
+          [[ } ]]
+          
+	      </label>
+      </td>
+      <td>
+        [[ if (typeof(org) == 'object') { ]]
+        [[ if (org.SellingStatus.ListingStatus == 'Active') { ]]
+        <i class="icon-play green"></i>
+        [[ } else if (org.SellingStatus.ListingStatus == 'Completed') { ]]
+        <i class="icon-stop grey smaller-75"></i>
+        [[ } ]]
+        [[ } else { ]]
+        <i class="icon-edit grey"></i>
+        [[ } ]]
+      </td>
+      <td style="width:40px; text-align:center;">
+        [[ if (mod && mod.PictureDetails) { ]]
+        <img src="/image/?url={{mod.PictureDetails.PictureURL}}" 
+             class="img-rounded" 
+             style="max-width:40px; max-height:40px;" />
+        [[ } else { ]]
+        <img src="/img/noimage.jpg"
+             class="img-rounded" 
+             style="max-width:40px; max-height:40px;" />
+        [[ } ]]
+      </td>
+      <td style="max-width:30%;">
+        [[ if (typeof(UserID) == 'string') { ]]
+
+        [[ if (typeof(mod.Title) == 'string') { ]]
+        <a href="/#/items/{{UserID}}/{{id}}" class="Title bigger-110">{{mod.Title}}</a>
+        [[ } else { ]]
+        <a href="/#/items/{{UserID}}/{{id}}" class="Title bigger-110">(empty title)</a>
+        [[ } ]]
+        
+        [[ } ]]
+        
+        [[ if (typeof(status) == 'string' && status != '') { ]]
+        
+        <ul class="list-unstyled">
+          <li class="text-warning">
+            {{status}}
+          </li>
+        </ul>
+        
+        [[ } else if (typeof(error) == 'object' && error != null) { ]]
+        
+        <ul class="list-unstyled">
+          [[ for(i = 0; i < error.length; i++) { ]]
+          [[ if (error[i].SeverityCode == 'Warning') continue; ]]
+          <li class="text-danger">
+            <i class="icon-warning-sign red"></i>
+            {{-error[i].ShortMessage}}<br/>
+          </li>
+          
+          [[ if (error[i].LongMessage != error[i].ShortMessage) { ]]
+          <li class="text-danger">
+            <i class="icon-warning-sign red"></i>
+            {{-error[i].LongMessage}}<br/>
+          </li>
+          [[ } ]]
+          
+          [[ } ]]
+        </ul>
+        
+        [[ } ]]
+        
+      </td>
+      <td>
+        <div>
+          [[ if (typeof(org) == 'object') { ]]
+          <a href="{{org.ListingDetails.ViewItemURL}}" class="ItemID" target="_blank">
+            {{org.ItemID}}
+          </a>
+          [[ } else { ]]
+          -
+          [[ } ]]
+        </div>
+        <div class="UserID">
+          [[ if (typeof(UserID) == 'string') { ]]
+          {{UserID}}
+          [[ } ]]
+        </div>
+      </td>
+      <td>
+        <div class="HitCount">
+          [[ if (typeof(org) == 'object' && org.hasOwnProperty('HitCount')) { ]]
+          {{org.HitCount}}
+          [[ } else { ]]
+          -
+          [[ } ]]
+        </div>
+        <div class="WatchCount">
+          [[ if (typeof(org) == 'object' && org.hasOwnProperty('WatchCount')) { ]]
+          {{org.WatchCount}}
+          [[ } else { ]]
+          -
+          [[ } ]]
+        </div>
+      </td>
+      <td>
+        <div class="BidCount">
+          [[ if (typeof(org) == 'object' && org.SellingStatus.hasOwnProperty('BidCount')) { ]]
+          {{org.SellingStatus.BidCount}}
+          [[ } else { ]]
+          -
+          [[ } ]]
+        </div>
+        <div class="SoldCount">
+          [[ if (typeof(org) == 'object' && org.SellingStatus.hasOwnProperty('QuantitySold')) { ]]
+          {{org.SellingStatus.QuantitySold}}
+          [[ } else { ]]
+          -
+          [[ } ]]
+        </div>
+      </td>
+      <td class="Quantity">
+        [[ if (typeof(mod) == 'object') { ]]
+        {{mod.Quantity}}
+        [[ } ]]
+      </td>
+      <td>
+        <div class="CurrentPrice">
+        </div>
+        <div class="StartPrice">
+          [[ if (typeof(mod) == 'object' && typeof(mod.StartPrice) == 'object') { ]]
+          [[ if (mod.StartPrice['@currencyID'] == 'USD') { ]]
+          <i class="icon-usd"></i>
+          [[ } ]]
+          {{mod.StartPrice['#text']}}
+          [[ } ]]
+        </div>
+      </td>
+      <td>
+        <div class="EndTime">
+          [[ if (typeof(endtime) == 'string') { ]]
+          {{endtime}}
+          [[ } ]]
+        </div>
+        <div class="StartTime">
+          
+        </div>
+      </td>
+    </tr>
+    <tr id="{{id}}-row2" style="border-bottom:1px solid #ccc;" class="row2">
+      <td colspan="10" id="{{id}}-detail">
+				<div class="message-loading-overlay hide" id="{{id}}-loading">
+					<i class="icon-spin icon-spinner orange2 bigger-160"></i>
+				</div>
+        
+        [[ if (typeof(membermessages) == 'object') { ]]
+        [[ for(i = 0; i < membermessages.length; i++) { ]]
+        [[ if (membermessages[i].MessageStatus == 'Answered') continue; ]]
+        <div class="well well-sm membermessage">
+          <div class="row">
+            
+            <div class="col-xs-6">
+              <span class="label label-sm label-danger">
+                {{membermessages[i].MessageStatus}}
+              </span>
+              <strong style="margin-left:10px;">
+                {{membermessages[i].Question.SenderID}}
+              </strong>
+              <span style="margin-left:10px;">
+                <i>{{membermessages[i].CreationDate}}</i>
+              </span>
+              
+              <p style="background-color:#fff; padding:5px; margin-top:10px; border:1px solid #ddd;">
+                {{membermessages[i].Question.Body.replace(/[\n]/g, '<br/>')}}
+              </p>
+            </div>
+            
+            <div class="col-xs-1 pull-right">
+              <button class="btn btn-xs respondbutton"
+                      data-id="{{id}}"
+                      data-userid="{{UserID}}"
+                      data-itemid="{{org.ItemID}}"
+                      data-parent="{{membermessages[i].Question.MessageID}}"
+                      data-sender="{{membermessages[i].Question.SenderID}}">
+                <%= __('Respond') %>
+              </button>
+            </div>
+            
+            <div class="col-xs-5 pull-right">
+              <div class="form">
+                <textarea name="body" class="form-control" rows="3"></textarea>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+        [[ } ]]
+        [[ } ]]
+        
+      </td>
+    </tr>
+    
+  </script>
+  
+  <script id="detailTemplate" type="text/template">
+    <% include detail-template %>
+  </script>
+  
+</table>

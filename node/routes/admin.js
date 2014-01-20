@@ -54,6 +54,19 @@ exports.index = function(req, res) {
                 });
               }
               
+              userid.notification_enabled = 0;
+              userid.notification_disabled = 0;
+              
+              if (userid.hasOwnProperty('NotificationEnable')) {
+                userid.NotificationEnable.forEach(function(elm) {
+                  if (elm.EventEnable == 'Enable') {
+                    userid.notification_enabled++;
+                  } else {
+                    userid.notification_disabled++;
+                  }
+                });
+              }
+              
             });
           }
           
@@ -110,13 +123,7 @@ exports.callapi = function(req, res) {
   var apimodule = require('./ebayapi/' + callname);
   
   apimodule.call(req.body, function(response) {
-    
-    console.log('admin.callapi response to browser: [' + response + ']');
-    
-    //res.writeHead(200, {'Content-Type': 'application/json'});
-    //res.write(JSON.stringify(response));
-    res.end();
-    
+    res.json(response);
   });
   
   return;

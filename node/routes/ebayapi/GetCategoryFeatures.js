@@ -1,8 +1,8 @@
-var mongo      = require('../mongoconnect');
-var taskmodule = require('./task');
-var config     = require('../../config');
-var async      = require('async');
-var clone      = require('clone');
+var mongo  = require('../mongoconnect');
+var task   = require('./task');
+var config = require('../../config');
+var async  = require('async');
+var clone  = require('clone');
 
 module.exports = {
   
@@ -13,20 +13,15 @@ module.exports = {
     async.waterfall([
       
       function(callback) {
-        taskmodule.getnewtokenmap('admin@listers.in', callback);
+        task.getnewtokenmap('admin@listers.in', callback);
       },
       
       function(token, callback) {
         
         mongo(function(db) {
-          
           db.collection('US.eBayDetails', function(err, collection) {
-            
             collection.findOne({}, function(err, document) {
-              
               document.SiteDetails.forEach(function(doc) {
-                
-                if (doc.Site != 'US') return;
                 
                 var requestjson = {
                   email: 'admin@listers.in',
@@ -44,36 +39,38 @@ module.exports = {
                   }
                 };
                 
-                taskmodule.addqueue(requestjson, function(err, resultjson) {
+                task.addqueue(requestjson, function(err, resultjson) {
                   
                   var correlationid = resultjson.CorrelationID.split(' ');
                   var site = correlationid[1];
                   
-                  var resultcopy = clone(resultjson);
+                  //var resultcopy = clone(resultjson);
+                  task.convertattr(resultjson);
                   
                   db.collection
-                  (site + '.CategoryFeatures', function(err, collection) {
+                  (site + '.CategoryFeatures.Category.ready', function(err, collection) {
                     collection.remove({}, function() {
-                      delete resultjson.Category;
-                      collection.insert(resultjson);
+                      collection.insert(resultjson.Category, function(err, doc) {
+                        
+                        db.collection
+                        (site + '.CategoryFeatures.ready', function(err, collection) {
+                          collection.remove({}, function() {
+                            delete resultjson.Category;
+                            collection.insert(resultjson);
+                          });
+                        });
+                        
+                      });
                     });
                   });
                   
-                  db.collection
-                  (site + '.CategoryFeatures.Category', function(err, collection) {
-                    collection.remove({}, function() {
-                      collection.insert(resultcopy.Category);
-                    });
-                  });
                   
-                });
+                  
+                }); // addqueue
                 
               }); // forEach
-              
             }); // findOne
-            
           }); // collection
-          
         }); // mongo
         
         callback(null, '');

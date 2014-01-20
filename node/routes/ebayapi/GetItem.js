@@ -222,6 +222,7 @@ var methods = {
 
 module.exports = methods;
 
+// todo: use task.convertattr
 function convertattr(o) {
   
   Object.keys(o).forEach(function(key) {

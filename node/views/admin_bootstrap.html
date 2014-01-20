@@ -64,7 +64,7 @@
         <th>E</th>
         <th>C</th>
         <th>L</th>
-        <th>Z</th>
+        <th>N</th>
         <th>I</th>
         <th>P</th>
         <th>A</th>
@@ -100,16 +100,25 @@
              <%= users[i].lastused_at %>
            </td>
            <td rowspan="<%= users[i].userids2.length %>">
-             <%= users[i].timezone.replace('GMT', '').replace(':00', '') %>
+             <% if (users[i].hasOwnProperty('newlook')) { %>
+             <%= users[i].newlook %>
+             <% } %>
            </td>
            <% } %>
            
 					 <td>
              <%= users[i].userids2[j].username %>
+             
              <% if (users[i].userids2[j].hasOwnProperty('TokenStatus')
                  && users[i].userids2[j].TokenStatus.Status != 'Active') { %>
              <div style="color:red;">(<%= users[i].userids2[j].TokenStatus.Status %>)</div>
              <% } %>
+             
+             <% if (users[i].userids2[j].hasOwnProperty('User')
+                && users[i].userids2[j].User.Status != 'Confirmed') { %>
+             <div style="color:red;">(<%= users[i].userids2[j].User.Status %>)</div>
+             <% } %>
+             
            </td>
 					 <td align="right" style="color:#f00;">
              <% if (users[i].userids2[j].hasOwnProperty('summary')
@@ -151,6 +160,36 @@
              <%= users[i].userids2[j].membermessages.Answered %>
              <% } %>
            </td>
+           <td>
+             
+             <% if (users[i].userids2[j].notification_enabled > 0) { %>
+             <span style="color:#00f;">
+               <%= users[i].userids2[j].notification_enabled %>
+             </span>
+             <% } %>
+             
+             <% if (users[i].userids2[j].notification_disabled > 0) { %>
+             <span style="color:#f00;">
+               <%= users[i].userids2[j].notification_disabled %>
+             </span>
+             <% } %>
+             
+             <a href="#" class="enablenotification"
+                data-email='<%= users[i].email %>'
+                data-username='<%= users[i].userids2[j].username %>'
+                >O</a>
+             
+             <a href="#" class="disablenotification"
+                data-email='<%= users[i].email %>'
+                data-username='<%= users[i].userids2[j].username %>'
+                >X</a>
+             
+             <a href="#" class="getnotificationpreferences"
+                data-email='<%= users[i].email %>'
+                data-username='<%= users[i].userids2[j].username %>'
+                >U</a>
+             
+           </td>
          </tr>
          <% } %>
          
@@ -174,7 +213,9 @@
              <%= users[i].lastused_at %>
            </td>
            <td>
-             <%= users[i].timezone.replace('GMT', '').replace(':00', '') %>
+             <% if (users[i].hasOwnProperty('newlook')) { %>
+             <%= users[i].newlook %>
+             <% } %>
            </td>
 					 <td>-</td>
 					 <td align="right">-</td>
@@ -200,12 +241,6 @@
     <button class="btn btn-default btn-sm">GetCategorySpecifics</button>
     <button class="btn btn-default btn-sm">GetCategoryMappings</button>
   </div>
-  
-  <button id="notify" class="btn btn-default btn-sm">NOTIFY</button>
-  
-  <a href="/node/json/import" target="_blank">GetSellerList</a>
-  
-  <a href="/node/json/getitem">GetItem</a>
   
 </div><!-- /.container -->
     

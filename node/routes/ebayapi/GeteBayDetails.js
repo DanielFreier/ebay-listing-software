@@ -62,7 +62,7 @@ module.exports = {
             var site = correlationid[1];
             
             mongo(function(db) {
-              db.collection(site + '.eBayDetails', function(err, collection) {
+              db.collection(site + '.eBayDetails.ready', function(err, collection) {
                 collection.remove({}, function() {
                   collection.insert(resultjson2);
                 });

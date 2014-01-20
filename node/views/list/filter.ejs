@@ -1,0 +1,51 @@
+<form id="hiddenforms">
+  
+  <select name="selling" class="filter">
+    <option value="allitems">All items</option>
+    <option value="scheduled">Scheduled</option>
+    <option value="active" selected>Active</option>
+    <option value="sold">Sold</option>
+    <option value="unsold">Unsold</option>
+    <option value="unanswered">Unanswered</option>
+    <option value="saved">Saved</option>
+  </select>
+  
+  <select name="UserID" class="filter">
+    <option value="">All UserID</option>
+    <% if (user.userids2) { %>
+    <% for (var i = 0; i < user.userids2.length; i++) { %>
+    <option value="<%= user.userids2[i].username %>">
+			<%= user.userids2[i].username %>
+		</option>
+    <% } %>
+    <% } %>
+  </select>
+  
+  <select name="sortfield" class="filter">
+    <option value="mod.Quantity">Quantity</option>
+    <option value="mod.StartPrice">Price</option>
+    <option value="mod.Title">Title</option>
+    <option value="org.ItemID">ItemID</option>
+    <option value="org.WatchCount">Watch count</option>
+    <option value="org.HitCount">Hit count</option>
+    <option value="org.ListingDetails.EndTime" selected>End time</option>
+    <option value="org.SellingStatus.BidCount">Bid count</option>
+    <option value="org.SellingStatus.QuantitySold">Sold count</option>
+    <option value="UserID">UserID</option>
+  </select>
+  
+  <select name="sortorder" class="filter">
+    <option value="1">Ascending</option>
+    <option value="-1">Descending</option>
+  </select>
+  
+  offset<input type="text" class="filter" name="offset" size="3" value="0"/>
+  limit <input type="text" class="filter" name="limit"  size="3" value="30"/>
+  total <input type="text" class="filter" name="total"  size="3"/>
+  
+  <input type="text" class="filter" name="option"   size="3" value=""/>
+  <input type="text" class="filter" name="allpages" size="3" value=""/>
+  
+  <input type="text" class="filter" name="title" size="3" value=""/>
+  
+</form>

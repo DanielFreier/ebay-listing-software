@@ -1,0 +1,334 @@
+<div class="form-group">
+	<label for="UserID" class="col-sm-3 control-label no-padding-right">
+    <%= __('PrimaryCategory') %>
+  </label>
+	<div class="col-sm-9" data-form="primarycategory">
+    <select name="mod.PrimaryCategory.CategoryID" class="form-control">
+    </select>
+	</div>
+</div>
+
+<div class="form-group">
+	<label for="UserID" class="col-sm-3 control-label no-padding-right">
+    <%= __('SecondaryCategory') %>
+  </label>
+	<div class="col-sm-9" data-form="secondarycategory">
+    <select name="mod.SecondaryCategory.CategoryID" class="form-control">
+    </select>
+	</div>
+</div>
+
+<div class="form-group">
+	<label for="UserID" class="col-sm-3 control-label no-padding-right">
+    <%= __('ProductDetails') %>
+  </label>
+	<div class="col-sm-9">
+
+    
+    <div class="productsearchform">
+      
+      <span class="CharacteristicsSetsName"></span>
+      
+			<div class="input-group">
+        
+				<input type="text" class="form-control search-query remove"
+               placeholder="Type your query"
+               name="ProductSearch.QueryKeywords" />
+        
+				<span class="input-group-btn">
+					<button type="button" class="btn btn-sm GetProductSearchResults">
+						<i class="icon-search icon-on-right bigger-110"></i>
+            <%= __('Search') %>
+					</button>
+				</span>
+        
+			</div>
+        
+      <div class="productsearchmessage"></div>
+      
+      <input name="ProductSearch.CharacteristicSetIDs.ID" type="hidden" class="remove" />
+      
+      <div class="productlistingdetails">
+        
+        <input name="mod.ProductListingDetails.ProductID"
+               type="text" size="15" placeholder="Product ID"/>
+        
+        <input name="mod.ProductListingDetails.ProductReferenceID"
+               type="text" size="15" placeholder="Product Reference ID"/>
+        
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="true" class="ace"
+                   name="mod.ProductListingDetails.IncludePrefilledItemInformation"
+                   id="_id.ProductListingDetails.IncludePrefilledItemInformation"/>
+            <span class="lbl">
+              Include the following product information in your listing
+            </span>
+          </label>
+        </div>
+        
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="true" class="ace"
+                   name="mod.ProductListingDetails.IncludeStockPhotoURL"
+                   id="_id.ProductListingDetails.IncludeStockPhotoURL"/>
+            <span class="lbl">
+              Include Stock Photo
+            </span>
+          </label>
+        </div>
+        
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="true" class="ace"
+                   name="mod.ProductListingDetails.UseStockPhotoURLAsGallery"
+                   id="_id.ProductListingDetails.UseStockPhotoURLAsGallery" />
+            <span class="lbl">
+              Use Stock Photo As Gallery
+            </span>
+          </label>
+        </div>
+        
+      </div><!-- .productlistingdetails -->
+      
+    </div><!-- .productsearchform -->
+    
+    
+	</div>
+</div>
+
+<div class="widget-box foundproducts">
+  <div class="widget-header widget-header-small header-color-dark">
+    <h6 class="smaller">Found products</h6>
+    <div class="widget-toolbar">
+      <a href="#" class="closefoundproducts">
+        <i class="icon-remove"></i>
+      </a>
+    </div>
+  </div>
+  <div class="widget-body">
+    <div class="widget-main">
+      <h4 class="green"><%= __('Categories') %></h4>
+      <ul class="suggestedcategories">
+        <li class="suggestedcategory-template">
+          <input type="radio" name="CategoryID">
+          <label></label>
+        </li>
+      </ul>
+      <h5 class="blue"><%= __('Products') %></h5>
+      <ul class="product-list clearfix">
+        <li class="product-template clearfix">
+          <div class="product-stockphoto">
+            <img src=""/>
+          </div>
+          <div class="product-text">
+            <div class="product-title"></div>
+            <a href="#" class="product-select">Select</a>
+            <a href="#" class="product-detail" target="_blank">Detail</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div><!-- .foundproducts -->
+
+<h5 class="header blue bolder">
+  <i class="icon-list-alt"></i>
+  <% if (locale == 'ja') { %>
+  この商品を複数のバリエーションで出品する
+  <% } else if (locale == 'de') { %>
+  List multiple variations of this item in one listing
+  <% } else { %>
+  List multiple variations of this item in one listing
+  <% } %>
+</h5>
+
+<div class="col-xs-12">
+    
+      <div class="variations-enabled">
+        
+        <div class="variationaddforms">
+          <div>
+            <%= __('AddVariationDetail') %>
+          </div>
+          <div>
+            <ul class="VariationSpecificsSet clearfix">
+            </ul>
+          </div>
+          <div>
+            <input type="text" id="addowndetail" class="inputleft" 
+                   placeholder="<%= __('AddYourOwnDetail') %>" />
+            <button class="addownbutton btnright"><%= __('Add') %></button>
+          </div>
+        </div>
+        
+        <div class="variationstablewrapper">
+          <table class="Variations">
+            <thead>
+              <tr>
+                <th><%= __('CustomLabel') %></th>
+                <th><%= __('Price') %></th>
+                <th><%= __('Quantity') %></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <input type="text" name="mod.Variations.Variation.0.SKU" />
+                </td>
+                <td>
+                  <input type="hidden" 
+                         name="mod.Variations.Variation.0.StartPrice.@currencyID" />
+                  <div class="currencyID"></div>
+                  <input type="text"   name="mod.Variations.Variation.0.StartPrice.#text" />
+                </td>
+                <td>
+                  <input type="text" name="mod.Variations.Variation.0.Quantity" />
+                </td>
+                <td>
+                  <a href="#" class="removevariationrow">X</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <a href="#" class="addvariationrow"><%= __('AddMoreVariation') %></a>
+        </div>
+        
+        <div class="variationaddforms clearfix">
+          <div>
+            <%= __('VariationSpecificPictureSet') %>
+          </div>
+          <div>
+            <select name="mod.Variations.Pictures.VariationSpecificName">
+              <option value="">(not selected)</option>
+            </select>
+          </div>
+        </div><!-- .variationaddforms -->
+        <div class="VariationSpecificPictureSet">
+          <div class="VariationPictures0">
+            
+            <div class="variationspecificvalue"></div>
+            
+            <ul class="ace-thumbnails variationpictures variationpictures0 clearfix">
+              <li class="template">
+			          <a href="/ace/assets/images/gallery/image-2.jpg" 
+                   title="Photo Title" data-rel="colorbox" target="_blank"
+                   style="display:table-cell; vertical-align:middle; width:150px; height:150px; text-align:center; background-color:#f5f5f5;">
+                  <img src="/img/noimage.jpg"/>
+                </a>
+			          <div class="tools tools-bottom">
+				          <a href="#">
+					          <i class="icon-link"></i>
+				          </a>
+				          <a href="#">
+					          <i class="icon-remove red"></i>
+				          </a>
+			          </div>
+              </li>
+            </ul>
+            
+            <input type="hidden" name="mod.<%= __('_VPVSPS') %>.0.VariationSpecificValue" />
+            
+            <form method="post" action="/node/file/upload"
+                  target="posttarget" enctype="multipart/form-data">
+              
+              <input type="hidden" name="id" value="{{id}}" />
+              <input type="hidden" name="divclass" value="variationpictures0" />
+              <input type="hidden" name="userid" value="" />
+              
+              Upload images from your computer
+              <input type="file" name="fileUpload" multiple="multiple"/>
+            </form>
+            
+            <form class="webimageform" method="post" action="/">
+              Use self hosted images
+              <input type="text" name="webimageurl" size="30"
+                     placeholder="Input url of self hosted image" />
+              <button class="webimageformbutton">UPLOAD</button>
+            </form>
+            
+          </div>
+        </div><!-- .VariationSpecificPictureSet -->
+        
+      </div><!-- .variations-enabled -->
+      
+      <div class="variations-disabled">
+        Variations are disabled in selected category.
+      </div>
+      
+</div>
+
+
+<h5 class="header blue bolder">
+  <i class="icon-list-alt"></i>
+  <% if (locale == 'ja') { %>
+  タイトルと商品の仕様
+  <% } else if (locale == 'de') { %>
+  Verfassen Sie eine aussagekräftige Artikelbezeichnung
+  <% } else { %>
+  Help buyers find your item with a great title
+  <% } %>
+</h5>
+
+<div class="form-group">
+	<label for="Title" class="col-sm-3 control-label no-padding-right">
+    <%= __('Title') %>
+  </label>
+	<div class="col-sm-9">
+    
+    <input type="text" class="form-control limited" max-length="80"
+           name="mod.Title" value=""/>
+    
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="true" name="mod.ListingEnhancement" class="ace"/>
+        <span class="lbl">
+          Attract buyers' attention by making the title of your listing appear in Bold
+        </span>
+      </label>
+    </div>
+    
+	</div>
+</div>
+
+<div class="form-group">
+	<label for="SubTitle" class="col-sm-3 control-label no-padding-right">
+    <%= __('SubTitle') %>
+  </label>
+	<div class="col-sm-9">
+    <input type="text" class="form-control limited" max-length="80"
+           name="mod.SubTitle" value=""/>
+	</div>
+</div>
+
+<div class="form-group">
+	<label for="Condition" class="col-sm-3 control-label no-padding-right">
+    <%= __('Condition') %>
+  </label>
+	<div class="col-sm-3">
+    <select name="mod.ConditionID" class="form-control">
+    </select>
+	</div>
+</div>
+
+<div class="form-group">
+	<label for="ConditionDescription" class="col-sm-3 control-label no-padding-right">
+    <%= __('ConditionDescription') %>
+  </label>
+	<div class="col-sm-9">
+    <textarea name="mod.ConditionDescription" class="form-control"></textarea>
+	</div>
+</div>
+
+<div class="form-group">
+	<label for="ItemSpecifics" class="col-sm-3 control-label no-padding-right">
+    <%= __('ItemSpecifics') %>
+  </label>
+	<div class="col-sm-9 ItemSpecifics">
+    <table class="ItemSpecifics">
+    </table>
+    <a href="#" class="addis">Add Item Specifics</a>
+	</div>
+</div>
+

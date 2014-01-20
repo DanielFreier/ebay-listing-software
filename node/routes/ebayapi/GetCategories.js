@@ -49,7 +49,7 @@ module.exports = {
                   
                   console.log('result: ' + site);
                   
-                  db.collection(site + '.Categories', function(err, collection) {
+                  db.collection(site + '.Categories.ready', function(err, collection) {
                     collection.remove({}, function() {
                       collection.insert(resultjson.CategoryArray.Category);
                     });

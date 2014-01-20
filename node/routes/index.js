@@ -8,6 +8,45 @@ var async      = require('async');
 var moment     = require('moment');
 var util       = require('util');
 
+exports.list = function(req, res) {
+  
+  var url = require('url');
+  var url_parts = url.parse(req.url, true);
+  var query = url_parts.query;
+  
+  if (query.request_locale) {
+    req.locale = query.request_locale;
+  }
+  
+	/* Default date range value for sync item form */
+  var mischash = {};
+  mischash.datestart = moment().subtract('days', 59).format('YYYY-MM-DD');
+  mischash.dateend   = moment().add('days', 60).format('YYYY-MM-DD');
+  console.dir(mischash);
+  
+  mongo(function(db) {
+    db.collection('US.eBayDetails', function(err, coll) {
+      coll.findOne(
+        {}, 
+        {
+          'SiteDetails.Site': true,
+          'SiteDetails.SiteID': true,
+          'CurrencyDetails.Currency': true
+        },
+        function(err, doc) {
+          res.render('list', {
+            user: req.user,
+            US: {
+              eBayDetails: doc
+            },
+            mischash: mischash
+          })
+        });
+    });
+  });
+  
+} // list()
+
 exports.index = function(req, res) {
   
   var url = require('url');
@@ -65,11 +104,23 @@ exports.index = function(req, res) {
       
     }, function(err, results) {
       
-      res.render('index', { 
-        title: 'Express' ,
-        locale: req.locale,
-        feeds: results
-      });
+      if (true || query.hasOwnProperty('bootstrap')) {
+        
+        res.render('index_bootstrap', { 
+          title: 'Express' ,
+          locale: req.locale,
+          feeds: results
+        });
+        
+      } else {
+        
+        res.render('index', { 
+          title: 'Express' ,
+          locale: req.locale,
+          feeds: results
+        });
+        
+      }
       
     });
     
@@ -157,8 +208,6 @@ exports.sendmail = function(req, res) {
 
 exports.receivenotify = function(req, res) {
   
-  res.end();
-  
   var xml = '';
   
   req.on('data', function(chunk) {
@@ -188,6 +237,8 @@ exports.receivenotify = function(req, res) {
                   + '          /receivenotify'
                   + ' ' + userid + ' ' + rootname + ' ' + eventname);
       
+      //res.end();
+      
       /* save xml file */
       var savedir = '/var/www/listers.in/logs/apicall/notification/' + eventname;
       if (!fs.existsSync(savedir)) fs.mkdirSync(savedir);
@@ -195,7 +246,9 @@ exports.receivenotify = function(req, res) {
       savedir += '/' + moment().format('YYYY-MM-DD');
       if (!fs.existsSync(savedir)) fs.mkdirSync(savedir);
       
-      fs.writeFile(savedir + '/' + userid + '.' + body.CorrelationID + '.xml', xml);
+      fs.writeFileSync(savedir + '/' + userid + '.' + body.CorrelationID + '.xml', xml);
+      
+      res.end();
       
       /* GetMemberMessages */
       if (eventname == 'AskSellerQuestion') {
@@ -301,7 +354,7 @@ exports.receivenotify = function(req, res) {
     });
   });
   
-}
+} // receivenotify
 
 exports.index_bootstrap = function(req, res) {
   

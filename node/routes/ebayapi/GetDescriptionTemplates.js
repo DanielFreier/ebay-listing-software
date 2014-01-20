@@ -26,7 +26,7 @@ module.exports = {
               
               document.SiteDetails.forEach(function(doc) {
                 
-                if (doc.Site != 'Italy') return;
+                //if (doc.Site != 'Italy') return;
                 
                 var requestjson = {
                   email: 'admin@listers.in',
@@ -49,18 +49,24 @@ module.exports = {
                   var site = correlationid[1];
                   
                   db.collection
-                  (site + '.DescriptionTemplates.DescriptionTemplate', function(err, collection) {
-                    collection.remove({}, function() {
-                      collection.insert(resultjson.DescriptionTemplate);
-                    });
-                  });
+                  (site + '.DescriptionTemplates.DescriptionTemplate.ready', 
+                   function(err, collection) {
+                     collection.remove({}, function() {
+                       collection.insert(resultjson.DescriptionTemplate);
+                     });
+                   });
                   
-                  db.collection
-                  (site + '.DescriptionTemplates.ThemeGroup', function(err, collection) {
-                    collection.remove({}, function() {
-                      collection.insert(resultjson.ThemeGroup);
-                    });
-                  });
+                  if (resultjson.hasOwnProperty('ThemeGroup')) {
+                    
+                    db.collection
+                    (site + '.DescriptionTemplates.ThemeGroup.ready', 
+                     function(err, collection) {
+                       collection.remove({}, function() {
+                         collection.insert(resultjson.ThemeGroup);
+                       });
+                     });
+                    
+                  }
                   
                 });
                 

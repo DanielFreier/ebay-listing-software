@@ -43,4 +43,61 @@ $(function() {
     
   });
   
+  $('.enablenotification').click(function() {
+    
+    var postdata = {
+      callname: 'SetNotificationPreferences',
+      email: $(this).attr('data-email'),
+      username: $(this).attr('data-username')
+    }
+    
+    $.post('/node/admin/callapi',
+           postdata,
+           function() {
+           },
+           'json');
+    
+    return false;
+    
+  });
+  
+  $('.disablenotification').click(function() {
+    
+    var postdata = {
+      callname: 'SetNotificationPreferences',
+      email: $(this).attr('data-email'),
+      username: $(this).attr('data-username'),
+      disable: true
+    }
+    
+    $.post('/node/admin/callapi',
+           postdata,
+           function() {
+             
+           },
+           'json');
+    
+    return false;
+    
+  });
+  
+  $('.getnotificationpreferences').click(function() {
+    
+    console.dir('click');
+    
+    $.post('/node/admin/callapi',
+           {
+             callname: 'GetNotificationPreferences',
+             email: $(this).attr('data-email'),
+             username: $(this).attr('data-username')
+           },
+           function() {
+             console.dir('resp');
+           },
+           'json');
+    
+    return false;
+    
+  });
+  
 });

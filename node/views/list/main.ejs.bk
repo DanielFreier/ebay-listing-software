@@ -1,0 +1,21 @@
+<div class="message-container">
+  
+	<div id="id-message-list-navbar" class="message-navbar align-center clearfix">  
+    <% include main-navbar %>
+  </div>
+  
+	<div class="message-list-container message-condensed">
+		<div class="message-list" id="items">
+      
+      <script id="itemTemplate" type="text/template">
+        <% include item-template %>
+      </script>
+      
+      <script id="detailTemplate" type="text/template">
+        <% include detail-template %>
+      </script>
+      
+		</div>
+	</div><!-- /.message-list-container -->
+  
+</div><!-- /.message-container -->
