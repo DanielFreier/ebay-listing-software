@@ -10,6 +10,8 @@ require.config({
     jquerydump:     '/js/jquery.dump',
     redactor:       '/js/redactor/redactor.min',
     bootstrap:      '/ace/assets/js/bootstrap.min',
+    bootstraptag:   '/ace/assets/js/bootstrap-tag.min',
+    bootstraptagta: '/ace/assets/js/typeahead-bs2.min',
     bootstrapwysiwyg: '/ace/assets/js/bootstrap-wysiwyg.min',
     bootstrapdatepicker: '/ace/assets/js/date-time/bootstrap-datepicker.min',
     ace:            '/ace/assets/js/uncompressed/ace',
@@ -46,11 +48,18 @@ require.config({
     bootstrapwysiwyg: {
       deps: ['jquery']
     },
+    bootstraptag: {
+      deps: ['jquery', 'bootstraptagta']
+    },
+    bootstraptagta: {
+      deps: ['jquery']
+    },
     aceelements: {
       deps: ['jquery']
     },
     ace: {
-      deps: ['jquery', 'aceelements', 'bootstrap', 'bootstrapwysiwyg', 'bootstrapdatepicker', 
+      deps: ['jquery', 'aceelements', 'bootstrap', 'bootstrapwysiwyg',
+             'bootstrapdatepicker', 'bootstraptag', 'bootstraptagta',
              'jquerycolorbox', 'jquerydump', 'jqueryui']
     }
   }    

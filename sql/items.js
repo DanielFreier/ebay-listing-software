@@ -3,7 +3,7 @@ db.users.find().forEach(
   
   function(row) {
     
-    if (row.email != 'namba.hiroshi@gmail.com') return;
+    if (row.email != 'Maxclinder@aol.com') return;
     //if (row.email != 'fd3s.boost@gmail.com') return;
     //if (row.email != 'demo@listers.in') return;
     
@@ -13,11 +13,11 @@ db.users.find().forEach(
     _id = _id.replace('"', '');
     _id = _id.replace('ObjectId(', '');
     _id = _id.replace(')', '');
-    print(_id);
+    //print(_id);
     
-    db.getCollection('items.' + _id).remove();
+    db.getCollection('items.' + _id).find().forEach(printjson);
     
-    var now = new Date();
+    //var now = new Date();
     
     /*
     var res = db.runCommand({

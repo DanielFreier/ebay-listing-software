@@ -129,6 +129,8 @@ define([
         $('a.tab-all', this.el).click();
       }
       
+      $('input[name="opt.tags"]', this.el).tag();
+      
       return this;
     },
     

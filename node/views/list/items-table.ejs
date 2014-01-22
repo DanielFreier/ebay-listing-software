@@ -127,6 +127,16 @@
         
         [[ } ]]
         
+        [[ if (typeof(opt) == 'object') { ]]
+        [[ if (opt.hasOwnProperty('tags')) { ]]
+        <div class="pull-right">
+          [[ for (i = 0; i < opt.tags.length; i++) { ]]
+          <span class="label label-sm label-info">{{opt.tags[i]}}</span>
+          [[ } ]]
+        </div>
+        [[ } ]]
+        [[ } ]]
+        
         [[ if (typeof(status) == 'string' && status != '') { ]]
         
         <ul class="list-unstyled">
@@ -218,6 +228,16 @@
           [[ if (typeof(mod) == 'object' && typeof(mod.StartPrice) == 'object') { ]]
           [[ if (mod.StartPrice['@currencyID'] == 'USD') { ]]
           <i class="icon-usd"></i>
+          [[ } else if (mod.StartPrice['@currencyID'] == 'GBP') { ]]
+          <i class="icon-gbp"></i>
+          [[ } else if (mod.StartPrice['@currencyID'] == 'EUR') { ]]
+          <i class="icon-eur"></i>
+          [[ } else if (mod.StartPrice['@currencyID'] == 'INR') { ]]
+          <i class="icon-inr"></i>
+          [[ } else if (mod.StartPrice['@currencyID'] == 'CNY') { ]]
+          <i class="icon-cny"></i>
+          [[ } else { ]]
+          {{mod.StartPrice['@currencyID']}}
           [[ } ]]
           {{mod.StartPrice['#text']}}
           [[ } ]]

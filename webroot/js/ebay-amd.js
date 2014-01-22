@@ -1923,7 +1923,22 @@ showformvalues: function(item) {
       
     });
   }
-
+  
+  /* tags */
+  if (item.hasOwnProperty('opt')) {
+    if (item.opt.hasOwnProperty('tags')) {
+      $.each(item.opt.tags, function(idx, tag) {
+        var span = $('<span/>')
+          .addClass('label')
+          .addClass('label-info')
+          .html(tag);
+        $('input[name="opt.tags"]', detail).parent().append(span).append('&nbsp;');
+      });
+    }
+  }
+  $('input[name="opt.tags"]', detail).parent().css('padding-top', '4px');
+  $('input[name="opt.tags"]', detail).remove();
+  
 	/* hide links */
 	$('a.addis',      detail).remove();
 	$('a.removeispc', detail).remove();

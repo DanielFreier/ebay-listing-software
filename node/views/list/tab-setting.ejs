@@ -70,3 +70,19 @@
     
 	</div>
 </div>
+
+<div class="form-group">
+	<label class="col-sm-3 control-label no-padding-right" for="mod.Site">
+    Tags
+  </label>
+	<div class="col-sm-5">
+		<input type="text" name="opt.tags"
+           id="form-field-tags-{{id}}"
+           placeholder="Enter tags ..."
+           [[ if (typeof(opt) == 'object') { ]]
+           value="{{opt.tags}}"
+           [[ } ]]
+           />
+	</div>
+</div>
+

@@ -1318,6 +1318,12 @@ exports.save = function(req, res) {
     convertdate(mod, config.datefield[i]);
   }
   
+  /* tags */
+  if (opt.hasOwnProperty('tags')) {
+    var tags = opt.tags.split(',');
+    opt.tags = tags;
+  }
+  
   var orgexists = false;
   var taskid = 'verifyadditem_' + moment().format('YYYY-MM-DD_HH-mm-ss');
   
@@ -2060,7 +2066,7 @@ function _item(user, id, callback) {
         categorypath(item.mod.Site, item.mod.SecondaryCategory.CategoryID, function(err, path) {
           
           console.dir(path);
-          item.categorypath = path;
+          item.secondarycategorypath = path;
           
           /* grandchildren */
           var pathstr = clone(path);

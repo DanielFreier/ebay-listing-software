@@ -1672,7 +1672,6 @@ function getrow(idx, row)
 	}
 	
 	if (row.mod.ListingType) {
-    console.dir(typeof(row.mod.ListingType));
 		if (row.mod.ListingType.match('Fixed')) {
 			$('td.ListingType', dom).html('<img src="/img/currency_dollar.png" width="12"/>');
 		} else {
@@ -1945,19 +1944,19 @@ function setformelements(item)
 	
 	var pds = getcategorypulldowns(site, tmppath);
 	$('td.primarycategory', '#'+id).html(pds);
+  
 	
 	/* Secondary Category */
 	if (item.secondarycategorypath) {
-		
 	} else {
 		item.secondarycategorypath = [];
 	}
 	
-	var tmppath = item.secondarycategorypath.slice(0); // just copy?
-	tmppath.unshift(0);
+	var tmppath2 = item.secondarycategorypath.slice(0); // just copy?
+	tmppath2.unshift(0);
 	
-	var pds = getsecondarycategorypulldowns(site, tmppath);
-	$('td.secondarycategory', '#'+id).html(pds);
+	var pds2 = getsecondarycategorypulldowns(site, tmppath2);
+	$('td.secondarycategory', '#'+id).html(pds2);
 	
 	var tmppc = hash[site].Categories;
 	if (item.categorypath.length >= 2) {
@@ -1967,7 +1966,7 @@ function setformelements(item)
 	$('select[name="mod.ConditionID"]', '#'+id).empty();
 	var category;
 	if (item.mod.PrimaryCategory) {
-		var category = tmppc['c'+item.mod.PrimaryCategory.CategoryID];
+		var category = tmppc['c' + item.mod.PrimaryCategory.CategoryID];
 		
 		if (category.CategoryFeatures) {
       
@@ -4091,34 +4090,36 @@ function setformelements_itemspecifics_values(id, i, recomm, specific)
 			}
 		}
 		
-    recomm.ValueRecommendation = arrayize(recomm.ValueRecommendation);
-		for (j in recomm.ValueRecommendation) {
-			
-			if (checkboxidx % 3 == 0) {
-				$(tabletag).append($('<tr />'));
-			}
-			
-			var idforlabel = id+'.ItemSpecifics.NameValueList.'+i+'.Value.'+checkboxidx;
-			
-			var checkboxtag = $('<input/>')
-				.attr('id', idforlabel)
-				.attr('name', 'mod.ItemSpecifics.NameValueList.'+i+'.Value')
-				.attr('type', 'checkbox')
-				.val(recomm.ValueRecommendation[j].Value);
-			
-			var labeltag = $('<label/>')
-				.attr('for', idforlabel)
-				.html(recomm.ValueRecommendation[j].Value);
-			
-			var tdtagv = $('<td />')
-				.append(checkboxtag)
-				.append(labeltag);
-			
-			$('tr:last', $(tabletag)).append(tdtagv);
-			
-			checkboxidx++;
+    if (typeof(recomm.ValueRecommendation) == 'object') {
+      recomm.ValueRecommendation = arrayize(recomm.ValueRecommendation);
+		  for (j in recomm.ValueRecommendation) {
+			  
+			  if (checkboxidx % 3 == 0) {
+				  $(tabletag).append($('<tr />'));
+			  }
+			  
+			  var idforlabel = id+'.ItemSpecifics.NameValueList.'+i+'.Value.'+checkboxidx;
+			  
+			  var checkboxtag = $('<input/>')
+				  .attr('id', idforlabel)
+				  .attr('name', 'mod.ItemSpecifics.NameValueList.'+i+'.Value')
+				  .attr('type', 'checkbox')
+				  .val(recomm.ValueRecommendation[j].Value);
+			  
+			  var labeltag = $('<label/>')
+				  .attr('for', idforlabel)
+				  .html(recomm.ValueRecommendation[j].Value);
+			  
+			  var tdtagv = $('<td />')
+				  .append(checkboxtag)
+				  .append(labeltag);
+			  
+			  $('tr:last', $(tabletag)).append(tdtagv);
+			  
+			  checkboxidx++;
+		  }
 		}
-		
+    
 		$(tdtag).append(tabletag);
 		
 	} else if (recomm.ValidationRules.SelectionMode == 'SelectionOnly'
@@ -4140,7 +4141,9 @@ function setformelements_itemspecifics_values(id, i, recomm, specific)
 		
 	} else {
 		
-		$(tdtag).append('<pre>'+$.dump(recomm)+'</pre>');
+    console.log('===[recomm]===');
+    console.dir(recomm);
+		//$(tdtag).append('<pre>'+$.dump(recomm)+'</pre>');
 		
 	}
 	//$(tdtag).append('<pre>'+$.dump(recomm)+'</pre>');
