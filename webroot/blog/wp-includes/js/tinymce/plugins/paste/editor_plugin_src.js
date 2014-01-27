@@ -686,7 +686,6 @@
 						levels.push(margin);
 
 					if (!listElm || type != lastType) {
-
 						listElm = dom.create(type);
 						dom.insertAfter(listElm, p);
 					} else {

@@ -22,11 +22,6 @@ if ( !class_exists( 'Yoast_Tracking' ) ) {
 		 * Class constructor
 		 */
 		function __construct() {
-			// The tracking checks daily, but only sends new data every 7 days.
-			if ( !wp_next_scheduled( 'yoast_tracking' ) ) {
-				wp_schedule_event( time(), 'daily', 'yoast_tracking' );
-			}
-
 			add_action( 'yoast_tracking', array( $this, 'tracking' ) );
 		}
 
@@ -89,7 +84,7 @@ if ( !class_exists( 'Yoast_Tracking' ) ) {
 				$plugins = array();
 				foreach ( get_option( 'active_plugins' ) as $plugin_path ) {
 					if ( !function_exists( 'get_plugin_data' ) )
-						require_once ABSPATH . 'wp-admin/includes/admin.php';
+						require_once( ABSPATH . 'wp-admin/includes/admin.php' );
 
 					$plugin_info = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin_path );
 
@@ -106,11 +101,9 @@ if ( !class_exists( 'Yoast_Tracking' ) ) {
 				$data = array(
 					'site'     => array(
 						'hash'      => $hash,
-						'url'       => site_url(),
-						'name'      => get_bloginfo( 'name' ),
 						'version'   => get_bloginfo( 'version' ),
 						'multisite' => is_multisite(),
-						'users'     => $wpdb->get_var( "SELECT COUNT(*) FROM wp_users INNER JOIN wp_usermeta ON (wp_users.ID = wp_usermeta.user_id) WHERE 1 = 1 AND ( wp_usermeta.meta_key = 'wp_{$blog_id}_capabilities' ) " ),
+						'users'     => $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->users INNER JOIN $wpdb->usermeta ON ({$wpdb->users}.ID = {$wpdb->usermeta}.user_id) WHERE 1 = 1 AND ( {$wpdb->usermeta}.meta_key = %s )", 'wp_' . $blog_id . '_capabilities' ) ),
 						'lang'      => get_locale(),
 					),
 					'pts'      => $pts,

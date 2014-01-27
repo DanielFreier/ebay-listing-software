@@ -147,7 +147,6 @@ function sack(file) {
 						case 2:
 							self.onLoaded();
 							break;
-
 						case 3:
 							self.onInteractive();
 							break;

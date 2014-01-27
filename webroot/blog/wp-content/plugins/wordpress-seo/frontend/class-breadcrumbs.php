@@ -97,9 +97,38 @@ class WPSEO_Breadcrumbs {
 							unset( $terms_by_id[$term->parent] );
 						}
 
-						// As we could still have two subcategories, from different parent categories, let's pick the first.
-						reset( $terms_by_id );
-						$deepest_term = current( $terms_by_id );
+						// As we could still have two subcategories, from different parent categories, let's pick the one with the lowest ordered ancestor.
+                        $parents_count = 0;
+                        $term_order = 9999; //because ASC
+                        reset( $terms_by_id );
+                        $deepest_term = current($terms_by_id);
+                        foreach ( $terms_by_id as $term ) {
+                            $parents = $this->get_term_parents( $term );
+
+                            if ( sizeof( $parents ) >= $parents_count ) {
+                                $parents_count = sizeof( $parents );
+
+                                //if higher count
+                                if ( sizeof( $parents ) > $parents_count ) {
+                                    //reset order
+                                    $term_order = 9999;
+                                }
+
+                                $parent_order = 9999; //set default order
+                                foreach ( $parents as $parent ) {
+                                    if ( $parent->parent == 0 && isset( $parent->term_order ) ) {
+                                        $parent_order = $parent->term_order;
+                                    }
+                                }
+
+                                //check if parent has lowest order
+                                if ( $parent_order < $term_order ) {
+                                    $term_order = $parent_order;
+
+                                    $deepest_term = $term;
+                                }
+                            }
+                        }
 
 						if ( is_taxonomy_hierarchical( $main_tax ) && $deepest_term->parent != 0 ) {
 							foreach ( $this->get_term_parents( $deepest_term ) as $parent_term ) {
@@ -130,7 +159,7 @@ class WPSEO_Breadcrumbs {
 			$links[] = array( 'id' => $post->ID );
 		} else {
 			if ( is_post_type_archive() ) {
-				$links[] = array( 'ptarchive' => get_post_type() );
+				$links[] = array( 'ptarchive' => $wp_query->query['post_type'] );
 			} else if ( is_tax() || is_tag() || is_category() ) {
 				$term = $wp_query->get_queried_object();
 
@@ -218,7 +247,7 @@ class WPSEO_Breadcrumbs {
 						$crumb404 = $options['breadcrumbs-404crumb'];
 					else
 						$crumb404 = __( 'Error 404: Page not found', 'wordpress-seo' );
-							
+
 					$links[] = array( 'text' => $crumb404 );
 				}
 			}
@@ -263,8 +292,6 @@ class WPSEO_Breadcrumbs {
 		$output = '';
 
 		foreach ( $links as $i => $link ) {
-			if ( !empty( $output ) )
-				$output .= " $sep ";
 
 			if ( isset( $link['id'] ) ) {
 				$link['url']  = get_permalink( $link['id'] );
@@ -283,11 +310,20 @@ class WPSEO_Breadcrumbs {
 			}
 
 			if ( isset( $link['ptarchive'] ) ) {
+				/* @todo add something along the lines of the below to make it work with WooCommerce.. ?
+				if( false === $link['ptarchive'] && true === is_post_type_archive( 'product' ) ) {
+					$link['ptarchive'] = 'product'; // translate ?
+				}*/
 				if ( isset( $opt['bctitle-ptarchive-' . $link['ptarchive']] ) && '' != $opt['bctitle-ptarchive-' . $link['ptarchive']] ) {
 					$archive_title = $opt['bctitle-ptarchive-' . $link['ptarchive']];
 				} else {
 					$post_type_obj = get_post_type_object( $link['ptarchive'] );
-					$archive_title = $post_type_obj->labels->menu_name;
+					if( isset( $post_type_obj->label ) && $post_type_obj->label !== '' ) {
+						$archive_title = $post_type_obj->label;
+					}
+					else {
+						$archive_title = $post_type_obj->labels->menu_name;
+					}
 				}
 				$link['url']  = get_post_type_archive_link( $link['ptarchive'] );
 				$link['text'] = $archive_title;
@@ -306,7 +342,9 @@ class WPSEO_Breadcrumbs {
 			}
 			$link_output .= '</' . $element . '>';
 
-			$output .= apply_filters( 'wpseo_breadcrumb_single_link', $link_output, $link );
+			$link_sep = ( !empty( $output ) ? " $sep " : '' );
+			$link_output = apply_filters( 'wpseo_breadcrumb_single_link', $link_output, $link );
+			$output .= apply_filters( 'wpseo_breadcrumb_single_link_with_sep', $link_sep . $link_output, $link );
 		}
 
 		$id = apply_filters( 'wpseo_breadcrumb_output_id', false );

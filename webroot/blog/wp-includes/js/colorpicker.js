@@ -486,7 +486,6 @@ USAGE:
 var cp = new ColorPicker();
 
 // Create a new ColorPicker object using Window Popup
-
 var cp = new ColorPicker('window');
 
 // Add a link in your page to trigger the popup. For example:

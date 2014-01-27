@@ -1,3 +1,4 @@
+/* global tinymce, getUserSetting, setUserSetting, switchEditors, autosave */
 /**
  * WordPress plugin.
  */
@@ -142,7 +143,7 @@
 				}
 			});
 
-			ed.onExecCommand.add( function( ed, cmd, ui, val ) {
+			ed.onExecCommand.add( function( ed, cmd ) {
 				if ( tinymce.isWebKit && style && ( 'InsertUnorderedList' == cmd || 'InsertOrderedList' == cmd ) )
 					ed.dom.remove( style );
 			});
@@ -221,12 +222,22 @@
 
 					last = k;
 				});
-			};
+			}
 
 			// keep empty paragraphs :(
 			ed.onSaveContent.addToTop(function(ed, o) {
 				o.content = o.content.replace(/<p>(<br ?\/?>|\u00a0|\uFEFF)?<\/p>/g, '<p>&nbsp;</p>');
 			});
+
+			// Fix bug in iOS Safari where it's impossible to type after a touchstart event on the parent document.
+			// Happens after zooming in or out while the keyboard is open. See #25131.
+			if ( tinymce.isIOS5 ) {
+				ed.onKeyDown.add( function() {
+					if ( document.activeElement == document.body ) {
+						ed.getWin().focus();
+					}
+				});
+			}
 
 			ed.onSaveContent.add(function(ed, o) {
 				// If editor is hidden, we just want the textarea's value to be saved
@@ -260,7 +271,6 @@
 			ed.addShortcut(mod_key + '+r', 'justifyright_desc', 'JustifyRight');
 			ed.addShortcut(mod_key + '+l', 'justifyleft_desc', 'JustifyLeft');
 			ed.addShortcut(mod_key + '+j', 'justifyfull_desc', 'JustifyFull');
-
 			ed.addShortcut(mod_key + '+q', 'blockquote_desc', 'mceBlockQuote');
 			ed.addShortcut(mod_key + '+u', 'bullist_desc', 'InsertUnorderedList');
 			ed.addShortcut(mod_key + '+o', 'numlist_desc', 'InsertOrderedList');
@@ -282,19 +292,19 @@
 
 			// popup buttons for images and the gallery
 			ed.onInit.add(function(ed) {
-				tinymce.dom.Event.add(ed.getWin(), 'scroll', function(e) {
+				tinymce.dom.Event.add(ed.getWin(), 'scroll', function() {
 					ed.plugins.wordpress._hideButtons();
 				});
-				tinymce.dom.Event.add(ed.getBody(), 'dragstart', function(e) {
+				tinymce.dom.Event.add(ed.getBody(), 'dragstart', function() {
 					ed.plugins.wordpress._hideButtons();
 				});
 			});
 
-			ed.onBeforeExecCommand.add(function(ed, cmd, ui, val) {
+			ed.onBeforeExecCommand.add( function( ed ) {
 				ed.plugins.wordpress._hideButtons();
 			});
 
-			ed.onSaveContent.add(function(ed, o) {
+			ed.onSaveContent.add( function( ed ) {
 				ed.plugins.wordpress._hideButtons();
 			});
 
@@ -316,7 +326,7 @@
 						ed.windowManager.close(null, id);
 					}
 				}
-			}
+			};
 
 			// close popups when clicking on the background
 			tinymce.dom.Event.remove(document.body, 'click', closeOnClick);
@@ -352,7 +362,7 @@
 		},
 
 		_showButtons : function(n, id) {
-			var ed = tinyMCE.activeEditor, p1, p2, vp, DOM = tinymce.DOM, X, Y;
+			var ed = tinymce.activeEditor, p1, p2, vp, DOM = tinymce.DOM, X, Y;
 
 			vp = ed.dom.getViewPort(ed.getWin());
 			p1 = DOM.getPos(ed.getContentAreaContainer());
