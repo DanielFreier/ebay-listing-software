@@ -7,7 +7,7 @@ db.getCollectionNames().forEach(
 	function(coll) {
 		if (coll.indexOf('items') == 0) {
 			
-			print('indexing '+coll+' ('+db[coll].count()+' records)');
+			print('indexing ' + coll + ' (' + db[coll].count() + ' records)');
 			
 			/*
 			var idxs = db[coll].getIndexes();
@@ -24,14 +24,16 @@ db.getCollectionNames().forEach(
 			db[coll].ensureIndex({'org.SellingStatus.QuantitySold':1});
 			db[coll].ensureIndex({'org.ListingDetails.EndTime':1});
 			db[coll].ensureIndex({'membermessages.MessageStatus':1});
+			db[coll].ensureIndex({'statustags':1});
       
 			db[coll].ensureIndex(
         {
+          'UserID': 1,
           'org.SellingStatus.ListingStatus': 1,
           'org.ListingDetails.EndTime': 1
         }
       );
-
+      
 			db[coll].ensureIndex(
         {
           'mod.ScheduleTime': 1,
