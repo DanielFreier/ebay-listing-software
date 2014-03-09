@@ -268,6 +268,8 @@ public class AddItems extends ApiCall {
         upditem.put("org.SellingStatus.ListingStatus", "Active");
       }
       
+      boolean iserror = false;
+      
       // todo: aware <SeverityCode>Warning</SeverityCode>
       if (item.get("Errors") != null) {
         String errorclass = item.get("Errors").getClass().toString();
@@ -281,6 +283,13 @@ public class AddItems extends ApiCall {
           continue;
         }
         upditem.put("error", errors);
+        
+        for (Object err : errors) {
+          String severitycode = ((BasicDBObject) err).getString("SeverityCode");
+          if (severitycode.equals("Error")) {
+            iserror = true;
+          }
+        }
       }
       
       BasicDBObject query = new BasicDBObject();
@@ -290,6 +299,24 @@ public class AddItems extends ApiCall {
       update.put("$set", upditem);
       
       WriteResult result = coll.update(query, update);
+      
+      /* apilog */
+      Date now = new Date();
+      
+      BasicDBObject apilog = new BasicDBObject();
+      apilog.put("date",   now);
+      apilog.put("email",  email);
+      apilog.put("userid", userid);
+      apilog.put("itemid", id);
+      apilog.put("callname", "AddItem");
+      if (iserror) {
+        apilog.put("result", "failure");
+      } else {
+        apilog.put("result", "success");
+      }
+      
+      DBCollection apilogcoll = db.getCollection("apilog");
+      apilogcoll.insert(apilog);
       
       // todo: call GetItem immediately
       /* GetItem */

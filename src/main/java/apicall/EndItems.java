@@ -116,8 +116,12 @@ public class EndItems extends ApiCall {
 						String id     = ((BasicDBObject) tmpidx).get("_id").toString();
 						String itemid = ((BasicDBObject) ((BasicDBObject) tmpidx)
                              .get("org")).getString("ItemID");
-						
-						ldbo.add(new BasicDBObject("MessageID", userdbo.getString("_id")+" "+id)
+            
+            String messageidstring = getnewtokenmap(email);
+            messageidstring += " " + tmpuserid;
+            messageidstring += " " + id;
+            
+            ldbo.add(new BasicDBObject("MessageID", messageidstring)
                      .append("ItemID", itemid)
                      .append("EndingReason", "NotAvailable"));
 						tmpcnt++;
@@ -159,7 +163,7 @@ public class EndItems extends ApiCall {
 	public String callback(String responsexml) throws Exception {
 		
 		writelog("EndItems/res.xml", responsexml);
-		
+    
 		BasicDBObject responsedbo = convertXML2DBObject(responsexml);
 		
 		log("Ack: "+responsedbo.get("Ack").toString());
@@ -181,10 +185,14 @@ public class EndItems extends ApiCall {
 			BasicDBObject item = (BasicDBObject) oitem;
 			
 			String[] messages = item.getString("CorrelationID").split(" ");
-			String itemcollectionname_id = messages[0];
-			String id = messages[1];
-			
-			DBCollection coll = db.getCollection("items."+itemcollectionname_id);
+      String email  = getemailfromtokenmap(messages[0]);
+      String userid = messages[1];
+      String id     = messages[2];
+      
+      BasicDBObject userdbo = (BasicDBObject) db.getCollection("users")
+        .findOne(new BasicDBObject("email", email));
+      
+      DBCollection coll = db.getCollection("items." + userdbo.getString("_id"));
 			
 			BasicDBObject upditem = new BasicDBObject();
 			upditem.put("status", "");
@@ -192,9 +200,12 @@ public class EndItems extends ApiCall {
 			if (item.containsField("EndTime")) {
 				upditem.put("org.ListingDetails.EndTime", item.getString("EndTime"));
 			}
+
+      boolean iserror = false;
+      
 			if (item.containsField("Errors")) {
 				String errorclass = item.get("Errors").getClass().toString();
-				
+        
 				BasicDBList errors = new BasicDBList();
 				if (errorclass.equals("class com.mongodb.BasicDBObject")) {
 					errors.add((BasicDBObject) item.get("Errors"));
@@ -205,6 +216,13 @@ public class EndItems extends ApiCall {
 					continue;
 				}
 				upditem.put("error", errors);
+        
+        for (Object err : errors) {
+          String severitycode = ((BasicDBObject) err).getString("SeverityCode");
+          if (severitycode.equals("Error")) {
+            iserror = true;
+          }
+        }
 			}
 			
 			BasicDBObject query = new BasicDBObject();
@@ -214,6 +232,24 @@ public class EndItems extends ApiCall {
 			update.put("$set", upditem);
 			
 			WriteResult result = coll.update(query, update);
+      
+      /* apilog */
+      Date now = new Date();
+      
+      BasicDBObject apilog = new BasicDBObject();
+      apilog.put("date",   now);
+      apilog.put("email",  email);
+      apilog.put("userid", userid);
+      apilog.put("itemid", id);
+      apilog.put("callname", "EndItem");
+      if (iserror) {
+        apilog.put("result", "failure");
+      } else {
+        apilog.put("result", "success");
+      }
+      
+      DBCollection apilogcoll = db.getCollection("apilog");
+      apilogcoll.insert(apilog);
 		}
 		
 		return "";

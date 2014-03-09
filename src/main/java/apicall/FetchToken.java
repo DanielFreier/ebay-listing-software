@@ -74,7 +74,7 @@ public class FetchToken extends ApiCall {
     
 		db.getCollection("users").update(query, update);
 		
-    updatemessage(email, true, "Added eBay account " + username + ".");
+    updatemessage(email, false, "Added eBay account " + username + ".");
     
 		return "";
 	}

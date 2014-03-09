@@ -80,13 +80,14 @@ public class RelistItem extends ApiCall {
 			site   = mod.get("Site").toString();
 			
 			BasicDBObject reqdbo = new BasicDBObject();
+			reqdbo.append("RequesterCredentials",
+                    new BasicDBObject("eBayAuthToken", tokenmap.get(userid)));
 			reqdbo.append("ErrorLanguage", "en_US");
 			reqdbo.append("WarningLevel", "High");
-			reqdbo.append("RequesterCredentials",
-						  new BasicDBObject("eBayAuthToken", tokenmap.get(userid)));
-			reqdbo.append("MessageID", userdbo.getString("_id")+" "+item.get("_id").toString());
 			reqdbo.append("Item", mod);
-			
+      reqdbo.append("MessageID", getnewtokenmap(email) + " " + userid + " " 
+                    + item.get("_id").toString());
+      
 			// copy from AddItems
 			String jss = reqdbo.toString();
 					
@@ -120,19 +121,30 @@ public class RelistItem extends ApiCall {
 	public String callback(String responsexml) throws Exception {
 		
 		BasicDBObject responsedbo = convertXML2DBObject(responsexml);
-		
-		// todo: almost same as AddItems callback function.
-		
+    
 		String[] messages = responsedbo.getString("CorrelationID").split(" ");
-		String itemcollectionname_id = messages[0];
-		String id = messages[1];
+    String email  = getemailfromtokenmap(messages[0]);
+    String userid = messages[1];
+		String id     = messages[2];
+    
+    BasicDBObject userdbo = (BasicDBObject) db.getCollection("users")
+      .findOne(new BasicDBObject("email", email));
+    
+    DBCollection coll = db.getCollection("items." + userdbo.getString("_id"));
+    
 		String itemid    = responsedbo.getString("ItemID");
 		String starttime = responsedbo.getString("StartTime");
 		String endtime   = responsedbo.getString("EndTime");
 		
-		writelog("RelistItem/res."+itemid+".xml", responsexml);
-		
-		log("Ack:"+responsedbo.get("Ack").toString());
+		String timestamp = responsedbo.getString("Timestamp").replaceAll("\\.", "_");
+		String savedir = basedir + "/logs/apicall/RelistItem/" + timestamp.substring(0,10);
+		if (!(new File(savedir)).exists()) {
+			new File(savedir).mkdir();
+		}
+		writelog("RelistItem/" + timestamp.substring(0,10) + "/" + userid + "." + itemid + ".xml",
+             responsexml);
+    
+		log("Ack:" + responsedbo.get("Ack").toString());
 		
 		BasicDBObject upditem = new BasicDBObject();
 		upditem.put("status", "");
@@ -142,6 +154,8 @@ public class RelistItem extends ApiCall {
 			upditem.put("org.ListingDetails.EndTime", endtime);
 			upditem.put("org.SellingStatus.ListingStatus", "Active");
 		}
+    
+    boolean iserror = false;
 		
 		// todo: aware <SeverityCode>Warning</SeverityCode>
 		if (responsedbo.get("Errors") != null) {
@@ -156,7 +170,14 @@ public class RelistItem extends ApiCall {
 			}
 			
 			upditem.put("error", errors);
-			
+      
+      for (Object err : errors) {
+        String severitycode = ((BasicDBObject) err).getString("SeverityCode");
+        if (severitycode.equals("Error")) {
+          iserror = true;
+        }
+      }
+      
 		} else {
 			
 			/* No error! */
@@ -169,32 +190,29 @@ public class RelistItem extends ApiCall {
 		
 		BasicDBObject update = new BasicDBObject();
 		update.put("$set", upditem);
-		
-		DBCollection coll = db.getCollection("items."+itemcollectionname_id);
+    
 		WriteResult result = coll.update(query, update);
 		
+    /* apilog */
+    Date now = new Date();
+    
+    BasicDBObject apilog = new BasicDBObject();
+    apilog.put("date",   now);
+    apilog.put("email",  email);
+    apilog.put("userid", userid);
+    apilog.put("itemid", id);
+    apilog.put("callname", "RelistItem");
+    if (iserror) {
+      apilog.put("result", "failure");
+    } else {
+      apilog.put("result", "success");
+    }
+    
+    DBCollection apilogcoll = db.getCollection("apilog");
+    apilogcoll.insert(apilog);
+    
 		return "";
 	}
-	
-	// todo: move to super class?
-  /*
-	private int getSiteID(String site) throws Exception {
-
-		Integer siteid = null;
-		
-		DBObject row = db.getCollection("US.eBayDetails")
-			.findOne(null, new BasicDBObject("SiteDetails", 1));
-		BasicDBList sitedetails = (BasicDBList) row.get("SiteDetails");
-		for (Object sitedbo : sitedetails) {
-			if (site.equals(((BasicDBObject) sitedbo).getString("Site"))) {
-				siteid = Integer.parseInt(((BasicDBObject) sitedbo).getString("SiteID"));
-				break;
-			}
-		}
-		
-		return siteid;
-	}
-  */
   
 	// todo: not copy from AddItems
 	private void expandElements(JSONObject item) throws Exception {
