@@ -11,61 +11,39 @@ var emailTemplates = require('email-templates')
 var crypto = require('crypto');
 var util   = require('util');
 
-var now = new Date();
-
-var sellingquery = {
-  
-  allitems: {
-  },
-  
-  scheduled: {
-    $or: [
-      {'mod.ScheduleTime': {$gt: now}},
-      {'opt.ScheduleTime': {$gt: now}},
-      {'org.ListingDetails.StartTime': {$gt: now}}
-    ]
-  },
-  
-  active: {
-    'org.ItemID': {$exists: true},
-    'org.SellingStatus.ListingStatus': 'Active',
-    'org.ListingDetails.StartTime': {$lt: now}
-  },
-  
-  sold: {
-    'org.ItemID': {$exists: true},
-    'org.SellingStatus.QuantitySold': {$gte: 1} 
-  },
-  
-  unsold: {
-    'org.ItemID': {$exists: true},
-    'org.SellingStatus.ListingStatus': 'Completed',
-    'org.SellingStatus.QuantitySold': 0
-  },
-  
-  unanswered: {
-    'org.ItemID': {$exists: true},
-    'membermessages.MessageStatus': 'Unanswered'
-  },
-  
-  saved: {
-    'org.ItemID': {$exists: false}
-  }
-  
-};
-
 exports.items = function(req, res) {
   
+  /* save new item (with REST post request) */
+  if (req.body.hasOwnProperty('save')) {
+    
+    req.body.id = 'newitem0';
+    exports.save(req, res);
+    
+    return;
+  }
+  
   _items(req, function(err, result) {
-    result.message = req.user.message;
-    res.json({
-      json: result
+    
+    summary_and_tags(req.user, function(err, summary_tag) {
+      
+      result.message = req.user.message;
+      
+      res.json({
+        json: result,
+        user: {
+          status: req.user.status,
+          period: req.user.period,
+          expired: req.user.expired
+        },
+        summary: summary_tag
+      });
     });
+    
+    //updatesummary(req.user);
+    //update_tags_summary(req.user);
   });
   
-  console.log(req.user.email + ' ' + req.user.id);
-  
-} // items()
+} // exports.items()
 
 exports.item = function(req, res) {
   
@@ -76,11 +54,24 @@ exports.item = function(req, res) {
     });
   });
   
-} // item()
+} // exports.item()
 
 exports.addaccount = function(req, res) {
 	
   if (!req.isAuthenticated()) res.json(null);
+  
+  if (req.user.status == 'trial' || req.user.status == 'starter') {
+    if (req.user.hasOwnProperty('userids2')) {
+      if (req.user.userids2.length >= 1) {
+        
+        res.json({
+          message: 'Business plan user can manage multiple eBay ids.'
+        })
+        
+        return;
+      }
+    }
+  }
   
   var apimodule = require('./ebayapi/GetSessionID');
 	
@@ -96,7 +87,7 @@ exports.addaccount = function(req, res) {
 		});
   });
   
-}
+} // exports.addaccount()
 
 exports.removeaccount = function(req, res) {
 	
@@ -134,12 +125,23 @@ exports.removeaccount = function(req, res) {
     res.end();
   });
 	
-}
+} // exports.removeaccount()
 
 exports.import = function(req, res) {
   
   if (!req.isAuthenticated()) res.json(null);
   
+  updatemessage(req.user.email, true, 'Importing items from eBay.');
+  
+  res.json({
+    json: {
+      message: {
+        hasnext: true,
+        message: 'Importing items from eBay.'
+      }
+    }
+  });
+
   var apimodule = require('./ebayapi/GetSellerList');
   
 	var reqjson = {
@@ -206,7 +208,7 @@ exports.delete = function(req, res) {
     
   }  
   
-}
+} // exports.delete()
 
 exports.site = function(req, res) {
   
@@ -334,7 +336,6 @@ function children2(site, path, callback) {
     [
       /* CategoryFeatures */
       function(callback) {
-        console.log('children2: site: ' + site);
         mongo(function(db) {
           db.collection(site + '.CategoryFeatures', function(err, collft) {
             collft.findOne({}, function(err, doc) {
@@ -529,33 +530,50 @@ exports.summary = function(req, res) {
 
 exports.summary_backbone = function(req, res) {
   
+  summary_and_tags(req.user, function(err, summary) {
+    res.json(summary);
+  });
+  
+  /*
   summarydata(req.user, function(err, result) {
     
     var data = [];
     
     Object.keys(result).forEach(function(key) {
       
-      var tmp = result[key];
-      tmp.userid = key;
+      var tmp = {}
+      tmp.username = key;
+      tmp.summary = result[key];
       
       data.push(tmp);
     });
     
-    res.json(data);
+    tags_summary(req.user, function(err, result_tags) {
+      for (var i = 0; i < data.length; i++) {
+        if (result_tags.hasOwnProperty(data[i].username)) {
+          data[i].tags = result_tags[data[i].username];
+        }
+      }
+      
+      console.dir(data);
+      
+      res.json(data);
+    });
   });
+  */
   
 } // summary_backbone()
 
 exports.refresh = function(req, res) {
   
   _items(req, function(err, result_items) {
-    summarydata(req.user, function(err, result_summary) {
+    summary_and_tags(req.user, function(err, summary_tag) {
       
-      result_items.summary = result_summary;
       result_items.message = req.user.message;
       
       res.json({
-        json: result_items
+        json: result_items,
+        summary: summary_tag
       });
     });
   });
@@ -584,6 +602,7 @@ exports.copy = function(req, res) {
     
   } else {
     
+    var sellingquery = getsellingquery();
     query = clone(sellingquery[req.body.selling]);
     if (req.body.UserID != '') {
       query['UserID'] = req.body.UserID;
@@ -616,14 +635,20 @@ exports.copy = function(req, res) {
           newdblist.push(clone(item));
         }); // items.forEach
         
-        itemcoll.insert(newdblist);
-        
-        res.json({
-          json: {
-            message: null
-          }
-        });
-        
+        itemcoll.insert(newdblist, {safe: true}, function(err, docs) {
+          
+          summary_and_tags(req.user, function(err, summary_tag) {
+            
+            res.json({
+              json: {
+                message: null
+              },
+              summary: summary_tag
+            });
+            
+          });
+          
+        }); // insert
       }); // itemcoll.find
     }); // collection
   }); // mongo
@@ -652,6 +677,8 @@ exports.settings = function(req, res) {
     req.user.timezone = req.body.timezone;
   }
   
+  var zonestr = req.user.timezone.replace(/^GMT/, '');
+  
   var settings = {};
   settings.language   = req.user.language;
   settings.timezone   = req.user.timezone;
@@ -659,6 +686,11 @@ exports.settings = function(req, res) {
   settings.itemlimit  = req.user.itemlimit;
   settings.status     = req.user.status;
   settings.email      = req.user.email;
+  settings.period = {
+    start: moment(req.user.period.start).zone(zonestr).format('YYYY-MM-DD'),
+    end: moment(req.user.period.end).zone(zonestr).format('YYYY-MM-DD'),
+  };
+  settings.expired    = req.user.expired;
   
   var userids2 = [];
   if (req.user.hasOwnProperty('userids2')) {
@@ -680,6 +712,11 @@ exports.settings = function(req, res) {
     json: {
       settings: settings,
       message: req.user.message
+    },
+    user: {
+      status: req.user.status,
+      period: req.user.period,
+      expired: req.user.expired
     }
   });
   
@@ -723,7 +760,7 @@ exports.end = function(req, res) {
           res.json({
             json: {
               message: {
-                datetime: now,
+                datetime: moment()._d,
                 hasnext: true,
                 message: 'Ending ' + count + ' items.'
               }
@@ -781,7 +818,7 @@ exports.relist = function(req, res) {
           res.json({
             json: {
               message: {
-                datetime: now,
+                datetime: moment()._d,
                 hasnext: true,
                 message: 'Relisting ' + count + ' items.'
               }
@@ -840,7 +877,7 @@ exports.revise = function(req, res) {
           res.json({
             json: {
               message: {
-                datetime: now,
+                datetime: moment()._d,
                 hasnext: true,
                 message: 'Revising ' + count + ' items.'
               }
@@ -899,7 +936,7 @@ exports.verifyadditem = function(req, res) {
           res.json({
             json: {
               message: {
-                datetime: now,
+                datetime: moment()._d,
                 hasnext: true,
                 message: 'Verifing ' + count + ' items.'
               }
@@ -958,7 +995,7 @@ exports.add = function(req, res) {
           res.json({
             json: {
               message: {
-                datetime: now,
+                datetime: moment()._d,
                 hasnext: true,
                 message: 'Listing ' + count + ' items.'
               }
@@ -1086,22 +1123,25 @@ exports.signup = function(req, res) {
           crypto.randomBytes(20, function(err, buf) {
             
             var tmptoken = buf.toString('hex');
-            //console.log('random: ' + tmptoken);
             
-            var tmptoken_expiration = '';
+            var now = moment();
+            var plan_start = moment();
+            var plan_end = moment().add('days', 30);
             
             var field = {
               email: req.body.email,
               password: req.body.password,
               tmptoken: tmptoken,
-              tmptoken_expiration: tmptoken_expiration,
               status: 'temporary registration',
+              period: {
+                start: plan_start._d,
+                end: plan_end._d,
+              },
               language: 'English',
               timezone: 'GMT-08:00',
-              itemlimit: '100',
               newlook: 1,
-              created_at: now,
-              lastused_at: now
+              created_at: now._d,
+              lastused_at: now._d
             };
             
             coll.insert(field);
@@ -1273,6 +1313,8 @@ exports.save = function(req, res) {
   var setting = item.setting;
   var shippingdetails = item.ShippingDetails;
   
+  //console.dir(mod.ItemSpecifics.NameValueList);
+  
   /* ScheduleTime */
   if (mod.hasOwnProperty('ScheduleTime')) {
     
@@ -1320,7 +1362,7 @@ exports.save = function(req, res) {
   
   /* tags */
   if (opt.hasOwnProperty('tags')) {
-    var tags = opt.tags.split(',');
+    var tags = opt.tags.replace(/, /, ',').split(',');
     opt.tags = tags;
   }
   
@@ -1389,9 +1431,7 @@ exports.save = function(req, res) {
               opt: opt,
               UserID: item.UserID
             }
-            if (!orgexists) {
-              set.status = taskid;
-            } else {
+            if (req.user.email != 'demo@listers.in') {
               set.status = taskid;
             }
             
@@ -1441,9 +1481,15 @@ exports.save = function(req, res) {
       ], function(err, results) {
         
         _item(req.user, id, function(err, result) {
-          result.message = req.user.message;
-          res.json({
-            json: result
+
+          summary_and_tags(req.user, function(err, summary_tag) {
+            
+            result.message = req.user.message;
+            res.json({
+              json: result,
+              summary: summary_tag
+            });
+            
           });
         });
         
@@ -1464,13 +1510,6 @@ exports.save_backbone = function(req, res) {
   var opt  = item.opt;
   var setting = item.setting;
   var shippingdetails = item.ShippingDetails;
-  
-  //req.body.id = req.params.id;
-  //var obj = extractObject(req.body.form);
-  
-  //console.log('save: ' + req.params.id);
-  
-  //req.body.id = req.params.id;
   
   _items(req, function(err, result) {
     result.message = req.user.message;
@@ -1567,6 +1606,34 @@ exports.findproducts = function(req, res) {
   
 } // findproducts
 
+exports.updatesyncmode = function(req, res) {
+  res.end();
+  
+  var syncmode = false;
+  if (req.body.sync == 'true') {
+    syncmode = true;
+  }
+  
+  mongo(function(db) {
+    db.collection('users', function(err, collection) {
+      
+      collection.update(
+        {
+          email: req.user.email,
+          'userids2.username': req.body.username
+        },
+        {
+          $set: {
+            'userids2.$.sync': syncmode
+          }
+        }
+      );
+      
+    });
+    
+  });
+}
+
 exports.savedebugjson = function(req, res) {
   
   var org = JSON.parse(req.body.json);
@@ -1649,10 +1716,10 @@ function mapcategoryid(site, categoryid, callback) {
       coll.findOne({'@oldID': categoryid}, function(err, doc) {
         
         if (doc != null) {
-          console.log('mapcategoryid: ' + categoryid + ' -> ' + doc['@id']);
+          //console.log('mapcategoryid: ' + categoryid + ' -> ' + doc['@id']);
           callback(null, doc['@id']);
         } else {
-          console.log('mapcategoryid: ' + categoryid + ' no map');
+          //console.log('mapcategoryid: ' + categoryid + ' no map');
           callback(null, categoryid);
         }
         
@@ -1710,6 +1777,7 @@ function summarydata(user, callback) {
           var userid = userids.shift();
           summarydata[userid] = {};
           
+          var sellingquery = getsellingquery();
           var sellingquerykeys = [];
           Object.keys(sellingquery).forEach(function(key) {
             sellingquerykeys.push(key);
@@ -1730,6 +1798,7 @@ function summarydata(user, callback) {
                 query.UserID = userid;
               }
               
+              //console.dir(query);
               itemcoll.count(query, function(err, result) {
                 summarydata[userid][sellingquerykey] = result;
                 callback(null, null);
@@ -1780,6 +1849,7 @@ function _items(req, callback) {
     
   } else {
     
+    var sellingquery = getsellingquery();
     query = clone(sellingquery[req.body.selling]);
     if (req.body.hasOwnProperty('UserID') && req.body.UserID != '') {
       query['UserID'] = req.body.UserID;
@@ -1789,6 +1859,9 @@ function _items(req, callback) {
     }
     if (req.body.hasOwnProperty('mod.ListingType') && req.body['mod.ListingType'] != '') {
       query['mod.ListingType'] = req.body['mod.ListingType'];
+    }
+    if (req.body.hasOwnProperty('tag') && req.body.tag != '') {
+      query['opt.tags'] = req.body.tag;
     }
     
   }
@@ -1842,6 +1915,7 @@ function _items(req, callback) {
   
   /* each items */
   mongo(function(db) {
+    console.log('db.items.' + req.user._id);
     db.collection('items.' + req.user._id, function(err, itemcoll) {
       
       var cursor = itemcoll.find(query, field).limit(limit).skip(offset).sort(sort);
@@ -1929,10 +2003,6 @@ function _items(req, callback) {
               }
             }
             
-            /* missing fields */
-            if (false) {
-            }
-            
           }); // forEach
           
           callback(null, {
@@ -1964,6 +2034,8 @@ function _item(user, id, callback) {
   var query = {
     _id: ObjectID(id)
   };
+  console.log('==== _item query ====');
+  console.dir(query);
   
   async.series([
     
@@ -1971,6 +2043,9 @@ function _item(user, id, callback) {
       mongo(function(db) {
         db.collection('items.' + user._id, function(err, itemcoll) {
           itemcoll.findOne(query, function(err, doc) {
+            
+            console.log('==== doc ====');
+            console.dir(doc);
             
             item = doc;
             item.id = item._id;
@@ -2234,6 +2309,8 @@ function _item(user, id, callback) {
 
 function updatemessage(email, hasnext, message) {
   
+  console.log(message);
+  
   mongo(function(db) {
     db.collection('users', function(err, coll) {
       coll.update(
@@ -2243,7 +2320,7 @@ function updatemessage(email, hasnext, message) {
         {
           $set: {
             message: {
-              datetime: now,
+              datetime: moment()._d,
               hasnext: hasnext,
               message: message
             }
@@ -2389,6 +2466,8 @@ function extractObject(formdata) {
     
   });
   
+  //console.dir(mod);
+  
   return mod;
 }
 
@@ -2473,3 +2552,203 @@ function convertdate(o, field) {
   return;
   
 } // convertdate
+
+function updatesummary(user) {
+  
+  summarydata(user, function(err, result_summary) {
+    tags_summary(user, function(err, result_tags) {
+      
+      var summary2 = [];
+      
+      Object.keys(result_summary).forEach(function(username) {
+        
+        var tmptags = [];
+        
+        Object.keys(result_tags[username]).forEach(function(tag) {
+          var tmptag = {
+            tag: tag,
+            count: result_tags[username][tag]
+          };
+          
+          tmptags.push(tmptag);
+        });
+        
+        var arr = {
+          username: username,
+          items: result_summary[username],
+          tags: tmptags
+        };
+        
+        summary2.push(arr);
+      });
+      
+      mongo(function(db) {
+        db.collection('users', function(err, collection) {
+          collection.update(
+            {
+              email: user.email
+            },
+            {
+              $set: {
+                summary2: summary2
+              }
+            }
+          ); // update
+        }); // collection
+      }); // mongo
+      
+    }); // tags_summary
+  }); // summarydata
+  
+} // updatesummary()
+
+function tags_summary(user, callback) {
+  
+  var tagsdata = {};
+  tagsdata['alluserids'] = {};
+  
+  if (!user.hasOwnProperty('userids2')) {
+    callback(null, null);
+    return;
+  }
+  
+  mongo(function(db) {
+    db.collection('items.' + user._id, function(err, itemcoll) {
+      
+      var userids = ['alluserids'];
+      user.userids2.forEach(function(userid) {
+        userids.push(userid.username);
+      });
+      
+      async.whilst(
+        function() {
+          return userids.length > 0;
+        },
+        
+        function(callback) {
+          var userid = userids.shift();
+          tagsdata[userid] = {};
+          
+          itemcoll.aggregate([
+            {
+              $match: {
+                UserID: userid
+              }
+            },
+            {
+              $unwind: "$opt.tags"
+            },
+            {
+              $group: {
+                _id: "$opt.tags",
+                count: {
+                  $sum: 1 
+                }
+              }
+            }
+            
+          ], function(err, results) {
+            
+            results.forEach(function(tagrow) {
+              tagsdata[userid][tagrow._id] = tagrow.count;
+              
+              if (tagsdata['alluserids'].hasOwnProperty(tagrow._id)) {
+                tagsdata['alluserids'][tagrow._id] += tagrow.count;
+              } else {
+                tagsdata['alluserids'][tagrow._id] = tagrow.count;
+              }
+            });
+            
+            callback(null, null);
+          });
+        },
+        
+        function(err) {
+          callback(null, tagsdata);
+        }
+      ); // async.whilst
+      
+    }); // collection
+  }); // mongo
+  
+} // tags_summary()
+
+function summary_and_tags(user, callback) {
+
+  summarydata(user, function(err, result) {
+    
+    var data = [];
+    
+    Object.keys(result).forEach(function(key) {
+      
+      var tmp = {}
+      tmp.username = key;
+      tmp.summary = result[key];
+      
+      data.push(tmp);
+    });
+    
+    tags_summary(user, function(err, result_tags) {
+      for (var i = 0; i < data.length; i++) {
+        if (result_tags.hasOwnProperty(data[i].username)) {
+          data[i].tags = result_tags[data[i].username];
+        }
+      }
+      
+      callback(null, data);
+    });
+  });
+  
+} // summary_and_tags
+
+function getsellingquery() {
+  
+  var now = new Date();
+  
+  var sellingquery = {
+    
+    allitems: {
+    },
+    
+    scheduled: {
+      $or: [
+        {'mod.ScheduleTime': {$gt: now}},
+        {'opt.ScheduleTime': {$gt: now}},
+        {'org.ListingDetails.StartTime': {$gt: now}}
+      ]
+    },
+    
+    active: {
+      'org.ItemID': {$exists: true},
+      'org.SellingStatus.ListingStatus': 'Active',
+      'org.ListingDetails.StartTime': {$lt: now}
+    },
+    
+    sold: {
+      'org.ItemID': {$exists: true},
+      'org.SellingStatus.QuantitySold': {$gte: 1} 
+    },
+    
+    unsold: {
+      'org.ItemID': {$exists: true},
+      'org.SellingStatus.ListingStatus': 'Completed',
+      'org.SellingStatus.QuantitySold': 0
+    },
+    
+    unanswered: {
+      'org.ItemID': {$exists: true},
+      'membermessages.MessageStatus': 'Unanswered'
+    },
+    
+    saved: {
+      'org.ItemID': {$exists: false}
+    },
+    
+    template: {
+      'opt.template': 'true'
+    }
+  };
+  
+  return sellingquery;
+  
+} // getsellingquery()

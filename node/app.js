@@ -166,39 +166,48 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 console.log('app.js locale: ' + i18n.getLocale());
 
-// development only
-if ('development' == app.get('env')) {
-  app.use(express.errorHandler());
-}
-
 app.all('*', function(req, res, next) {
   
-  if (!req.cookies.hasOwnProperty('admin') && req.isAuthenticated()) {
+  if (req.isAuthenticated()) {
+    if (req.user.hasOwnProperty('period')) {
+      
+      var now = moment();
+      var exp = moment(req.user.period.end);
+      
+      if (now <= exp) {
+        req.user.expired = false;
+      } else {
+        req.user.expired = true;
+        if (req.user.status == 'trial') {
+          req.user.expiredmessage = 'Your free trial period is over.';
+        }
+      }
+      
+    }
+  }
+  
+  if (!req.cookies.hasOwnProperty('admin')
+      && req.headers['x-forwarded-for'] != '54.199.194.51'
+      && req.isAuthenticated()) {
+    
+    var now = moment();
     
     mongo(function(db) {
       db.collection('users', function(err, collection) {
-        collection.findOne(
+        
+        collection.update(
           {
             _id: req.user._id,
           },
-          function(err, user) {
-            
-            var now = new Date();
-            
-            collection.update(
-              {
-                _id: req.user._id,
-              },
-              {
-                $set: {
-                  lastused_at: now
-                }
-              }
-            );
+          {
+            $set: {
+              lastused_at: now._d
+            }
           }
-        );
-      });
-    });
+        ); // update
+        
+      }); // collection
+    }); // mongo
     
   }
   
@@ -281,6 +290,13 @@ app.get('/accept',         index.accept);
 
 app.post('/receivenotify', index.receivenotify);
 
+app.get('/terms', function(req, res) {
+  res.render('terms-of-service.ejs');
+});
+app.get('/privacy', function(req, res) {
+  res.render('privacy.ejs');
+});
+
 //app.get('/users', user.list);
 
 app.get('/admin',             admin.index);
@@ -289,8 +305,49 @@ app.get('/admin/listeditems', admin.listeditems);
 app.get('/admin/unanswered',  admin.unanswered);
 app.post('/admin/callapi',    admin.callapi);
 
+app.get('/admin/update-period', function(req, res) {
+  res.redirect('/admin/');
+  
+  mongo(function(db) {
+    db.collection('users', function(err, collection) {
+      
+      collection.find(
+        {
+          email: 'demo@listers.in'
+        }
+      ).toArray(function(err, docs) {
+        
+        docs.forEach(function(doc) {
+          
+          end = moment('2020-12-31 00:00:00');
+          
+          collection.update(
+            {
+              email: doc.email
+            },
+            {
+              $set: {
+                period: {
+                  start: moment(doc.created_at)._d,
+                  end: end._d
+                }
+              }
+            }
+          );
+          
+        });
+        
+      });
+    });
+  });
+});
+
+
 app.get('/user/items', user.items);
 app.get('/image', image.index);
+
+app.post('/paypalipn',    index.paypalipn);
+app.get('/paypalreturn', index.paypalreturn);
 
 app.post('/file/upload',    file.upload);
 app.post('/file/csvupload', file.csvupload);
@@ -312,6 +369,7 @@ app.post('/json/verifyadditem', json.verifyadditem);
 app.post('/json/add',           json.add);
 app.post('/json/import',        json.import);
 app.post('/json/import_java',   json.import_java);
+app.post('/json/updatesyncmode', json.updatesyncmode);
 app.post('/json/savedebugjson', json.savedebugjson);
 app.post('/json/refresh',       json.refresh);
 app.post('/json/settings',      json.settings);

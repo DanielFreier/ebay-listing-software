@@ -22,30 +22,60 @@ exports.list = function(req, res) {
   var mischash = {};
   mischash.datestart = moment().subtract('days', 59).format('YYYY-MM-DD');
   mischash.dateend   = moment().add('days', 60).format('YYYY-MM-DD');
-  console.dir(mischash);
   
   mongo(function(db) {
-    db.collection('US.eBayDetails', function(err, coll) {
-      coll.findOne(
-        {}, 
-        {
-          'SiteDetails.Site': true,
-          'SiteDetails.SiteID': true,
-          'CurrencyDetails.Currency': true
-        },
-        function(err, doc) {
-          res.render('list', {
-            user: req.user,
-            US: {
-              eBayDetails: doc
+
+    async.parallel({
+      
+      ebaydetails: function(callback) {
+        
+        db.collection('US.eBayDetails', function(err, coll) {
+          coll.findOne(
+            {}, 
+            {
+              'SiteDetails.Site': true,
+              'SiteDetails.SiteID': true,
+              'CurrencyDetails.Currency': true
             },
-            mischash: mischash
-          })
+            function(err, doc) {
+              callback(null, doc);
+            }
+          );
         });
-    });
-  });
+        
+      },
+      
+      templates: function(callback) {
+        db.collection('items.' + req.user._id, function(err, itemcoll) {
+          itemcoll.find(
+            {
+              'opt.template': 'true'
+            },
+            {
+              'mod.Title': true
+            }
+          ).toArray(function(err, docs) {
+            callback(null, docs);
+          });
+        })
+      }
+      
+    }, function(err, results) {
+      
+      res.render('list', {
+        user: req.user,
+        US: {
+          eBayDetails: results.ebaydetails
+        },
+        templates: results.templates,
+        mischash: mischash
+      })
+      
+    }); // async.parallel
+    
+  }); // mongo
   
-} // list()
+} // exports.list()
 
 exports.index = function(req, res) {
   
@@ -149,11 +179,24 @@ exports.signup_confirm = function(req, res) {
         function(err, user) {
           if (user) {
             
-            console.log('temporary user found: ' + user.email);
+            var now = moment();
+            var plan_start = moment();
+            var plan_end = moment().add('days', 30);
             
             collection.update(
-              {email: user.email},
-              {$set: {status: 'free trial'}},
+              {
+                email: user.email
+              },
+              {
+                $set: {
+                  status: 'trial',
+                  period: {
+                    start: plan_start._d,
+                    end: plan_end._d,
+                  },
+                  lastused_at: now._d
+                }
+              },
               function(err, result) {
                 res.render('signin', {
                   email: user.email,
@@ -255,12 +298,33 @@ exports.receivenotify = function(req, res) {
         mongo(function(db) {
           db.collection('users', function(err, collection) {
             collection.findOne({'userids2.username': userid}, function(err, user) {
-              if (user) {
-                db.collection('items.' + user._id, function(err, itemcoll) {
+              if (!user) return;
+              
+              var ebayuser = null;
+              user.userids2.forEach(function(tmpuser) {
+                if (tmpuser.username != userid) return;
+                ebayuser = tmpuser;
+              });
+              
+              db.collection('items.' + user._id, function(err, itemcoll) {
+                
+                if (ebayuser.sync) {
                   var getmm = require('./ebayapi/GetMemberMessages');
                   getmm.upsert(user.email, body.MemberMessage.MemberMessageExchange, itemcoll);
-                });
-              }
+                  return;
+                }
+                
+                itemcoll.findOne(
+                  {'org.ItemID': body.MemberMessage.MemberMessageExchange.Item.ItemID},
+                  function(err, item) {
+                    if (!item) return;
+                    var getmm = require('./ebayapi/GetMemberMessages');
+                    getmm.upsert(user.email, body.MemberMessage.MemberMessageExchange, itemcoll);
+                  }
+                );
+                
+              });
+              
             }); // findOne
           }); // collection
         }); // mongo
@@ -271,16 +335,37 @@ exports.receivenotify = function(req, res) {
         mongo(function(db) {
           db.collection('users', function(err, collection) {
             collection.findOne({'userids2.username': userid}, function(err, user) {
-              if (user) {
-                db.collection('items.' + user._id, function(err, itemcoll) {
+              if (!user) return
+              
+              var ebayuser = null;
+              user.userids2.forEach(function(tmpuser) {
+                if (tmpuser.username != userid) return;
+                ebayuser = tmpuser;
+              });
+              
+              db.collection('items.' + user._id, function(err, itemcoll) {
+                
+                if (ebayuser.sync) {
                   var getitem = require('./ebayapi/GetItem');
                   getitem.upsert(body.Item, itemcoll);
-                });
-              }
+                  return;
+                }
+                
+                itemcoll.findOne(
+                  {'org.ItemID': body.Item.ItemID},
+                  function(err, item) {
+                    if (!item) return;
+                    
+                    var getitem = require('./ebayapi/GetItem');
+                    getitem.upsert(body.Item, itemcoll);
+                  }
+                )
+                
+              });
             }); // findOne
           }); // collection
         }); // mongo
-      }
+      } // rootname == 'GetItemResponse'
       
       // todo: are ItemUnsold and ItemClosed same?
       if (eventname == 'ItemUnsold') {
@@ -361,7 +446,7 @@ exports.index_bootstrap = function(req, res) {
   res.render('index_bootstrap', {
   });
   
-} // index_bootstrap
+} // exports.index_bootstrap
 
 exports.reset_password = function(req, res) {
   
@@ -387,10 +472,11 @@ exports.reset_password = function(req, res) {
     }); // collection
   }); // mongo
         
-} // reset_password
+} // exports.reset_password
 
 exports.cancelaccount = function(req, res) {
   
+  // todo: don't remove record, move instead.
   mongo(function(db) {
     db.collection('users', function(err, coll) {
       coll.remove({
@@ -401,7 +487,7 @@ exports.cancelaccount = function(req, res) {
   
   res.redirect('/');
   
-} // cancelaccount
+} // exports.cancelaccount
 
 exports.accept = function(req, res) {
   
@@ -438,6 +524,112 @@ exports.accept = function(req, res) {
   writesocket_async(args); // not wait
   
   res.redirect('/');
+  
+} // exports.accept
+
+exports.paypalipn = function(req, res) {
+  res.end();
+  
+  var now = moment();
+  
+  mongo(function(db) {
+    
+    db.collection('paypalipn', function(err, coll) {
+      coll.insert({
+        date: now._d,
+        ipn: req.body
+      });
+    }); // collection
+    
+    if (req.body.txn_type == 'subscr_payment') {
+      
+      var plan_start = moment();
+      var plan_end = moment().add('days', 32);
+      
+      if (req.body.transaction_subject == 'listers.in starter plan') {
+        plan = 'starter';
+      } else if (req.body.transaction_subject == 'listers.in business plan') {
+        plan = 'business';
+      }
+      
+      db.collection('users', function(err, coll) {
+        coll.update(
+          {
+            email: req.body.custom
+          },
+          {
+            $set: {
+              status: plan,
+              period: {
+                start: plan_start._d,
+                end: plan_end._d,
+              },
+            }
+          }
+        );
+      }); // collection
+      
+    } else if (req.body.txn_type == 'subscr_cancel') {
+      
+      db.collection('users', function(err, coll) {
+        coll.update(
+          {
+            email: req.body.custom
+          },
+          {
+            $set: {
+              period: {
+                end: now._d,
+              },
+            }
+          }
+        );
+      }); // collection
+      
+    }
+    
+  }); // mongo
+
+}
+
+exports.paypalreturn = function(req, res) {
+  
+  var url = require('url');
+  var url_parts = url.parse(req.url, true);
+  var query = url_parts.query;
+  
+  if (query.st == 'Completed') {
+    
+    var plan_start = moment();
+    var plan_end = moment().add('days', 31);
+    
+    if (query.amt == '9.95') {
+      plan = 'starter';
+    } else if (query.amt == '14.95') {
+      plan = 'business';
+    }
+    
+    mongo(function(db) {
+      db.collection('users', function(err, coll) {
+        coll.update(
+          {
+            email: query.cm
+          },
+          {
+            $set: {
+              status: plan,
+              period: {
+                start: plan_start._d,
+                end: plan_end._d,
+              },
+            }
+          }
+        );
+      }); // collection
+    }); // mongo
+  }
+  
+  res.redirect('/#/settings');
 }
 
 function writesocket_async(args) {

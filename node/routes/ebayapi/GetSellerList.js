@@ -1,7 +1,11 @@
-var mongo = require('../mongoconnect');
-var taskmodule = require('./task');
-var config = require('../../config');
-var async = require('async');
+var fs      = require('fs');
+var mongo   = require('../mongoconnect');
+var task    = require('./task');
+var config  = require('../../config');
+var async   = require('async');
+var moment  = require('moment');
+var clone   = require('clone');
+var getitem = require('./GetItem');
 
 module.exports = {
   
@@ -13,22 +17,16 @@ module.exports = {
     async.waterfall([
       
       function(callback) {
-        taskmodule.getnewtokenmap(request.email, callback);
+        task.getnewtokenmap(request.email, callback);
       },
       
       function(token, callback) {
-        taskmodule.getebayauthtoken(request.email, request.userid, function(err, ebayauthtoken) {
+        task.getebayauthtoken(request.email, request.userid, function(err, ebayauthtoken) {
           callback(null, token, ebayauthtoken);
         });
       },
       
       function(token, ebayauthtoken, callback) {
-        
-        var messageid = token;
-        messageid += ' ' + request.userid;
-        messageid += ' ' + request.daterange;
-        messageid += ' ' + request.datestart;
-        messageid += ' ' + request.dateend;
         
         var requestjson = {
           email: request.email,
@@ -36,124 +34,117 @@ module.exports = {
           site: 'US',
           siteid: 0,
           params: {
-            DetailLevel: 'ReturnAll',
-            IncludeWatchCount: 'true',
-            IncludeVariations: 'true',
             WarningLevel: 'High',
             RequesterCredentials: {
               eBayAuthToken: ebayauthtoken
             },
             Pagination: {
-              EntriesPerPage: 50,
+              EntriesPerPage: 9,
               PageNumber: 1
             },
-            Sort: 2,
-            MessageID: messageid
+            MessageID: token + ' ' + request.userid + ' 0'
           }
         };
         
         requestjson.params[request.daterange + 'TimeFrom'] = request.datestart + ' 00:00:00';
         requestjson.params[request.daterange + 'TimeTo']   = request.dateend   + ' 00:00:00';
         
-        //console.log(requestjson);
-        
-        taskmodule.addqueue(requestjson, callback);
+        task.addqueue(requestjson, function(err, resultjson) {
+          
+          callback(null, token, ebayauthtoken, resultjson);
+        });
       },
       
-      function (resultjson, callback) {
+      function (token, ebayauthtoken, resultjson, callback) {
+        mongo(function(db) {
+          db.collection('users', function(err, collection) {
+            collection.findOne({email: request.email}, function(err, document) {
+              db.collection('items.' + document._id, function(err, collection) {
+                callback(null, token, ebayauthtoken, resultjson, collection);
+              });
+            });
+          });
+        }); // mongo
+      },
+      
+      function (token, ebayauthtoken, resultjson, collection, callback) {
         
-        console.log('item count: ' + resultjson.ItemArray.Item.length);
+        var pages = resultjson.PaginationResult.TotalNumberOfPages;
+        var total = resultjson.PaginationResult.TotalNumberOfEntries;
         
-        resultjson.ItemArray.Item.forEach(function(org) {
-          return;
+        task.updatemessage(request.email, true, 'Importing ' + total + ' items from eBay.');
+        
+        async.times(pages, function(pagenumber, callback) {
           
-          var mod = org;
+          var messageid = token;
+          messageid += ' ' + request.userid;
+          messageid += ' ' + (pagenumber + 1);
           
-          var query = {
-            org: {
-              ItemID: org.ItemID
+          var requestjson = {
+            email: request.email,
+            callname: 'GetSellerList',
+            site: 'US',
+            siteid: 0,
+            params: {
+              DetailLevel: 'ReturnAll',
+              IncludeWatchCount: 'true',
+              IncludeVariations: 'true',
+              WarningLevel: 'High',
+              RequesterCredentials: {
+                eBayAuthToken: ebayauthtoken
+              },
+              Pagination: {
+                EntriesPerPage: 9,
+                PageNumber: (pagenumber + 1)
+              },
+              Sort: 2,
+              MessageID: messageid
             }
           };
           
-          var item = {
-            mod: mod,
-            org: org
-          };
+          requestjson.params[request.daterange + 'TimeFrom'] = request.datestart + ' 00:00:00';
+          requestjson.params[request.daterange + 'TimeTo']   = request.dateend   + ' 00:00:00';
           
-          mongo(function(db) {
-            db.collection('items.' + ebayuser._id +'.node', function(err, collection) {
-              collection.update(
-                query,
-                item,
-                {upsert: true}
-              );
-            });
-          }); // mongo
+          task.addqueue(requestjson, function(err, resultjson2) {
+            
+            var seller = clone(resultjson2.Seller);
+            
+            if (Array.isArray(resultjson2.ItemArray.Item)) {
+              
+              resultjson2.ItemArray.Item.forEach(function(org) {
+                
+                org.Seller = seller;
+                getitem.upsert(org, collection);
+                
+              }); // forEach
+              
+            } else {
+              
+              resultjson2.ItemArray.Item.Seller = seller;
+              getitem.upsert(resultjson2.ItemArray.Item, collection);
+              
+            }
+            
+            callback(null, null);
+          });
           
-        }); // forEach
+        }, function(err, result) {
+          
+          callback(null, total);
+          
+        });
         
-        callback(null, 'last');
       }
       
-    ], function(err, result) {
+    ], function(err, total) {
       
-      console.dir(result);
-      callback(null, result);
+      task.updatemessage(request.email, false,
+                         'Imported ' + total + ' items from eBay.');
       
-    });
+      callback(null, null);
+      
+    }); // async.waterfall
     
-    /*
-    mongo(function(db) {
-      
-      db.collection('users', function(err, collection) {
-        collection.find({email: request.email}).toArray(function(err, users) {
-          users[0].userids2.forEach(function(ebayuser) {
-            if (ebayuser.username != request.userid) return;
-            
-            
-            
-            taskmodule.addqueue(requestjson, function(resultjson) {
-              
-              resultjson.ItemArray.Item.forEach(function(org) {
-                console.dir(org.Title);
-                
-                var mod = org;
-                
-                var query = {
-                  org: {
-                    ItemID: org.ItemID
-                  }
-                };
-                
-                var item = {
-                  mod: mod,
-                  org: org
-                };
-                
-                mongo(function(db) {
-                  db.collection('items.' + ebayuser._id +'.node', function(err, collection) {
-                    collection.update(
-                      query,
-                      item,
-                      {upsert: true}
-                    );
-                  });
-                }); // mongo
-                
-              });
-              callback('');
-              //resultjson.
-              
-            });
-            
-          }); // forEach
-          
-        }); // find
-        
-      }); // collection
-      
-    }); // mongo
-    
-    */
-  }
-}
+  } // call
+  
+} // exports

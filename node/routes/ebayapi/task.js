@@ -117,7 +117,33 @@ var methods = {
     console.log(now + ' ' + logstr);
     
     return;
-  }
+  },
+  
+  updatemessage: function(email, hasnext, message) {
+    
+    console.log(message);
+    
+    mongo(function(db) {
+      db.collection('users', function(err, coll) {
+        coll.update(
+          {
+            email: email
+          },
+          {
+            $set: {
+              message: {
+                datetime: moment()._d,
+                hasnext: hasnext,
+                message: message
+              }
+            }
+          }
+        ); // update
+      }); // collection
+    }); // mongo
+    
+  } // updatemessage
+  
   
 } // methods
 
@@ -345,8 +371,11 @@ function dopost2(postjson, callback) {
   };
   
   var logdir = '/var/www/listers.in/logs/apicall/downloadFile';
+  var reqfile = logdir + '/' + postjson.email + '_' + postjson.site + '.req';
   var rawfile = logdir + '/' + postjson.email + '_' + postjson.site + '.raw';
   var zipfile = logdir + '/' + postjson.email + '_' + postjson.site + '.zip';
+  
+  fs.writeFile(reqfile, requestxml);
   
   if (fs.existsSync(zipfile)) {
     callback(null, {zipfile: zipfile});
@@ -354,6 +383,8 @@ function dopost2(postjson, callback) {
   }
   
   var req = https.request(options, function(apires) {
+    
+    fs.writeFile(rawfile, apires);
     
     var formidable = require('formidable');
     var form = new formidable.IncomingForm();

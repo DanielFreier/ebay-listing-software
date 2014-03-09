@@ -30,10 +30,14 @@ exports.index = function(req, res) {
         
         users.forEach(function(user) {
           if (user.hasOwnProperty('created_at')) {
-            user.created_at = moment(user.created_at).format('YYYY/MM/DD HH:mm');
+            user.created_at = moment(user.created_at).format('YYYY-MM-DD HH:mm');
           }
           if (user.hasOwnProperty('lastused_at')) {
-            user.lastused_at = moment(user.lastused_at).format('YYYY/MM/DD HH:mm');
+            user.lastused_at = moment(user.lastused_at).format('YYYY-MM-DD HH:mm');
+          }
+          if (user.hasOwnProperty('period')) {
+            user.period.start = moment(user.period.start).format('YYYY-MM-DD HH:mm');
+            user.period.end   = moment(user.period.end  ).format('YYYY-MM-DD HH:mm');
           }
           
           if (user.hasOwnProperty('userids2')) {
@@ -135,11 +139,11 @@ exports.listeditems = function(req, res) {
     db.collection('listeditems', function(err, collection) {
       collection.find({
         status: 'Active'
-      }).sort({starttime: -1}).toArray(function(err, items) {
-
+      }).sort({endtime: -1}).toArray(function(err, items) {
+        
         items.forEach(function(item) {
-          item.starttime = moment(item.starttime).format('MM-DD HH:mm');
-          item.endtime   = moment(item.endtime).format('MM-DD HH:mm');
+          item.starttime = moment(item.starttime).format('YYYY-MM-DD HH:mm');
+          item.endtime   = moment(item.endtime).format('YYYY-MM-DD HH:mm');
         });
         
         res.render('listeditems', {items: items});
