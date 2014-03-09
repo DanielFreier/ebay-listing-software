@@ -129,5 +129,8 @@
 	"Verify": "エラーチェック",
 	"Weight": "重量",
 	"PrimaryCategory": "PrimaryCategory",
-	"SecondaryCategory": "SecondaryCategory"
+	"SecondaryCategory": "SecondaryCategory",
+	"Home": "ホーム",
+	"FreeTrial": "FreeTrial",
+	"Plan": "Plan"
 }

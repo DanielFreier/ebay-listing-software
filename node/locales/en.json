@@ -132,5 +132,10 @@
 	"Verify": "Verify",
 	"Weight": "Weight",
 	"blog": "blog",
-	"ResetPassword": "ResetPassword"
+	"ResetPassword": "Reset Password",
+	"Home": "Home",
+	"Plan": "Plan",
+	"30DaysFree": "30DaysFree",
+	"30DaysFreeTrial": "30DaysFreeTrial",
+	"FreeTrial": "Free Trial"
 }
