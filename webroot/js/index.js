@@ -14,6 +14,11 @@ function bindevents()
 	/* Sign up button */
 	$('button', '#signupbox').click(function() {
     
+    if (!$('#agree').is(':checked')) {
+      alert('Please agree to listers.in\'s Terms of Service.');
+      return false;
+    }
+    
 		$('#signupmessage').css('color', 'red').html('');
 		
 		var email = $('input[name="email"]', '#signupbox').val();

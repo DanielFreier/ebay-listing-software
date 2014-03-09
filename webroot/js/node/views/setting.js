@@ -18,7 +18,8 @@ define([
       'click .addebayaccount': 'clickAddeBayAccount',
       'click .removeaccount': 'clickRemoveAccount',
       'change select[name="TimeZone"]': 'changeTimeZone',
-      'click #syncbutton': 'clickSyncButton'
+      'click #syncbutton': 'clickSyncButton',
+      'click input.synctoggle': 'clickSyncToggle'
     },
     
     initialize: function() {
@@ -59,13 +60,13 @@ define([
       $(this.el).append(settingTemplate);
       
       var option = {
-         format: "yyyy-mm-dd",
+        format: "yyyy-mm-dd",
         autoclose: true,
         todayHighlight: true
       };
       
       $('input[name="datestart"]', this.el).datepicker(option);
-      $('input[name="dateend"]', this.el).datepicker(option);
+      $('input[name="dateend"]',   this.el).datepicker(option);
       
 			$('#csvfile').ace_file_input({
 				no_file: 'No File ...',
@@ -103,7 +104,12 @@ define([
 		  $.post('/node/json/addaccount',
 			       null,
 			       function(data) {
-				       window.location.href = data.json.url;
+               if (data.message) {
+                 $('span.loading', $(e.currentTarget).parent()).hide();
+                 alert(data.message);
+               } else {
+				         window.location.href = data.json.url;
+               }
 			       },
 			       'json');
       
@@ -116,15 +122,15 @@ define([
 		  var trtag = $(e.currentTarget).closest('tr');
       var userid = $(e.currentTarget).attr('data-userid');
       
-		  if (!confirm('Remove ' + userid + ' from ListersIn?')) {
+		  if (!confirm('Remove ' + userid + ' from listers.in?')) {
 			  return false;
 		  }
       
 		  $.post('/node/json/removeaccount',
 			       'userid=' + userid,
 			       function(data) {
-               console.log('response remove');
 				       $(trtag).remove();
+               $('#nav-' + userid).remove();
 			       });
       
     },
@@ -176,6 +182,21 @@ define([
 				       
 			       });
       
+    },
+    
+    clickSyncToggle: function(e) {
+      
+      var username = $(e.currentTarget).attr('name').replace(/^sync-/, '');
+      var checked  = $(e.currentTarget).is(':checked');
+      
+      $.post('/node/json/updatesyncmode',
+             'username=' + username + '&sync=' + checked,
+             function(data) {
+               
+             },
+             'json');
+      
+      return;
     }
     
   });

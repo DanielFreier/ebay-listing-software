@@ -37,6 +37,7 @@ define([
       
       Events.on('canceledit:click', _.bind(function(message) {
         
+        $('thead', '#items').show();
         this.search();
         
       }, this)); // canceledit:click
@@ -58,7 +59,13 @@ define([
         $('#settings').hide();
         $('#help').hide();
         
-        $('select[name="selling"]', '#hiddenforms').val(message.status);
+        if (message.status.match(/^allitems|scheduled|active|sold|unsold|unanswered|saved|template$/)) {
+          $('select[name="selling"]', '#hiddenforms').val(message.status);
+          $('input[name="tag"]',      '#hiddenforms').val('');
+        } else {
+          $('select[name="selling"]', '#hiddenforms').val('allitems');
+          $('input[name="tag"]',      '#hiddenforms').val(message.status);
+        }
         $('select[name="UserID"]',  '#hiddenforms').val(message.userid);
 			  $('input[name="offset"]',   '#hiddenforms').val(0);
         
@@ -94,6 +101,8 @@ define([
            if (data.json.items) {
              
 				     $.each(data.json.items, function(idx, item) {
+               
+               if (!item.mod) return;
                
                var rowtemplate = _.template($('#itemTemplate').html());
                var itemTemplate = rowtemplate(item);
@@ -148,6 +157,26 @@ define([
           endtime: null
         };
         
+        var templatejson;
+        
+        if (message.hasOwnProperty('templateid')) {
+          
+          $.ajax({
+            url: '/node/json/items/' + message.templateid,
+            success: function(data) {
+              
+              item = data.json.item;
+              item.id = 'newitem0';
+              item.opt.template = 'false';
+              
+              templatejson = data;
+            },
+            async: false,
+            dataType: 'json'
+          });  
+          
+        }
+        
         this.collection.add([item]);
         
         var itemmodel = this.collection.at(this.collection.length-1);
@@ -165,22 +194,34 @@ define([
         
         detailView.model.detailView = detailView;
         
-        var site = 'US';
+        var site = item.mod.Site;
         
-        detailView.HashModel.url = '/node/json/site?site=' + site;
-        detailView.HashModel.fetch({
-          success: _.bind(function() {
-            
-            ebayjs.hash[site] = detailView.HashModel.get('json');
-		        ebayjs.hash[site].SecondaryCategories = $.extend({}, ebayjs.hash[site].Categories);
-            
-            ebayjs.setformelements(item);
-		        ebayjs.fillformvalues(item);
-            
-            detailView.clickEdit();
-            
-          }, detailView)
-        });
+        if (message.hasOwnProperty('templateid')) {
+          
+          ebayjs.hash[site] = templatejson.json;
+          ebayjs.setformelements(item);
+		      ebayjs.fillformvalues(item);
+          
+          detailView.clickEdit();
+          
+        } else {
+          
+          detailView.HashModel.url = '/node/json/site?site=' + site;
+          detailView.HashModel.fetch({
+            success: _.bind(function() {
+              
+              ebayjs.hash[site] = detailView.HashModel.get('json');
+		          ebayjs.hash[site].SecondaryCategories = $.extend({}, ebayjs.hash[site].Categories);
+              
+              ebayjs.setformelements(item);
+		          ebayjs.fillformvalues(item);
+              
+              detailView.clickEdit();
+              
+            }, detailView)
+          });
+          
+        }
         
       }, this)); // newitem:click
       
@@ -259,6 +300,7 @@ define([
           offset:    $('input[name="offset"]',     '#hiddenforms').val(),
           limit:     $('input[name="limit"]',      '#hiddenforms').val(),
           Title:     $('input[name="title"]',      '#hiddenforms').val(),
+          tag:       $('input[name="tag"]',        '#hiddenforms').val(),
           'mod.ListingType': ''
         },
         
@@ -388,7 +430,7 @@ define([
       
       var action = $(e.currentTarget).attr('data-action');
       
-      if (action.match(/^delete|add|relist|end$/)) {
+      if (action.match(/^add|relist|end$/)) {
         if (ebayjs.checkdemoaccount()) return;
 			  if (!confirm($(this).html() + ' checked items?')) return;
       }
@@ -404,6 +446,7 @@ define([
          $('#checkall').prop('checked', false);
          
 			   if (action == 'copy' || action == 'delete') {
+           $('i.icon-spinner', '#items').remove();
 		       $('input[name="id"]', '#items').prop('checked', false);
          }
          

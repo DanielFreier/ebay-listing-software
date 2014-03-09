@@ -25,8 +25,6 @@ define([
       
 		  $('input.filter[name="total"]',  '#hiddenforms').val(response.json.cnt);
       
-      console.dir(response.json.items);
-      
 	    var htmlencoded = $('<div/>').text($.dump(response.json.items)).html();
 	    $('#debug').html('<pre>'+htmlencoded+'</pre>');
       

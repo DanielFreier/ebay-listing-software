@@ -22,6 +22,57 @@ define([
 	    
 	    var data = $.parseJSON(xhr.responseText);
 	    
+      if (data.user) {
+        if (data.user.expired) {
+          $('#expired').removeClass('hide');
+        }
+      }
+      
+      /* Update left navigation bar item count */
+      if (data.summary) {
+        
+        var tagtemplate = _.template($('#tagTemplate').html());
+        
+        _.each(data.summary, function(summary) {
+          
+          var username = summary.username;
+          
+          for (var key in summary.summary) {
+            $('a[data-userid="' + username + '"][data-sellingstatus="' + key + '"] span.badge',
+              '#summaries').html(summary.summary[key]);
+          }
+          
+          for (var tag in summary.tags) {
+            
+            if ($('a[data-userid="' + username + '"][data-sellingstatus="' + tag + '"]').length) {
+              
+              $('a[data-userid="' + username + '"][data-sellingstatus="' + tag + '"] span.badge',
+                '#summaries').html(summary.tags[tag]);
+              
+              continue;
+            }
+            
+            var tagTemplate = tagtemplate({
+              username: username,
+              tag: tag,
+              count: summary.tags[tag]
+            });
+            
+            $('ul.submenu', '#nav-' + username).append(tagTemplate);
+          }
+          
+          $.each($('li.tag', '#nav-' + username), function(idx, li) {
+            
+            var tmptag = $('a', li).attr('data-sellingstatus');
+            if (summary.tags[tmptag]) return;
+            
+            $(li).remove();
+          });
+          
+        }, this);
+        
+      }
+      
 	    if (data.json == null
           || data.json.message == null
 			    || data.json.message.message == null
@@ -59,7 +110,7 @@ define([
 			           'json');
 	        
 	        return;
-        }, 2000);
+        }, 5000);
 	    }
       
 	    return;

@@ -1,12 +1,15 @@
 require.config({
   paths: {
-    jquery:         '/js/jquery-1.10.2.min',
+    jquery:         '/js/jquery-1.11.0.min',
     underscore:     '/js/underscoreTplSettings',
-    underscoreBase: '/js/underscore-min',
+    underscoreBase: '/js/underscore',
     backbone:       '/js/backbone-min',
-    jquerymobile:   '/ace/assets/js/jquery.mobile.custom.min',
-    jqueryui:       '/ace/assets/js/jquery-ui-1.10.3.custom.min',
-    jquerycolorbox: '/ace/assets/js/jquery.colorbox-min',
+    
+    jquerymobile:     '/ace/assets/js/jquery.mobile.custom.min',
+    jqueryui:         '/ace/assets/js/jquery-ui-1.10.3.custom.min',
+    jquerycolorbox:   '/ace/assets/js/jquery.colorbox-min',
+    jqueryslimscroll: '/ace/assets/js/jquery.slimscroll.min',
+    
     jquerydump:     '/js/jquery.dump',
     redactor:       '/js/redactor/redactor.min',
     bootstrap:      '/ace/assets/js/bootstrap.min',
@@ -36,6 +39,9 @@ require.config({
     jquerycolorbox: {
       deps: ['jquery']
     },
+    jqueryslimscroll: {
+      deps: ['jquery']
+    },
     bootstrapdatepicker: {
       deps: ['jquery']
     },
@@ -57,10 +63,13 @@ require.config({
     aceelements: {
       deps: ['jquery']
     },
+    events: {
+      deps: ['backbone']
+    },
     ace: {
       deps: ['jquery', 'aceelements', 'bootstrap', 'bootstrapwysiwyg',
              'bootstrapdatepicker', 'bootstraptag', 'bootstraptagta',
-             'jquerycolorbox', 'jquerydump', 'jqueryui']
+             'jquerycolorbox', 'jquerydump', 'jqueryui', 'jqueryslimscroll']
     }
   }    
 });

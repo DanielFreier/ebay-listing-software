@@ -35,7 +35,12 @@ define([
 		  $.post('/node/json/addaccount',
 			       null,
 			       function(data) {
-				       window.location.href = data.json.url;
+               if (data.message) {
+                 $('span', $(e.currentTarget).parent()).hide();
+                 alert(data.message);
+               } else {
+				         window.location.href = data.json.url;
+               }
 			       },
 			       'json');
       
