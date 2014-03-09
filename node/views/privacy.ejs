@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+    
+    <title>listers.in - eBay Listing Software</title>
+    
+    <link href="/bootstrap-3.1.1-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/carousel.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/css/index_bootstrap.css">
+  </head>
+  <body>
+
+
+    <div class="navbar-wrapper">
+      <div class="container">
+
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="/">listers.in</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li class="active"><a href="/">Home</a></li>
+                <li><a href="http://listers.in/blog/" target="_blank">Blog</a></li>
+                <li><a href="http://forum.listers.in/" target="_blank">Forum</a></li>
+              </ul>
+              
+              <form method="post" action="/node/login/"
+                    class="navbar-form navbar-right" role="search"
+                    id="signinbox">
+                <div class="form-group" style="margin-right:5px;">
+                  <label class="sr-only" for="exampleInputEmail2">Email address</label>
+                  <input type="email" name="email"
+                         class="form-control input-sm"
+                         id="exampleInputEmail2" placeholder="Email">
+                </div>
+                <div class="form-group" style="margin-right:5px;">
+                  <label class="sr-only" for="exampleInputPassword2">Password</label>
+                  <input type="password" name="password"
+                         class="form-control input-sm"
+                         id="exampleInputPassword2" placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-default btn-sm" id="signinbutton">Sign in</button>
+                <a id="forgotpasswordlink" href="#">Forgot password</a>
+              </form>
+              
+            </div>
+
+				<div id="forgotpassworddiv" style="background-color:#fff; padding:5px; display:none;" class="pull-right">
+					<form method="post" action="">
+						Please input your email address and click button.<br />
+						<input type="text" id="fpemail" name="fpemail" size="40" value=""><br />
+						<button><%= __('SendPasswordResetMail') %></button>
+					</form>
+					<div id="forgotpasswordmessage"></div>
+				</div>
+        
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+    
+    <div class="container marketing" style="width:1000px; margin-top:80px;">
+      
+      
+      
+      
+      
+<h1>listers.in Privacy Policy</h1>
+<p>This Privacy Policy was last modified on February 16, 2014.</p>
+<p>listers.in ("us", "we", or "our") operates listers.in (the "Site"). This page informs you of our policies regarding the collection, use and disclosure of Personal Information we receive from users of the Site.</p>
+<p>We use your Personal Information only for providing and improving the Site. By using the Site, you agree to the collection and use of information in accordance with this policy. Unless otherwise defined in this Privacy Policy, terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, accessible at listers.in.</p>
+
+<p><strong>Information Collection And Use</strong><br />While using our Site, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you. Personally identifiable information may include, but is not limited to, your name, email address, postal address and phone number ("Personal Information").</p>
+
+<p><strong>Log Data</strong><br />Like many site operators, we collect information that your browser sends whenever you visit our Site ("Log Data"). This Log Data may include information such as your computer's Internet Protocol ("IP") address, browser type, browser version, the pages of our Site that you visit, the time and date of your visit, the time spent on those pages and other statistics.</p>
+
+<p><strong>Cookies</strong><br />Cookies are files with small amount of data, which may include an anonymous unique identifier. Cookies are sent to your browser from a web site and stored on your computer's hard drive.</p>
+<p>Like many sites, we use "cookies" to collect information. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our Site.</p>
+
+<p><strong>Security</strong><br />The security of your Personal Information is important to us, but remember that no method of transmission over the Internet, or method of electronic storage, is 100% secure. While we strive to use commercially acceptable means to protect your Personal Information, we cannot guarantee its absolute security.</p>
+
+<p><strong>Links To Other Sites</strong><br />Our Site may contain links to other sites that are not operated by us. If you click on a third party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit.</p>
+<p>listers.in has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third party sites or services.</p>
+
+<p><strong>Changes To This Privacy Policy</strong><br />listers.in may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on the Site. You are advised to review this Privacy Policy periodically for any changes.</p>
+
+<p><strong>Contact Us</strong><br />If you have any questions about this Privacy Policy, please contact us.</p>
+
+<p style="font-size: 85%; color: #999;">Generated with permission from <a href="http://termsfeed.com/privacy-policy/generator/" title="TermsFeed" style="color: #999; text-decoration: none;">TermsFeed Generator</a>.</p>
+      
+      
+      
+      
+      
+      <hr class="featurette-divider">
+      
+      <footer>
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>&copy; 2014 listers.in
+          &middot; <a href="/node/privacy">Privacy</a>
+          &middot; <a href="/node/terms">Terms</a></p>
+      </footer>
+      
+    </div><!-- /.container -->
+
+    <script src="/js/jquery-1.11.0.min.js"></script>
+    <script src="/bootstrap-3.1.1-dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/index.js"></script>
+  </body>
+</html>

@@ -8,21 +8,9 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-    <title>listers.in - eBay Listing Software</title>
+    <title>listers.in - <%= __('eBayListingSoftware') %></title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Just for debugging purposes. Don't actually copy this line! -->
-    <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-    <![endif]-->
-
-    <!-- Custom styles for this template -->
+    <link href="/bootstrap-3.1.1-dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="/bootstrap-3.0.3/examples/carousel/carousel.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="/css/index_bootstrap.css">
 
@@ -70,27 +58,29 @@
             </div>
             <div class="navbar-collapse collapse">
               <ul class="nav navbar-nav">
-                <li class="active"><a href="/">Home</a></li>
-                <li><a href="http://listers.in/blog/" target="_blank">Blog</a></li>
-                <li><a href="http://forum.listers.in/" target="_blank">Forum</a></li>
+                <li class="active"><a href="/"><%= __('Home') %></a></li>
+                <li><a href="http://listers.in/blog/" target="_blank"><%= __('Blog') %></a></li>
+                <li><a href="http://forum.listers.in/" target="_blank"><%= __('Forum') %></a></li>
               </ul>
               
               <form method="post" action="/node/login/"
                     class="navbar-form navbar-right" role="search"
                     id="signinbox">
                 <div class="form-group" style="margin-right:5px;">
-                  <label class="sr-only" for="exampleInputEmail2">Email address</label>
+                  <label class="sr-only" for="exampleInputEmail2"><%= __('Email') %></label>
                   <input type="email" name="email"
                          class="form-control input-sm"
-                         id="exampleInputEmail2" placeholder="Email">
+                         id="exampleInputEmail2" placeholder="<%= __('Email') %>">
                 </div>
                 <div class="form-group" style="margin-right:5px;">
-                  <label class="sr-only" for="exampleInputPassword2">Password</label>
+                  <label class="sr-only" for="exampleInputPassword2"><%= __('Password') %></label>
                   <input type="password" name="password"
                          class="form-control input-sm"
-                         id="exampleInputPassword2" placeholder="Password">
+                         id="exampleInputPassword2" placeholder="<%= __('Password') %>">
                 </div>
-                <button type="submit" class="btn btn-default btn-sm" id="signinbutton">Sign in</button>
+                <button type="submit" class="btn btn-default btn-sm" id="signinbutton">
+                  <%= __('SignIn') %>
+                </button>
                 <a id="forgotpasswordlink" href="#">Forgot password</a>
               </form>
               
@@ -128,7 +118,9 @@
               <h1 style="color:black; font-size:40px; font-weight:800;">Light Weight eBay Listing Software</h1>
               <p style="color:#666;">Manage your listings with simple and easy tool.</p>
               <p style="margin-top:60px;">
-                <a class="btn btn-lg btn-primary" href="#" role="button" id="trydemo">Try demo</a>
+                <a class="btn btn-lg btn-primary" href="#" role="button" id="trydemo">
+                  <%= __('TryDemoAccount') %>
+                </a>
               </p>
             </div>
           </div>
@@ -151,14 +143,55 @@
           
           <h3 style="margin-top:0;"><%= __('Features') %></h3>
           <ul>
+            <% if (locale == 'ja') { %>
+		        <li>複数のeBayアカウントを管理できます。</li>
+		        <li>複数のeBayアカウントから質問メッセージに返答することができます。</li>
+					  <li>落札されずに終了した商品を自動際出品する際に、"Best Offer"(値引き交渉)オプションを付けられます。</li>
+		        <li>1商品に12枚の写真を一度にアップし、eBayのサーバへ送信できます。</li>
+		        <li>シンプルで使いやすい画面です。</li>
+		        <li>タイトルが重複している商品を見つけることができます。</li>
+            <% } else { %>
 		        <li>Manage multiple eBay accounts.</li>
 		        <li>Reply to messages from multiple eBay accounts.</li>
 					  <li>Add "Best Offer" option when unsold item is auto relisted.</li>
 		        <li>Upload 12 pictures for one item to eBay server at once.</li>
 		        <li>Simple and easy user interface.</li>
 		        <li>Find duplicate items by title.</li>
-            <li>FREE.</li>
+            <% } %>
           </ul>
+          
+          <h3 style="margin-top:0;"><%= __('Price') %></h3>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Trial</th>
+                <th>Starter</th>
+                <th>Business</th>
+              </tr>
+            </thead>
+            <tr>
+              <th>Listings *</th>
+              <td>100</td>
+              <td>100</td>
+              <td>Unlimited</td>
+            </tr>
+            <tr>
+              <th>eBay IDs</th>
+              <td>1</td>
+              <td>1</td>
+              <td>Unlimited</td>
+            </tr>
+            <tr>
+              <th>Price</th>
+              <td>30 days free</td>
+              <td>$9.95/month</td>
+              <td>$14.95/month</td>
+            </tr>
+          </table>
+          <p>
+            * Listings: Listed or relisted items using listers.in system.
+          </p>
           
           <h3 style="margin-top:0;"><%= __('Blog') %></h3>
 	    <ul class="blog">
@@ -184,26 +217,46 @@
         <div class="col-md-6">
 
           <div class="panel panel-primary">
-            <div class="panel-heading"><%= __('SignUp') %></div>
+            <div class="panel-heading">
+              <%= __('SignUp') %>
+              <%= __('FreeTrial') %>
+            </div>
             <div class="panel-body">
           <form method="post" action="#" class="form-horizontal" role="form"
                 id="signupbox">
             <div class="form-group">
-              <label for="inputEmail3" class="col-sm-5 control-label">Email</label>
+              <label for="inputEmail3" class="col-sm-5 control-label">
+                <%= __('Email') %>
+              </label>
               <div class="col-sm-7">
                 <input type="email" name="email" class="form-control" id="inputEmail3">
               </div>
             </div>
             <div class="form-group">
-              <label for="inputPassword3" class="col-sm-5 control-label">Password</label>
+              <label for="inputPassword3" class="col-sm-5 control-label">
+                <%= __('Password') %>
+              </label>
               <div class="col-sm-7">
                 <input type="password" name="password" class="form-control" id="inputPassword3">
               </div>
             </div>
             <div class="form-group">
-              <label for="inputPassword3" class="col-sm-5 control-label"><%= __('ConfirmPassword') %></label>
+              <label for="inputPassword3" class="col-sm-5 control-label">
+                <%= __('ConfirmPassword') %>
+              </label>
               <div class="col-sm-7">
                 <input type="password" name="password2" class="form-control" id="inputPassword3">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputPassword3" class="col-sm-5 control-label">
+              </label>
+              <div class="checkbox col-sm-7">
+                <label>
+                  <input type="checkbox" id="agree" name="agree">
+                  I agree to listers.in's
+                  <a href="/node/terms" target="_blank">Terms of Service</a>.
+                </label>
               </div>
             </div>
             <div class="form-group">
@@ -262,7 +315,7 @@
           <li>
             <div><%= feeds.githubjson[i].title %></div>
 						<div style="text-align:right; color:#aaa;">
-              <%= feeds.githubjson[i].updated.replace(/-07:00/, '').replace(/2013-/, '').replace(/T/, ' ') %>
+              <%= feeds.githubjson[i].updated.replace(/-0.:00/, '').replace(/T/, ' ') %>
             </div>
           </li>
           <% } %>
@@ -273,21 +326,19 @@
         </div>
       </div>
       
-      <!-- FOOTER -->
+      <hr class="featurette-divider">
+      
       <footer>
         <p class="pull-right"><a href="#">Back to top</a></p>
-        <p>listers.in - eBay Listing Software</p>
+        <p>&copy; 2014 listers.in
+          &middot; <a href="/node/privacy">Privacy</a>
+          &middot; <a href="/node/terms">Terms</a></p>
       </footer>
 
     </div><!-- /.container -->
-
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/bootstrap-3.0.3/docs-assets/js/holder.js"></script>
+    
+    <script src="/js/jquery-1.11.0.min.js"></script>
+    <script src="/bootstrap-3.1.1-dist/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/js/index.js"></script>
   </body>
 </html>

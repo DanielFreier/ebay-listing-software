@@ -62,8 +62,8 @@
       </tr>
       <tr>
         <th>E</th>
-        <th>C</th>
-        <th>L</th>
+        <th>L/C</th>
+        <th>E/S</th>
         <th>N</th>
         <th>I</th>
         <th>P</th>
@@ -87,17 +87,21 @@
              <a href="/admin/signin?email=<%= users[i].email %>" target="usersignin">
                <%= users[i].email.replace(/@.+$/, '') %>
              </a>
-             <% if (users[i].status != 'free trial') { %>
              <div><%= users[i].status %></div>
-             <% } %>
            </td>
            <td rowspan="<%= users[i].userids2.length %>">
+             <%= users[i].lastused_at %>
+             <br/>
              <% if (users[i].hasOwnProperty('created_at')) { %>
              <%= users[i].created_at %>
              <% } %>
            </td>
            <td rowspan="<%= users[i].userids2.length %>">
-             <%= users[i].lastused_at %>
+             <% if (users[i].hasOwnProperty('period')) { %>
+             <%= users[i].period.end %>
+             <br/>
+             <%= users[i].period.start %>
+             <% } %>
            </td>
            <td rowspan="<%= users[i].userids2.length %>">
              <% if (users[i].hasOwnProperty('newlook')) { %>
@@ -117,6 +121,10 @@
              <% if (users[i].userids2[j].hasOwnProperty('User')
                 && users[i].userids2[j].User.Status != 'Confirmed') { %>
              <div style="color:red;">(<%= users[i].userids2[j].User.Status %>)</div>
+             <% } %>
+             
+             <% if (users[i].userids2[j].hasOwnProperty('Errors')) { %>
+             <div style="color:red;">(<%= users[i].userids2[j].Errors.ShortMessage %>)</div>
              <% } %>
              
            </td>
@@ -205,12 +213,18 @@
              <% } %>
            </td>
            <td>
+             <%= users[i].lastused_at %>
+             <br/>
              <% if (users[i].hasOwnProperty('created_at')) { %>
              <%= users[i].created_at %>
              <% } %>
            </td>
            <td>
-             <%= users[i].lastused_at %>
+             <% if (users[i].hasOwnProperty('period')) { %>
+             <%= users[i].period.end %>
+             <br/>
+             <%= users[i].period.start %>
+             <% } %>
            </td>
            <td>
              <% if (users[i].hasOwnProperty('newlook')) { %>

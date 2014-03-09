@@ -118,8 +118,8 @@
       </td>
       <td style="max-width:30%;">
         [[ if (typeof(UserID) == 'string') { ]]
-
-        [[ if (typeof(mod.Title) == 'string') { ]]
+        
+        [[ if (typeof(mod.Title) == 'string' && mod.Title != '') { ]]
         <a href="/#/items/{{UserID}}/{{id}}" class="Title bigger-110">{{mod.Title}}</a>
         [[ } else { ]]
         <a href="/#/items/{{UserID}}/{{id}}" class="Title bigger-110">(empty title)</a>
@@ -135,6 +135,13 @@
           [[ } ]]
         </div>
         [[ } ]]
+
+        [[ if (opt.hasOwnProperty('template') && opt.template == 'true') { ]]
+        <div class="pull-right">
+          <span class="label label-sm">Template</span>&nbsp;
+        </div>
+        [[ } ]]
+        
         [[ } ]]
         
         [[ if (typeof(status) == 'string' && status != '') { ]]

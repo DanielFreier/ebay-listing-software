@@ -4,10 +4,86 @@
     
     <div class="form-group">
 	    <label for="Email" class="col-sm-2 control-label no-padding-right">
+        <%= __('Plan') %>
+      </label>
+	    <div class="col-sm-6">
+        
+        <b class="bigger-120">
+          [[ if (email == 'demo@listers.in') { ]]
+          Demo
+          [[ } else if (status == 'trial') { ]]
+          Free Trial
+          [[ } else if (status == 'starter') { ]]
+          Starter
+          [[ } else if (status == 'business') { ]]
+          Business
+          [[ } ]]
+        </b>
+        [[ if (email != 'demo@listers.in') { ]]
+        <div>
+          {{period.start}} - {{period.end}}
+        </div>
+        
+        [[ if (status == 'trial' || expired) { ]]
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Trial</th>
+              <th>Starter</th>
+              <th>Business</th>
+            </tr>
+          </thead>
+          <tr>
+            <th>Listings *</th>
+            <td>100</td>
+            <td>100</td>
+            <td>Unlimited</td>
+          </tr>
+          <tr>
+            <th>eBay IDs</th>
+            <td>1</td>
+            <td>1</td>
+            <td>Unlimited</td>
+          </tr>
+          <tr>
+            <th>Price</th>
+            <td>30 days free</td>
+            <td>$9.95</td>
+            <td>$14.95</td>
+          </tr>
+          <tr>
+            <th></th>
+            <td>
+            </td>
+            <td>
+              <% include paypal-button-starter %>
+            </td>
+            <td>
+              <% include paypal-button-business %>
+            </td>
+          </tr>
+        </table>
+        <p>
+          * Listings: Listed or relisted items using listers.in system.
+        </p>
+        [[ } ]]
+        
+        [[ if (expired == false && (status == 'starter' || status == 'business')) { ]]
+        <% include paypal-button-unsubscribe %>
+        [[ } ]]
+        
+        [[ } ]]
+        
+	    </div>
+    </div>
+    
+    <div class="form-group">
+	    <label for="Email" class="col-sm-2 control-label no-padding-right">
         <%= __('Email') %>
       </label>
-	    <div class="col-sm-10" style="padding-top:4px; fnot-size:14px; font-weight:bold;">
-        {{email}}
+	    <div class="col-sm-10">
+        <b class="bigger-120">{{email}}</b>
 	    </div>
     </div>
     
@@ -15,7 +91,7 @@
 	    <label for="Email" class="col-sm-2 control-label no-padding-right">
         Time zone
       </label>
-	    <div class="col-sm-5">
+	    <div class="col-sm-6">
         
 <select name="TimeZone" class="form-control">
   <option value="GMT-12:00">UTC -12:00 (Eniwetok, Kwajalein)</option>
@@ -53,24 +129,41 @@
 	    <label for="Email" class="col-sm-2 control-label no-padding-right">
         eBay accounts
       </label>
-	    <div class="col-sm-5">
+	    <div class="col-sm-6">
         
         <table class="table table-bordered" style="margin:0;">
+          <tr>
+            <th>eBay ID</th>
+            <th>Sync with eBay</th>
+            <th>Remove</th>
+          </tr>
           [[ _.each(userids2, function(userid) { ]]
           <tr>
             <td>
               {{userid.username}}
             </td>
             <td>
+							<label>
+								<input name="sync-{{userid.username}}"
+                       class="ace ace-switch ace-switch-2 synctoggle"
+                       type="checkbox"
+                       [[ if (userid.sync) { ]]
+                       checked="checked"
+                       [[ } ]]
+                       />
+								<span class="lbl"></span>
+							</label>
+            </td>
+            <td>
               <button class="btn btn-xs removeaccount" data-userid="{{userid.username}}">
                 <i class="icon-remove"></i>
-                Remove from ListersIn
+                Remove
               </button>
             </td>
           </tr>
           [[ }); ]]
           <tr>
-            <td colspan="2" style="text-align:center;">
+            <td colspan="3" style="text-align:center;">
               
               <button class="btn btn-primary btn-sm addebayaccount">
                 <i class="icon-plus"></i>
@@ -82,6 +175,13 @@
               
             </td>
           </tr>
+          <tr>
+            <td colspan="3">
+              <b>Sync with eBay</b><br/>
+              Yes: All items of the eBay account are automatically imported and synced.<br/>
+              No: Only items which are listed or relisted from listers.in are synced with eBay.
+            </td>
+          </tr>
         </table>
         
 	    </div>
@@ -89,7 +189,7 @@
     
     <div class="form-group" id="syncitemsform">
 	    <label for="Email" class="col-sm-2 control-label no-padding-right">
-        Sync items from eBay
+        Import items from eBay
       </label>
 	    <div class="col-sm-6">
         

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+    
+    <title>listers.in - eBay Listing Software</title>
+    
+    <link href="/bootstrap-3.1.1-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/carousel.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/css/index_bootstrap.css">
+  </head>
+  <body>
+
+
+    <div class="navbar-wrapper">
+      <div class="container">
+
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="/">listers.in</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li class="active"><a href="/">Home</a></li>
+                <li><a href="http://listers.in/blog/" target="_blank">Blog</a></li>
+                <li><a href="http://forum.listers.in/" target="_blank">Forum</a></li>
+              </ul>
+              
+              <form method="post" action="/node/login/"
+                    class="navbar-form navbar-right" role="search"
+                    id="signinbox">
+                <div class="form-group" style="margin-right:5px;">
+                  <label class="sr-only" for="exampleInputEmail2">Email address</label>
+                  <input type="email" name="email"
+                         class="form-control input-sm"
+                         id="exampleInputEmail2" placeholder="Email">
+                </div>
+                <div class="form-group" style="margin-right:5px;">
+                  <label class="sr-only" for="exampleInputPassword2">Password</label>
+                  <input type="password" name="password"
+                         class="form-control input-sm"
+                         id="exampleInputPassword2" placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-default btn-sm" id="signinbutton">Sign in</button>
+                <a id="forgotpasswordlink" href="#">Forgot password</a>
+              </form>
+              
+            </div>
+
+				<div id="forgotpassworddiv" style="background-color:#fff; padding:5px; display:none;" class="pull-right">
+					<form method="post" action="">
+						Please input your email address and click button.<br />
+						<input type="text" id="fpemail" name="fpemail" size="40" value=""><br />
+						<button><%= __('SendPasswordResetMail') %></button>
+					</form>
+					<div id="forgotpasswordmessage"></div>
+				</div>
+        
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+    
+    <div class="container marketing" style="width:1000px; margin-top:80px;">
+
+
+<h1>listers.in Terms of Service ("Agreement")</h1>
+<p>This Agreement was last modified on February 16, 2014.</p>
+
+<p>Please read these Terms of Service ("Agreement", "Terms of Service") carefully before using http://listers.in ("the Site") operated by listers.in ("us", "we", or "our"). This Agreement sets forth the legally binding terms and conditions for your use of the Site at http://listers.in.</p>
+<p>By accessing or using the Site in any manner, including, but not limited to, visiting or browsing the Site or contributing content or other materials to the Site, you agree to be bound by these Terms of Service. Capitalized terms are defined in this Agreement.</p>
+
+<p><strong>Intellectual Property</strong><br />The Site and its original content, features and functionality are owned by listers.in and are protected by international copyright, trademark, patent, trade secret and other intellectual property or proprietary rights laws.</p>
+
+<p><strong>Termination</strong><br />We may terminate your access to the Site, without cause or notice, which may result in the forfeiture and destruction of all information associated with you. All provisions of this Agreement that by their nature should survive termination shall survive termination, including, without limitation, ownership provisions, warranty disclaimers, indemnity, and limitations of liability.</p>
+
+<p><strong>Links To Other Sites</strong><br />Our Site may contain links to third-party sites that are not owned or controlled by listers.in.</p>
+<p>listers.in has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third party sites or services. We strongly advise you to read the terms and conditions and privacy policy of any third-party site that you visit.</p>
+
+<p><strong>Governing Law</strong><br />This Agreement (and any further rules, polices, or guidelines incorporated by reference) shall be governed and construed in accordance with the laws of Japan, without giving effect to any principles of conflicts of law.</p>
+
+<p><strong>Changes To This Agreement</strong><br />We reserve the right, at our sole discretion, to modify or replace these Terms of Service by posting the updated terms on the Site. Your continued use of the Site after any such changes constitutes your acceptance of the new Terms of Service.</p>
+<p>Please review this Agreement periodically for changes. If you do not agree to any of this Agreement or any changes to this Agreement, do not use, access or continue to access the Site or discontinue any use of the Site immediately.</p>
+
+<p><strong>Contact Us</strong><br />If you have any questions about this Agreement, please contact us.</p>
+
+<p style="font-size: 85%; color: #999;">Generated with permission from <a href="http://termsfeed.com/terms-service/generator/" title="TermsFeed" style="color: #999; text-decoration: none;">TermsFeed Generator</a>.</p>
+
+
+      <hr class="featurette-divider">
+      <footer>
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>&copy; 2014 listers.in
+          &middot; <a href="/node/privacy">Privacy</a>
+          &middot; <a href="/node/terms">Terms</a></p>
+      </footer>
+      
+    </div><!-- /.container -->
+
+    <script src="/js/jquery-1.11.0.min.js"></script>
+    <script src="/bootstrap-3.1.1-dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/index.js"></script>
+  </body>
+</html>

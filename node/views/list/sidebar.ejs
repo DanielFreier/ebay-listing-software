@@ -4,69 +4,179 @@
 		  <i class="icon-edit"></i>
       <%= __('AddNewItem') %>
 	  </button>
+    <button data-toggle="dropdown" class="btn btn-sm dropdown-toggle">
+      <span class="icon-caret-down icon-only"></span>
+    </button>
+    
+    <ul class="dropdown-menu" style="text-align:left;">
+      <% for (var idx in templates) { %>
+      <li>
+        <a href="#" class="newitemwithtemplate" 
+           data-templateid="<%= templates[idx]._id %>">
+          <%= templates[idx].mod.Title %>
+        </a>
+      </li>
+      <% } %>
+    </ul>
+    
   </div>
 </div>
-  
+
 <ul class="nav nav-list" id="summaries">
   
-  <script id="summaryTemplate" type="text/template">
-    <li>
-		  <a href="/#/items/{{userid}}" class="dropdown-toggle"
-         data-userid="{{userid}}" data-sellingstatus="allitems">
-			  <span class="menu-text">{{userid}}</span>
-        <span class="badge badge-inverse">{{allitems}}</span>
+    <li id="nav-alluserids">
+		  <a href="/#/items/alluserids" class="dropdown-toggle"
+         data-userid="alluserids" data-sellingstatus="allitems">
+			  <span class="menu-text">alluserids</span>
+        <span class="badge badge-inverse">0</span>
 			  <b class="arrow icon-angle-down"></b>
 		  </a>
 		  <ul class="submenu">
 			  <li>
-				  <a href="/#/items/{{userid}}/scheduled"
-             data-userid="{{userid}}" data-sellingstatus="scheduled">
+				  <a href="/#/items/alluserids/scheduled"
+             data-userid="alluserids" data-sellingstatus="scheduled">
 					  <i class="icon-double-angle-right"></i>
 					  Scheduled
-            <span class="badge badge-inverse">{{scheduled}}</span>
+            <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
 			  <li>
-				  <a href="/#/items/{{userid}}/active"
-             data-userid="{{userid}}" data-sellingstatus="active">
+				  <a href="/#/items/alluserids/active"
+             data-userid="alluserids" data-sellingstatus="active">
 					  <i class="icon-double-angle-right"></i>
             Active
-            <span class="badge badge-inverse">{{active}}</span>
+            <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
 			  <li>
-				  <a href="/#/items/{{userid}}/sold"
-             data-userid="{{userid}}" data-sellingstatus="sold">
+				  <a href="/#/items/alluserids/sold"
+             data-userid="alluserids" data-sellingstatus="sold">
 					  <i class="icon-double-angle-right"></i>
             Sold
-            <span class="badge badge-inverse">{{sold}}</span>
+            <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
 			  <li>
-				  <a href="/#/items/{{userid}}/unsold"
-             data-userid="{{userid}}" data-sellingstatus="unsold">
+				  <a href="/#/items/alluserids/unsold"
+             data-userid="alluserids" data-sellingstatus="unsold">
 					  <i class="icon-double-angle-right"></i>
             Unsold
-            <span class="badge badge-inverse">{{unsold}}</span>
+            <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
 			  <li>
-				  <a href="/#/items/{{userid}}/unanswered"
-             data-userid="{{userid}}" data-sellingstatus="unanswered">
+				  <a href="/#/items/alluserids/unanswered"
+             data-userid="alluserids" data-sellingstatus="unanswered">
 					  <i class="icon-double-angle-right"></i>
             Unanswered
-            <span class="badge badge-inverse">{{unanswered}}</span>
+            <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
 			  <li>
-				  <a href="/#/items/{{userid}}/saved"
-             data-userid="{{userid}}" data-sellingstatus="saved">
+				  <a href="/#/items/alluserids/saved"
+             data-userid="alluserids" data-sellingstatus="saved">
 					  <i class="icon-double-angle-right"></i>
             Saved
-            <span class="badge badge-inverse">{{saved}}</span>
+            <span class="badge badge-inverse">0</span>
+				  </a>
+			  </li>
+			  <li>
+				  <a href="/#/items/alluserids/template"
+             data-userid="alluserids" data-sellingstatus="template">
+					  <i class="icon-double-angle-right"></i>
+            Template
+            <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
       </ul>
+    </li>
+
+  <% if (user.userids2) { %>
+  <% for (var idx in user.userids2) { %>
+  <li id="nav-<%= user.userids2[idx].username %>">
+		  <a href="/#/items/<%= user.userids2[idx].username %>" class="dropdown-toggle"
+         data-userid="<%= user.userids2[idx].username %>" data-sellingstatus="allitems">
+			  <span class="menu-text"><%= user.userids2[idx].username %></span>
+        <span class="badge badge-inverse">0</span>
+			  <b class="arrow icon-angle-down"></b>
+		  </a>
+		  <ul class="submenu">
+			  <li>
+				  <a href="/#/items/<%= user.userids2[idx].username %>/scheduled"
+             data-userid="<%= user.userids2[idx].username %>" data-sellingstatus="scheduled">
+					  <i class="icon-double-angle-right"></i>
+					  Scheduled
+            <span class="badge badge-inverse">0</span>
+				  </a>
+			  </li>
+			  <li>
+				  <a href="/#/items/<%= user.userids2[idx].username %>/active"
+             data-userid="<%= user.userids2[idx].username %>" data-sellingstatus="active">
+					  <i class="icon-double-angle-right"></i>
+            Active
+            <span class="badge badge-inverse">0</span>
+				  </a>
+			  </li>
+			  <li>
+				  <a href="/#/items/<%= user.userids2[idx].username %>/sold"
+             data-userid="<%= user.userids2[idx].username %>" data-sellingstatus="sold">
+					  <i class="icon-double-angle-right"></i>
+            Sold
+            <span class="badge badge-inverse">0</span>
+				  </a>
+			  </li>
+			  <li>
+				  <a href="/#/items/<%= user.userids2[idx].username %>/unsold"
+             data-userid="<%= user.userids2[idx].username %>" data-sellingstatus="unsold">
+					  <i class="icon-double-angle-right"></i>
+            Unsold
+            <span class="badge badge-inverse">0</span>
+				  </a>
+			  </li>
+			  <li>
+				  <a href="/#/items/<%= user.userids2[idx].username %>/unanswered"
+             data-userid="<%= user.userids2[idx].username %>" data-sellingstatus="unanswered">
+					  <i class="icon-double-angle-right"></i>
+            Unanswered
+            <span class="badge badge-inverse">0</span>
+				  </a>
+			  </li>
+			  <li>
+				  <a href="/#/items/<%= user.userids2[idx].username %>/saved"
+             data-userid="<%= user.userids2[idx].username %>" data-sellingstatus="saved">
+					  <i class="icon-double-angle-right"></i>
+            Saved
+            <span class="badge badge-inverse">0</span>
+				  </a>
+			  </li>
+			  <li>
+				  <a href="/#/items/<%= user.userids2[idx].username %>/template"
+             data-userid="<%= user.userids2[idx].username %>" data-sellingstatus="template">
+					  <i class="icon-double-angle-right"></i>
+            Template
+            <span class="badge badge-inverse">0</span>
+				  </a>
+			  </li>
+      </ul>
+  </li>
+  <% } %>
+  <% } %>
+  
+  <script id="tagTemplate" type="text/template">
+		<li class="tag">
+			<a href="/#/items/{{username}}/{{tag}}"
+         data-userid="{{username}}"
+         data-sellingstatus="{{tag}}">
+				<i class="icon-double-angle-right"></i>
+				<i class="icon-tag"></i>
+        {{tag}}
+        <span class="badge badge-inverse">{{count}}</span>
+			</a>
+		</li>
+  </script>
+  
+  <script id="summaryTemplate" type="text/template">
+    <li>
     </li>
   </script>
 </ul>
