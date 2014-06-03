@@ -35,8 +35,8 @@ public class FetchToken extends ApiCall {
 		reqdbo.append("MessageID", getnewtokenmap(email) + " " + username);
 		
 		String requestxml = convertDBObject2XML(reqdbo, "FetchToken");
-		writelog("FetchToken/"+username+".req.xml", requestxml);
-		
+		writelog("FetchToken/" + username + ".req.xml", requestxml);
+    
 		Future<String> future = pool18.submit(new ApiCallTask(0, requestxml, "FetchToken"));
 		future.get();
 		
@@ -51,7 +51,7 @@ public class FetchToken extends ApiCall {
 		String email    = getemailfromtokenmap(messages[0]);
 		String username = messages[1];
     
-		writelog("FetchToken/"+username+".xml", responsexml);
+		writelog("FetchToken/" + username + ".xml", responsexml);
 		
     resdbo.put("username", username);
     

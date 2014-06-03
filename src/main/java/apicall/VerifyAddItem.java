@@ -102,10 +102,12 @@ public class VerifyAddItem extends ApiCall {
 			reqdbo.append("WarningLevel", "High");
 			reqdbo.append("RequesterCredentials", 
 										new BasicDBObject("eBayAuthToken", tokenmap.get(userid)));
-			reqdbo.append("MessageID", userdbo.getString("_id")+" "+item.get("_id").toString());
+      reqdbo.append("MessageID",
+                    getnewtokenmap(email) + " " + userid + " " + item.get("_id").toString());
 			reqdbo.append("Item", mod);
-			
+      
 			String jss = reqdbo.toString();
+      
 			JSONObject jso = JSONObject.fromObject(jss);
 			JSONObject tmpitem = jso.getJSONObject("Item");
 			expandElements(tmpitem);
@@ -140,21 +142,37 @@ public class VerifyAddItem extends ApiCall {
 	}
 	
 	public String callback(String responsexml) throws Exception {
-		
+    
 		writelog("VerifyAddItem/res.xml", responsexml);
-		
+    
 		BasicDBObject responsedbo = convertXML2DBObject(responsexml);
 		log("Ack:"+responsedbo.get("Ack").toString());
 		
 		// todo: almost same as AddItems callback function.
 		String[] messages = responsedbo.getString("CorrelationID").split(" ");
-		String itemcollectionname_id = messages[0];
-		String id = messages[1];
-		
-		DBCollection coll = db.getCollection("items."+itemcollectionname_id);
-		
-		writelog("VerifyAddItem/"+id+".xml", responsexml);
-		
+		String email  = getemailfromtokenmap(messages[0]);
+		String userid = messages[1];
+		String id     = messages[2];
+    
+		String timestamp = responsedbo.getString("Timestamp").replaceAll("\\.", "_");
+    
+		/* make log directory for each call */
+		String savedir = basedir + "/logs/apicall/VerifyAddItem/" + timestamp.substring(0,10);
+		if (!(new File(savedir)).exists()) {
+			new File(savedir).mkdir();
+		}
+		writelog("VerifyAddItem/" + timestamp.substring(0,10) + "/" + userid + "." + id + ".xml",
+             responsexml);
+    
+		/* get collection name for each users */
+		BasicDBObject userquery = new BasicDBObject();
+		userquery.put("email", email);
+		userquery.put("userids2.username", userid);
+		BasicDBObject userdbo = (BasicDBObject) db.getCollection("users").findOne(userquery);
+    
+    String itemcollname = "items." + userdbo.getString("_id");
+		DBCollection coll = db.getCollection(itemcollname);
+    
 		BasicDBObject upditem = new BasicDBObject();
 		upditem.put("status", "");
 		
@@ -173,7 +191,7 @@ public class VerifyAddItem extends ApiCall {
 			upditem.put("error", errors);
 			
 		} else {
-			
+      
 			/* No error! verified. */
 			upditem.put("error", null);
 			
