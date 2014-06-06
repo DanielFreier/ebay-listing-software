@@ -32,7 +32,7 @@
 			  <b class="arrow icon-angle-down"></b>
 		  </a>
 		  <ul class="submenu">
-			  <li>
+			  <li id="nav-alluserids-scheduled">
 				  <a href="/#/items/alluserids/scheduled"
              data-userid="alluserids" data-sellingstatus="scheduled">
 					  <i class="icon-double-angle-right"></i>
@@ -40,7 +40,7 @@
             <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
-			  <li>
+			  <li id="nav-alluserids-active">
 				  <a href="/#/items/alluserids/active"
              data-userid="alluserids" data-sellingstatus="active">
 					  <i class="icon-double-angle-right"></i>
@@ -48,7 +48,7 @@
             <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
-			  <li>
+			  <li id="nav-alluserids-sold">
 				  <a href="/#/items/alluserids/sold"
              data-userid="alluserids" data-sellingstatus="sold">
 					  <i class="icon-double-angle-right"></i>
@@ -56,7 +56,7 @@
             <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
-			  <li>
+			  <li id="nav-alluserids-unsold">
 				  <a href="/#/items/alluserids/unsold"
              data-userid="alluserids" data-sellingstatus="unsold">
 					  <i class="icon-double-angle-right"></i>
@@ -64,7 +64,7 @@
             <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
-			  <li>
+			  <li id="nav-alluserids-unanswered">
 				  <a href="/#/items/alluserids/unanswered"
              data-userid="alluserids" data-sellingstatus="unanswered">
 					  <i class="icon-double-angle-right"></i>
@@ -72,7 +72,7 @@
             <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
-			  <li>
+			  <li id="nav-alluserids-saved">
 				  <a href="/#/items/alluserids/saved"
              data-userid="alluserids" data-sellingstatus="saved">
 					  <i class="icon-double-angle-right"></i>
@@ -80,7 +80,7 @@
             <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
-			  <li>
+			  <li id="nav-alluserids-template">
 				  <a href="/#/items/alluserids/template"
              data-userid="alluserids" data-sellingstatus="template">
 					  <i class="icon-double-angle-right"></i>
@@ -101,7 +101,7 @@
 			  <b class="arrow icon-angle-down"></b>
 		  </a>
 		  <ul class="submenu">
-			  <li>
+			  <li id="nav-<%= user.userids2[idx].username %>-scheduled">
 				  <a href="/#/items/<%= user.userids2[idx].username %>/scheduled"
              data-userid="<%= user.userids2[idx].username %>" data-sellingstatus="scheduled">
 					  <i class="icon-double-angle-right"></i>
@@ -109,7 +109,7 @@
             <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
-			  <li>
+			  <li id="nav-<%= user.userids2[idx].username %>-active">
 				  <a href="/#/items/<%= user.userids2[idx].username %>/active"
              data-userid="<%= user.userids2[idx].username %>" data-sellingstatus="active">
 					  <i class="icon-double-angle-right"></i>
@@ -117,7 +117,7 @@
             <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
-			  <li>
+			  <li id="nav-<%= user.userids2[idx].username %>-sold">
 				  <a href="/#/items/<%= user.userids2[idx].username %>/sold"
              data-userid="<%= user.userids2[idx].username %>" data-sellingstatus="sold">
 					  <i class="icon-double-angle-right"></i>
@@ -125,7 +125,7 @@
             <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
-			  <li>
+			  <li id="nav-<%= user.userids2[idx].username %>-unsold">
 				  <a href="/#/items/<%= user.userids2[idx].username %>/unsold"
              data-userid="<%= user.userids2[idx].username %>" data-sellingstatus="unsold">
 					  <i class="icon-double-angle-right"></i>
@@ -133,7 +133,7 @@
             <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
-			  <li>
+			  <li id="nav-<%= user.userids2[idx].username %>-unanswered">
 				  <a href="/#/items/<%= user.userids2[idx].username %>/unanswered"
              data-userid="<%= user.userids2[idx].username %>" data-sellingstatus="unanswered">
 					  <i class="icon-double-angle-right"></i>
@@ -141,7 +141,7 @@
             <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
-			  <li>
+			  <li id="nav-<%= user.userids2[idx].username %>-saved">
 				  <a href="/#/items/<%= user.userids2[idx].username %>/saved"
              data-userid="<%= user.userids2[idx].username %>" data-sellingstatus="saved">
 					  <i class="icon-double-angle-right"></i>
@@ -149,7 +149,7 @@
             <span class="badge badge-inverse">0</span>
 				  </a>
 			  </li>
-			  <li>
+			  <li id="nav-<%= user.userids2[idx].username %>-template">
 				  <a href="/#/items/<%= user.userids2[idx].username %>/template"
              data-userid="<%= user.userids2[idx].username %>" data-sellingstatus="template">
 					  <i class="icon-double-angle-right"></i>

@@ -1,108 +1,123 @@
 <div class="form-group">
-	<label for="StartPrice" class="col-sm-3 control-label no-padding-right">
+  <label for="ListingType" class="col-sm-3 control-label no-padding-right">
     <%= __('ListingType') %>
   </label>
-	<div class="col-sm-6">
+  <div class="col-sm-6">
     <select name="mod.ListingType">
       <option value="Chinese">Online Auction</option>  
       <option value="FixedPriceItem">Fixed Price</option>
       <option value="StoresFixedPrice">Stores Fixed Price</option>
       <option value="LeadGeneration">Classified Ad</option>
     </select>
-	</div>
+  </div>
 </div>
 <div class="form-group">
-	<label for="StartPrice" class="col-sm-3 control-label no-padding-right">
+  <label for="StartPrice" class="col-sm-3 control-label no-padding-right">
     <%= __('StartPrice') %>
   </label>
-	<div class="col-sm-6">
+  <div class="col-sm-6">
     <input name="mod.StartPrice.@currencyID" type="text" size="3"/>
     <input name="mod.StartPrice.#text" type="text" size="10"/>
-	</div>
+  </div>
+</div>
+<div class="form-group buyitnowprice">
+  <label for="BuyItNowPrice" class="col-sm-3 control-label no-padding-right">
+    <%= __('BuyItNowPrice') %>
+  </label>
+  <div class="col-sm-6">
+    <input name="mod.BuyItNowPrice.@currencyID" type="text" size="3"/>
+    <input name="mod.BuyItNowPrice.#text" type="text" size="10"/>
+  </div>
 </div>
 <div class="form-group">
-	<label for="BestOffer" class="col-sm-3 control-label no-padding-right">
+  <label for="BestOffer" class="col-sm-3 control-label no-padding-right">
     <%= __('BestOffer') %>
   </label>
-	<div class="col-sm-7">
+  <div class="col-sm-7">
     <label>
       <input type="checkbox" value="true" name="mod.BestOfferDetails.BestOfferEnabled"/>
       <span class="lbl">
         Allow buyers to send you their Best Offers for your consideration
       </span>
     </label>
-	</div>
+  </div>
 </div>
 <div class="form-group">
-	<label for="BestOfferAutoAcceptPrice" class="col-sm-3 control-label no-padding-right">
+  <label for="BestOfferAutoAcceptPrice" class="col-sm-3 control-label no-padding-right">
     <%= __('BestOfferAutoAcceptPrice') %>
   </label>
-	<div class="col-sm-3">
+  <div class="col-sm-3">
     <input name="mod.ListingDetails.BestOfferAutoAcceptPrice.@currencyID" type="text" size="3"/>
     <input name="mod.ListingDetails.BestOfferAutoAcceptPrice.#text" type="text" size="10"/>
-	</div>
+  </div>
 </div>
 <div class="form-group">
-	<label for="MinimumBestOfferPrice" class="col-sm-3 control-label no-padding-right">
+  <label for="MinimumBestOfferPrice" class="col-sm-3 control-label no-padding-right">
     <%= __('MinimumBestOfferPrice') %>
   </label>
-	<div class="col-sm-3">
+  <div class="col-sm-3">
     <input name="mod.ListingDetails.MinimumBestOfferPrice.@currencyID" type="text" size="3"/>
     <input name="mod.ListingDetails.MinimumBestOfferPrice.#text" type="text" size="10"/>
-	</div>
+  </div>
 </div>
 <div class="form-group">
-	<label for="Quantity" class="col-sm-3 control-label no-padding-right">
+  <label for="Quantity" class="col-sm-3 control-label no-padding-right">
     <%= __('Quantity') %>
   </label>
-	<div class="col-sm-3">
+  <div class="col-sm-3">
     <input name="mod.Quantity" type="text" size="3"/>
-	</div>
+  </div>
 </div>
 <div class="form-group">
-	<label for="LotSize" class="col-sm-3 control-label no-padding-right">
+  <label for="LotSize" class="col-sm-3 control-label no-padding-right">
     <%= __('LotSize') %>
   </label>
-	<div class="col-sm-3">
+  <div class="col-sm-3">
     <!-- todo: disable if CategoryArray.Category.LSD is true. -->
     <input name="mod.LotSize" type="text" size="3"/>
-	</div>
+  </div>
 </div>
 <div class="form-group">
-	<label for="ListingDuration" class="col-sm-3 control-label no-padding-right">
+  <label for="ListingDuration" class="col-sm-3 control-label no-padding-right">
     <%= __('ListingDuration') %>
   </label>
-	<div class="col-sm-3">
-    <select name="mod.ListingDuration"></select>
+  <div class="col-sm-9">
+    
+    <div style="margin-bottom:5px;">
+      <select name="mod.ListingDuration"></select>
+    </div>
     
     <select name="opt.ScheduleType">
       <option value="">Start listing immediately</option>
       <option value="ebay">Schedule start time on eBay ($0.10)</option>
-      <option value="listersin">Schedule start time on ListersIn (Free)</option>
+      <option value="listersin">Schedule start time on listers.in (Free)</option>
     </select>
     
-    <input type="text" name="mod.ScheduleTime" placeholder="Click here to use calendar"/>
+    <!--div class="input-group">
+      <input data-format="yyyy-MM-dd hh:mm" type="text" name="mod.ScheduleTime" />
+			<span class="input-group-addon">
+				<i class="icon-calendar bigger-110"></i>
+			</span>
+    </div-->
+    
+    <input type="text" name="mod.ScheduleTime.date" placeholder="Date" class="input-small"/>
+    
+		<div class="bootstrap-timepicker" style="display:inline;">
+			<input type="text" name="mod.ScheduleTime.time" placeholder="Time" class="input-small"/>
+		</div>
+    
 	</div>
 </div>
 <div class="form-group">
 	<label for="PrivateListing" class="col-sm-3 control-label no-padding-right">
     <%= __('PrivateListing') %>
   </label>
-	<div class="col-sm-3">
+	<div class="col-sm-7">
     <label>
       <input type="checkbox" value="true" name="mod.PrivateListing"/>
       <span class="lbl">
         Allow buyers to remain anonymous to other eBay users
       </span>
     </label>
-	</div>
-</div>
-<div class="form-group">
-	<label for="BuyItNowPrice" class="col-sm-3 control-label no-padding-right">
-    <%= __('BuyItNowPrice') %>
-  </label>
-	<div class="col-sm-6">
-    <input name="mod.BuyItNowPrice.@currencyID" type="text" size="3"/>
-    <input name="mod.BuyItNowPrice.#text" type="text" size="10"/>
 	</div>
 </div>

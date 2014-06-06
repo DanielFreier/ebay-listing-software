@@ -1,0 +1,40 @@
+<script id="userlogTemplate" type="text/template">
+<table class="table">
+  <tr>
+    <th>Date</th>
+    <th>Action</th>
+    <th>IP address</th>
+    <th>Browser</th>
+  </tr>
+  <tr>
+    <td>
+      Now
+    </td>
+    <td>
+      {{now.action}}
+    </td>
+    <td>
+      {{now.ip}}
+    </td>
+    <td>
+      {{now.useragent}}
+    </td>
+  <tr>
+  [[ _.each(userlog, function(row) { ]]
+  <tr>
+    <td>
+      {{row.created_at}}
+    </td>
+    <td>
+      {{row.action}}
+    </td>
+    <td>
+      {{row.ip}}
+    </td>
+    <td>
+      {{row.useragent}}
+    </td>
+  </tr>
+  [[ }); ]]
+</table>
+</script>

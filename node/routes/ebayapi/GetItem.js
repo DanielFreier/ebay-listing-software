@@ -4,6 +4,8 @@ var config = require('../../config');
 var async  = require('async');
 var moment = require('moment');
 var clone  = require('clone');
+var util   = require('util');
+var ObjectID = require('mongodb').ObjectID;
 
 var methods = {
   
@@ -215,6 +217,37 @@ var methods = {
         upsert: true
       }
     );
+
+    /* GetAllBidders */
+    if (org.SellingStatus.BidCount > 0) {
+      
+      var tmpid = collection.collectionName.replace('items.', '');
+      var objid = new ObjectID(tmpid);
+      
+      mongo(function(db) {
+        db.collection('users', function(err, collection) {
+          collection.findOne(
+            {
+              _id: objid
+            }, 
+            function(err, document) {
+              
+	            var reqjson = {
+                email: document.email,
+                userid: org.Seller.UserID,
+                ItemID: org.ItemID
+              };
+              
+              var apimodule = require('./GetAllBidders');
+              apimodule.call(reqjson, function(response) {
+                
+              });
+            }
+          );
+        });
+      }); // mongo
+      
+    } // org.SellingStatus.BidCount > 0
     
   } // upsert()
 

@@ -1,10 +1,11 @@
 db.users.update(
   {
-    email: 'demo@listers.in'
+    email: 'ebppmain@gmail.com'
   },
   {
     $set: {
-      newlook: 1
+      newlook: 1,
+      status: 'trial'
     }
   }
 );

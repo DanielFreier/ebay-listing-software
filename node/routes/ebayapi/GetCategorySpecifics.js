@@ -26,9 +26,9 @@ module.exports = {
             collection.findOne({}, function(err, document) {
               
               document.SiteDetails.forEach(function(doc) {
-                
-                if (doc.Site != 'US') return;
-                
+                  
+                if (doc.Site != 'Singapore') return;
+                  
                 var requestjson = {
                   email: 'admin@listers.in',
                   callname: 'GetCategorySpecifics',
@@ -51,7 +51,11 @@ module.exports = {
                 /* xml -> mongodb */
                 if (fs.existsSync(xmlfile)) {
                   console.log('exists: ' + xmlfile);
-                  
+                    
+                    db.collection(doc.Site + '.CategorySpecifics.ready', function(err, spcoll) {
+                        spcoll.drop();
+                    })
+                    
                   /* xml -> json */
                   var xml2js = require('xml2js');
                   var parser = xml2js.Parser({
@@ -110,11 +114,7 @@ module.exports = {
                   };
                   
                   taskmodule.addqueue(requestjson2, function(err, resultjson2) {
-                    
-                    console.log(doc.Site + '=======================');
-                    console.dir(err);
-                    console.dir(resultjson2);
-                    
+                      
                     var unzip = require('unzip');
                     var zip = fs.createReadStream(resultjson2.zipfile);
                     var xml = fs.createWriteStream(resultjson2.zipfile.replace(/\.zip$/, '.xml'));

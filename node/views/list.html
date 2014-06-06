@@ -4,38 +4,22 @@
     <% include list/head %>
   </head>
   <body class="navbar-fixed breadcrumbs-fixed">
-
-<div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=158640537634051";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
     
     <div class="navbar navbar-default navbar-fixed-top" id="navbar">
-			<div class="navbar-container" id="navbar-container">
+      <div class="navbar-container" id="navbar-container">
         <div id="message"></div>
         <% include list/navbar %>
       </div>
     </div>
     
-		<div class="main-container" id="main-container">
-			<div class="main-container-inner">
+    <div class="main-container" id="main-container">
+      <div class="main-container-inner">
         
-				<div class="sidebar sidebar-fixed" id="sidebar">
+        <div class="sidebar sidebar-fixed" id="sidebar">
           <% include list/sidebar %>
-          
-          <div id="facebook" style="margin:50px 10px 10px;">
-            <div class="fb-like" data-href="http://listers.in/" 
-                 data-send="true" data-layout="button_count" data-width="150" 
-                 data-show-faces="false"></div>
-          </div>
-          
         </div>
         
-				<div class="main-content">
+        <div class="main-content">
           <div class="page-content" id="page-content">
             
             <div class="breadcrumbs breadcrumbs-fixed" id="breadcrumbs">
@@ -61,30 +45,20 @@
                     <i class="icon-refresh"></i>
                     <%= __('Relist') %>
                   </button>
-                  <!--
-                  <button class="btn btn-sm disabled btn-yellow" data-action="revise">
-                    <i class="icon-edit"></i>
-                    <%= __('Revise') %>
-                  </button>
-                  <button class="btn btn-sm disabled btn-yellow" data-action="verifyadditem">
-                    <i class="icon-check"></i>
-                    <%= __('Verify') %>
-                  </button>
-                  -->
                   <button class="btn btn-sm disabled btn-yellow" data-action="end">
                     <i class="icon-stop"></i>
                     <%= __('End') %>
                   </button>
                 </div>
                 
-						    <div class="nav-search" id="nav-search">
-								  <span class="input-icon">
-									  <input type="text" placeholder="Search ..." 
-                           class="nav-search-input" 
-                           id="nav-search-input" 
+                <div class="nav-search" id="nav-search">
+                  <span class="input-icon">
+                    <input type="text" placeholder="Search ..."
+                           class="nav-search-input"
+                           id="nav-search-input2"
                            autocomplete="off" />
-									  <i class="icon-search nav-search-icon"></i>
-								  </span>
+                    <i class="icon-search nav-search-icon"></i>
+                  </span>
                 </div>
                 
               </div><!-- /.pull-left -->
@@ -96,17 +70,17 @@
               </div>
             </div>
             
-						<div id="expired" class="alert alert-danger hide">
-							<b>
+            <div id="expired" class="alert alert-danger hide">
+              <b>
                 Your account was expired.
-							</b>
-						</div>
+              </b>
+            </div>
             
-						<div class="row">
-							<div class="col-xs-12">
+            <div class="row">
+              <div class="col-xs-12">
                 
                 <% include list/items-table %>
-								
+                
                 <div id="settings">
                   <div class="page-header">
                     <h1><i class="icon-cog"></i> Settings</h1>
@@ -114,9 +88,16 @@
                   <% include list/settings %>
                 </div>
                 
+                <div id="userlog">
+                  <div class="page-header">
+                    <h1><i class="icon-lock"></i> History</h1>
+                  </div>
+                  <% include list/userlog %>
+                </div>
+                
                 <div id="help">
                   <div class="page-header">
-                    <h1><i class="icon-cog"></i> Help</h1>
+                    <h1><i class="icon-question-sign"></i> Help</h1>
                   </div>
                   <% include list/help %>
                 </div>
@@ -125,10 +106,10 @@
                   DEBUG
                 </div>
                 
-								<div class="message-loading-overlay hide" id="loading">
-									<i class="icon-spin icon-spinner orange2 bigger-160"></i>
-								</div>
-								
+                <div class="message-loading-overlay hide" id="loading">
+                  <i class="icon-spin icon-spinner orange2 bigger-160"></i>
+                </div>
+                
               </div>
             </div>
             
@@ -142,5 +123,5 @@
     
     <% include list/foot.ejs %>
     
-	</body>
+  </body>
 </html>

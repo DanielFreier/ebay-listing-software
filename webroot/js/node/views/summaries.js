@@ -82,33 +82,13 @@ define([
     },
     
     events: {
-      'click #summaries ul.submenu a': 'subclick',
-      //'mousedown #summaries>li>a': 'pclick',
-      //'click #summaries a': 'fetchlist',
+      'click #summaries ul.submenu a': function(e) {},
       'click .newitem': 'clickNewItem',
       'click a.newitemwithtemplate': 'clickNewItemWithTemplate',
-      //'mousedown a.dropdown-toggle': 'fetchlist2',
       'click #toggledebug': 'toggledebug'
     },
     
     pclick: function(e) {
-      //$(e.currentTarget).closest('li').closest('li').addClass('active');
-      //$('#summaries > li.open').removeClass('open');
-      //$('#summaries > li.active').removeClass('active');
-      //$(e.currentTarget).closest('li').addClass('open');
-    },
-    
-    subclick: function(e) {
-      $('ul.submenu li.active', this.el).removeClass('active');
-      $(e.currentTarget).closest('li').addClass('active');
-
-      var userid = $(e.currentTarget).attr('data-userid');
-      var status = $(e.currentTarget).attr('data-sellingstatus');
-      
-      Events.trigger('filter:click', {
-        userid: userid,
-        status: status
-      });
     },
     
     fetchlist: function(e) {

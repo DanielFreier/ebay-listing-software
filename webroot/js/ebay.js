@@ -43,6 +43,12 @@ $(document).ajaxComplete(function(event, xhr, settings) {
   
 	var data = $.parseJSON(xhr.responseText);
 	
+  if (data.user) {
+    if (data.user.expired) {
+      $('#expired').show();
+    }
+  }
+  
 	if (data.json.message == null
 			|| data.json.message.message == null
 			|| data.json.message.message == '') {
@@ -1261,7 +1267,9 @@ function togglebulkbuttons() {
 }
 
 function checkdemoaccount() {
-    
+  
+  return false;
+  
   var email = $('#user_email').html();
 	
   if (email == 'demo@listers.in') {

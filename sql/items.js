@@ -8,7 +8,8 @@ db.users.find().forEach(
   function(row) {
     
     //if (row.email != 'Maxclinder@aol.com') return;
-    if (row.email != 'fd3s.boost@gmail.com') return;
+    //if (row.email != 'cptechworld@gmail.com') return;
+    if (row.email != 'info@novaleeco.com') return;
     //if (row.email != 'demo@listers.in') return;
     
     var _id = row._id;
@@ -19,12 +20,16 @@ db.users.find().forEach(
     _id = _id.replace(')', '');
     //print(_id);
     
+    //db.getCollection('items.' + _id).remove();
+      
     db.getCollection('items.' + _id).find(
       {
-        'org.ListingDetails.StartTime': {$lt: now}
+        bids: {
+          $exists: true
+        }
       },
       {
-        'org.ListingDetails.StartTime': true
+        'bids.Quantity': true
       }
     ).forEach(printjson);
     

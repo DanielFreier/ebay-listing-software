@@ -19,8 +19,6 @@ module.exports = {
       query['userids2.username'] = request.username;
     }
     
-    console.dir(query);
-    
     async.waterfall([
       
       function(callback) {
@@ -47,8 +45,6 @@ module.exports = {
       },
       
       function(users, collection, callback) {
-        
-        console.dir(users);
         
         users.forEach(function(user) {
           

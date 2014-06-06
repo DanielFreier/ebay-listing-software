@@ -6,38 +6,52 @@
 	</a>
 </div>
 <div class="navbar-header pull-right" role="navigation">
-	<ul class="nav ace-nav">
+  <ul class="nav ace-nav">
+    <% if (false && user.email == 'cptechworld@gmail.com') { %>
     <li>
       <a href="/?newlook=0">
         Back to old look
       </a>
     </li>
-		<li class="light-blue">
-			<a data-toggle="dropdown" href="#" class="dropdown-toggle"
+    <% } %>
+    <% if (user.email == 'demo@listers.in') { %>
+    <li class="white">
+      If you want to create a trial account, sign out from demo 
+      <i class="icon-arrow-right"></i>
+    </li>
+    <% } %>
+	<li class="light-blue">
+	  <a data-toggle="dropdown" href="#" class="dropdown-toggle"
          id="user_email" data-email="<%= user.email %>">
         <%= user.email %>
-				<i class="icon-caret-down"></i>
-			</a>
-			<ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
-				<li>
-					<a href="/#/settings" id="settingslink">
-						<i class="icon-cog"></i>
-						Settings
-					</a>
-				</li>
-				<li>
-					<a href="/#/help" id="showhelp">
-						<i class="icon-cog"></i>
-						<%= __('Help') %>
-					</a>
-				</li>
-				<li>
-					<a href="/node/logout">
-						<i class="icon-off"></i>
-            <%= __('SignOut') %>
-					</a>
-				</li>
-			</ul>
+		<i class="icon-caret-down"></i>
+	  </a>
+	  <ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+		<li>
+		  <a href="/#/settings" id="settingslink">
+			<i class="icon-cog"></i>
+			Settings
+		  </a>
 		</li>
+		<li>
+		  <a href="/#/history">
+			<i class="icon-lock"></i>
+			<%= __('History') %>
+		  </a>
+		</li>
+		<li>
+		  <a href="/#/help" id="showhelp">
+			<i class="icon-question-sign"></i>
+			<%= __('Help') %>
+		  </a>
+		</li>
+		<li>
+		  <a href="/node/logout">
+			<i class="icon-off"></i>
+            <%= __('SignOut') %>
+		  </a>
+		</li>
+	  </ul>
+	</li>
   </ul>
 </div>

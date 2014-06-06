@@ -12,6 +12,14 @@
       <script src="../../assets/js/html5shiv.js"></script>
       <script src="../../assets/js/respond.min.js"></script>
     <![endif]-->
+    <style type="text/css">
+    <!--
+    td {
+      white-space: nowrap;
+      vertical-align: top;
+    }
+    -->
+    </style>
   </head>
   <body>
     
@@ -80,7 +88,11 @@
       <% if (users[i].userids2 && users[i].userids2.length > 0) {  %>
          
          <% for (var j=0; j<users[i].userids2.length; j++) { %>
-         <tr>
+         <tr
+            <% if (users[i].expired) { %>
+            style="background-color:#eee;"
+            <% } %>
+            >
            
            <% if (j == 0) { %>
            <td rowspan="<%= users[i].userids2.length %>">
@@ -99,8 +111,9 @@
            <td rowspan="<%= users[i].userids2.length %>">
              <% if (users[i].hasOwnProperty('period')) { %>
              <%= users[i].period.end %>
-             <br/>
+             <!--
              <%= users[i].period.start %>
+             -->
              <% } %>
            </td>
            <td rowspan="<%= users[i].userids2.length %>">
@@ -203,7 +216,11 @@
          
       <% } else { %>
          
-         <tr>
+         <tr
+            <% if (users[i].expired) { %>
+            style="background-color:#eee;"
+            <% } %>
+            >
            <td>
              <a href="/admin/signin?email=<%= users[i].email %>" target="usersignin">
                <%= users[i].email.replace(/@.+$/, '') %>

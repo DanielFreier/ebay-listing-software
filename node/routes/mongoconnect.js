@@ -2,6 +2,7 @@ var Db = require('mongodb').Db;
 var Connection = require('mongodb').Connection;
 var Server = require('mongodb').Server;
 var connectionInstance;
+var config = require('../config');
 
 module.exports = function(callback) {
   
@@ -10,11 +11,20 @@ module.exports = function(callback) {
     return;
   }
   
+  var host = config.mongohost;
+  
   var db = new Db('ebay', 
-                  new Server("10.0.0.57", Connection.DEFAULT_PORT, {auto_reconnect: true}));
+                  new Server(host,
+                             Connection.DEFAULT_PORT, 
+                             {
+                               auto_reconnect: true
+                             }));
+  
   db.open(function(error, databaseConnection) {
     if (error) throw new Error(error);
+    
     connectionInstance = databaseConnection;
+    
     callback(databaseConnection);
   });
 };

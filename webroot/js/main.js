@@ -10,16 +10,17 @@ require.config({
     jquerycolorbox:   '/ace/assets/js/jquery.colorbox-min',
     jqueryslimscroll: '/ace/assets/js/jquery.slimscroll.min',
     
-    jquerydump:     '/js/jquery.dump',
-    redactor:       '/js/redactor/redactor.min',
-    bootstrap:      '/ace/assets/js/bootstrap.min',
-    bootstraptag:   '/ace/assets/js/bootstrap-tag.min',
-    bootstraptagta: '/ace/assets/js/typeahead-bs2.min',
-    bootstrapwysiwyg: '/ace/assets/js/bootstrap-wysiwyg.min',
-    bootstrapdatepicker: '/ace/assets/js/date-time/bootstrap-datepicker.min',
-    ace:            '/ace/assets/js/uncompressed/ace',
-    aceelements:    '/ace/assets/js/uncompressed/ace-elements',
-    events:         '/js/events'
+    jquerydump:   '/js/jquery.dump',
+    redactor:     '/js/redactor/redactor.min',
+    bootstrap:    '/ace/assets/js/bootstrap.min',
+    bstag:        '/ace/assets/js/bootstrap-tag.min',
+    bstagta:      '/ace/assets/js/typeahead-bs2.min',
+    bswysiwyg:    '/ace/assets/js/bootstrap-wysiwyg.min',
+    bsdatepicker: '/ace/assets/js/date-time/bootstrap-datepicker.min',
+    bstimepicker: '/ace/assets/js/date-time/bootstrap-timepicker.min',
+    ace:          '/ace/assets/js/uncompressed/ace',
+    aceelements:  '/ace/assets/js/uncompressed/ace-elements',
+    events:       '/js/events'
   },
   shim: {
     underscoreBase: {
@@ -42,22 +43,35 @@ require.config({
     jqueryslimscroll: {
       deps: ['jquery']
     },
-    bootstrapdatepicker: {
+    /*
+    jquerytimepicker: {
+      deps: ['jquery', 'jqueryui']
+    },
+    */
+    bsdatepicker: {
       deps: ['jquery']
     },
+    bstimepicker: {
+      deps: ['jquery']
+    },
+    /*
+    bsdatetimepicker: {
+      deps: ['jquery']
+    },
+    */
     jquerydump: {
       deps: ['jquery']
     },
     bootstrap: {
       deps: ['jquery']
     },
-    bootstrapwysiwyg: {
+    bswysiwyg: {
       deps: ['jquery']
     },
-    bootstraptag: {
-      deps: ['jquery', 'bootstraptagta']
+    bstag: {
+      deps: ['jquery', 'bstagta']
     },
-    bootstraptagta: {
+    bstagta: {
       deps: ['jquery']
     },
     aceelements: {
@@ -67,8 +81,9 @@ require.config({
       deps: ['backbone']
     },
     ace: {
-      deps: ['jquery', 'aceelements', 'bootstrap', 'bootstrapwysiwyg',
-             'bootstrapdatepicker', 'bootstraptag', 'bootstraptagta',
+      deps: ['jquery', 'aceelements', 'bootstrap', 'bswysiwyg',
+             'bsdatepicker', 'bstimepicker',
+             'bstag', 'bstagta',
              'jquerycolorbox', 'jquerydump', 'jqueryui', 'jqueryslimscroll']
     }
   }    

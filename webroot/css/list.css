@@ -77,6 +77,31 @@ div.EndTime {
   padding: 0 10px 5px;
 }
 
+.rowbid > td,
+.row-transaction > td,
+.row-dispute > td,
+.row-reply-dispute-form > td,
+.row-2nd-offer-form > td {
+  padding: 4px 10px;
+  color: #777;
+  background-color: #f6f6f6;
+}
+
+.rowmembermessages > td {
+  padding: 5px 10px;
+  color: #777;
+  background-color: #f6f6f6;
+  border-top: 3px solid #fff;
+}
+
+.row-transaction-message > td,
+.rowmembermessages-body > td {
+  padding: 5px 10px 10px;
+  color: #666;
+	background-color: #fcfcfc;
+	/*border: 1px solid #f0f0f0;*/
+}
+
 iframe.description {
   width: 100%;
   background-color: #fff;
@@ -95,10 +120,8 @@ iframe[name=posttarget] {
   display: none;
 }
 
-#settings {
-  display: none;
-}
-
+#settings,
+#userlog,
 #help {
   display: none;
 }
@@ -350,3 +373,6 @@ div.variationspecificvalue {
   font-weight: bold;
 }
 
+input[name^="mod.ScheduleTime"] {
+  display: none;
+}

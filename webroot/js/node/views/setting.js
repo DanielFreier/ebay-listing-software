@@ -19,7 +19,18 @@ define([
       'click .removeaccount': 'clickRemoveAccount',
       'change select[name="TimeZone"]': 'changeTimeZone',
       'click #syncbutton': 'clickSyncButton',
-      'click input.synctoggle': 'clickSyncToggle'
+      'click input.synctoggle': 'clickSyncToggle',
+      
+      'click input[name="receiveinfo"]': function(e) {
+        
+        $.post('/node/json/updatereceiveinfo',
+               'receiveinfo=' + $(e.currentTarget).prop('checked'),
+               function(data) {
+                 
+               },
+               'json');
+        
+      }
     },
     
     initialize: function() {

@@ -1,12 +1,63 @@
+var config = require('../config');
 var mongo  = require('./mongoconnect');
 var moment = require('moment');
 var util   = require('util');
 var async  = require('async');
 var nodemailer = require('nodemailer');
 var emailTemplates = require('email-templates')
+var crypto = require('crypto');
 
 /* Admin panel */
 exports.index = function(req, res) {
+    
+    res.cookie('admin', 1, {maxAge: 86400*365});
+    req.session.admin = 1;
+    
+    mongo(function(db) {
+        
+        db.collection('users', function(err, collection) {
+            
+            collection.find().sort({
+                lastused_at: -1,
+                created_at: -1,
+                _id: -1
+            }).limit(50).toArray(function(err, users) {
+                
+                users.forEach(function(user) {
+                    
+                    if (user.hasOwnProperty('created_at')) {
+                        user.created_at = moment(user.created_at).format('MM-DD HH:mm');
+                    }
+                    if (user.hasOwnProperty('lastused_at')) {
+                        user.lastused_at = moment(user.lastused_at).format('MM-DD HH:mm');
+                    }
+                    if (user.hasOwnProperty('period')) {
+                        
+                        var now = moment();
+                        var exp = moment(user.period.end);
+                        if (now <= exp) {
+                            user.expired = false;
+                        } else {
+                            user.expired = true;
+                        }
+                        
+                        user.period.start = moment(user.period.start).format('MM-DD HH:mm');
+                        user.period.end   = moment(user.period.end  ).format('MM-DD HH:mm');
+                    }
+                    
+                }); // users.forEach
+                
+                res.render('admin/index', {
+                    users: users,
+                });
+                
+            }); // find
+        }); // collection
+    }); // mongo
+    
+} // exports.index
+
+exports.index2 = function(req, res) {
   
   res.cookie('admin', 1, {maxAge: 86400*365});
   
@@ -29,6 +80,7 @@ exports.index = function(req, res) {
         };
         
         users.forEach(function(user) {
+          
           if (user.hasOwnProperty('created_at')) {
             user.created_at = moment(user.created_at).format('YYYY-MM-DD HH:mm');
           }
@@ -36,6 +88,15 @@ exports.index = function(req, res) {
             user.lastused_at = moment(user.lastused_at).format('YYYY-MM-DD HH:mm');
           }
           if (user.hasOwnProperty('period')) {
+            
+            var now = moment();
+            var exp = moment(user.period.end);
+            if (now <= exp) {
+              user.expired = false;
+            } else {
+              user.expired = true;
+            }
+            
             user.period.start = moment(user.period.start).format('YYYY-MM-DD HH:mm');
             user.period.end   = moment(user.period.end  ).format('YYYY-MM-DD HH:mm');
           }
@@ -72,9 +133,9 @@ exports.index = function(req, res) {
               }
               
             });
-          }
+          } // userids2
           
-        }); // forEach
+        }); // users.forEach
         
         res.render('admin_bootstrap', {
           users: users,
@@ -92,32 +153,37 @@ exports.index = function(req, res) {
 };
 
 exports.signin = function(req, res) {
-  
-  var url = require('url');
-  var url_parts = url.parse(req.url, true);
-  var query = url_parts.query;
-  
-  var email = query.email;
-  email = email.replace(/ /, '+');
-  
-  mongo(function(db) {
     
-    db.collection('users', function(err, collection) {
-      
-      collection.find({email: email}).toArray(function(err, users) {
+    var url = require('url');
+    var url_parts = url.parse(req.url, true);
+    var query = url_parts.query;
+    
+    var email = query.email;
+    email = email.replace(/ /, '+');
+    
+    mongo(function(db) {
         
-        users.forEach(function(user) {
-          res.render('signin', {
-            email: email, 
-            password: user.password
-          });
+        db.collection('users', function(err, collection) {
+            
+            collection.find({email: email}).toArray(function(err, users) {
+                
+                users.forEach(function(user) {
+                    
+                    var decipher = crypto.createDecipher('aes-256-cbc', config.auth_secret);
+                    var dec = decipher.update(user.password_encrypted, 'hex','utf8')
+                        + decipher.final('utf8');
+                    
+                    res.render('signin', {
+                        email: email, 
+                        password: dec
+                    });
+                });
+                
+            });
+            
         });
-        
-      });
-      
-    });
-  }); // mongo
-  
+    }); // mongo
+    
 } // signin
 
 exports.callapi = function(req, res) {
@@ -131,6 +197,22 @@ exports.callapi = function(req, res) {
   });
   
   return;
+}
+
+exports.test = function(req, res) {
+  
+  var apimodule = require('./ebayapi/GetUserDisputes');
+  
+  apimodule.call({
+    
+    email:  'dino.77@optusnet.com.au',
+    userid: 'www-customcans-com-au'
+    
+  }, function(response) {
+    console.dir(response);
+    res.json(response);
+  });
+  
 }
 
 exports.listeditems = function(req, res) {
@@ -300,4 +382,79 @@ exports.unanswered = function(req, res) {
   });
   
   res.end();
-}
+} // exports.unanswered
+
+exports.sendinformationmail = function(req, res) {
+  
+  //res.end();
+  
+  var templatedir = '/var/www/listers.in/node/templates';
+  
+  emailTemplates(templatedir, function(err, template) {
+    
+    mongo(function(db) {
+      db.collection('users', function(err, collection) {
+        collection.find(
+          {
+            receiveinfo: true,
+            email: {
+              $ne: 'cptechworld@gmail.com'
+            }
+          },
+          {
+            email: true
+          }
+        ).toArray(function(err, users) {
+          
+          return;
+          
+          template('information', {}, function(err, html, text) {
+            
+            async.whilst(
+              function() {
+                return users.length > 0;
+              },
+              function(callback) {
+                var user = users.shift();
+                
+                console.log(user.email);
+                
+                var smtpTransport = nodemailer.createTransport("SMTP", {
+                  host: 'localhost'
+                });
+                
+                smtpTransport.sendMail(
+                  {
+                    from: 'listers.in - eBay listing software<support@listers.in>',
+                    to: user.email,
+                    bcc: 'listersin+bcc@gmail.com',
+                    subject: 'Send a second chance offer',
+                    text: text,
+                    html: html
+                  }, 
+                  function(error, response) {
+                    
+                    if (error) {
+                      console.log(error);
+                    } else {
+                      console.log('Sent ' + user.email + ' ' + response.message);
+                    }
+                    
+                    smtpTransport.close();
+                    
+                    callback(null, null);
+                  }
+                ); // sendMail
+                
+              },
+              function(err) {
+              }
+            );
+            
+          }); // template
+        });
+      });
+    }); // template
+  }); // emailTemplates
+  
+}; // mailtest

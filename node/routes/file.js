@@ -39,7 +39,7 @@ exports.upload = function(req, res) {
       
       var timestampstr = moment().format('YYYYMMDD_HHmmss');
       var extension = file.name.replace(/^.+\./, '');
-      var tmpname = id + '_' + timestampstr + '_' + i + '.' + extension;
+      var tmpname = userid + '_' + id + '_' + timestampstr + '_' + i + '.' + extension;
       
       var filedata = fs.readFileSync(file.path);
       fs.writeFileSync('/var/www/' + config.hostname + '/webroot/itemimage/' + tmpname, filedata);

@@ -9,15 +9,19 @@ define([
   'node/views/body',
   'node/views/navbar',
   'node/views/setting',
-  'node/views/help'
+  'node/views/help',
+  'node/views/userlog'
 ], function($, _, Backbone, Events, ebayjs,
-            SummaryListView, ItemListView, BodyView, NavbarView, SettingView, HelpView) {
+            SummaryListView, ItemListView, BodyView, NavbarView,
+            SettingView, HelpView, UserLogView) {
   
   var AppRouter = Backbone.Router.extend({
     routes: {
       '': 'index',
       'settings': 'settings',
-      'help': 'help'
+      'history':  'userlog',
+      'help':     'help',
+      'items/:userid/:status': 'list'
     }
   });
   
@@ -28,58 +32,65 @@ define([
     var app_router = new AppRouter;
     
     app_router.on('route:settings', function() {
+      $('#page-content > .row > div').children().hide();
+      $('#settings').show();
       Events.trigger('settings:click', {});
     });
     
     app_router.on('route:help', function() {
-      Events.trigger('help:click', {});
+      $('#page-content > .row > div').children().hide();
+      $('#help').show();
+    });
+    
+    app_router.on('route:userlog', function() {
+      $('#page-content > .row > div').children().hide();
+      $('#userlog').show();
+      Events.trigger('userlog:click', {});
     });
     
     app_router.on('route:index', function(actions) {
       
-      $('#summaries > li:first > a').click();
-      $('a[data-userid="alluserids"][data-sellingstatus="active"]', '#summaries').click();
+      $('#nav-alluserids').addClass('open')
+      $('#nav-alluserids > ul').css('display', 'block');
       
-      summaryListView.collection.fetch({
-        success: function(collection, response, options) {
-          summaryListView.render();
-        }
+      var status = 'active';
+      
+      if ($('#user_email').attr('data-email') == 'demo@listers.in') {
+        status = 'saved';
+      }
+      
+      $('#nav-alluserids-' + status).addClass('active');
+      
+      Events.trigger('filter:click', {
+        userid: 'alluserids',
+        status: status
       });
       
-      //ebayjs.showmessage('Loading items...');
+      var submenus = $('ul.submenu', '#summaries').length;
+      if (submenus == 1) {
+        app_router.navigate('/settings', {trigger: true});
+      }
       
-          /*
-      summaryListView.collection.fetch({
-        success: function(collection, response, options) {
-          
-          if (collection.length == 0) {
-            Events.trigger('help:click', {});
-            return;
-          }
-          
-          var summarylis = $('li', '#summaries').length;
-          if (summarylis == 0) {
-            summaryListView.render();
-          }
-          
-            $('a[data-userid="alluserids"][data-sellingstatus="allitems"]').click();
-            
-            var lis = ['active', 'unsold', 'unanswered', 'sold', 'saved', 'template'];
-            $.each(lis, function(i, status) {
-            var atag = $('a[data-userid="alluserids"][data-sellingstatus="' + status + '"]');
-            var cnt = $('span.badge', atag).html();
-            if (cnt > 0) {
-            $(atag).click();
-            return false;
-            }
-            });
-        }
+    });
+    
+    app_router.on('route:list', function(userid, status) {
+      
+      if (!$('#nav-' + userid).hasClass('open')) {
+        $('#nav-' + userid).addClass('open')
+        $('#nav-' + userid + ' > ul').css('display', 'block');
+      } 
+      
+      $('li.active').removeClass('active');
+      if (!$('#nav-' + userid + '-' + status).hasClass('active')) {
+        $('#nav-' + userid + '-' + status).addClass('active');
+      }
+      
+      Events.trigger('filter:click', {
+        userid: userid,
+        status: status
       });
-          */
       
     })
-    
-    
     
     var itemListView = new ItemListView();
     
@@ -90,6 +101,8 @@ define([
     var settingView = new SettingView();
     
     var helpView = new HelpView();
+    
+    var userlogView = new UserLogView();
     
     Backbone.history.start();
   };

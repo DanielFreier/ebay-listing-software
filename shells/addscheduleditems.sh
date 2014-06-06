@@ -1,8 +1,9 @@
 #!/bin/sh
 
-NOW=`date --utc '+%Y-%m-%d %H:%M:00'`
+YYYYMMDD=`date --utc '+%Y-%m-%d'`
 
-BASEDIR="$( dirname "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" )"
-DAEMONPORT=`grep daemonport $BASEDIR/config/config.xml | sed 's/[^0-9]//g'`
+node /var/www/listers.in/node/addscheduleditems.js \
+    | grep -v '=' \
+    >> /var/www/listers.in/logs/scheduled.$YYYYMMDD
 
-echo -e "AddScheduledItems\n$NOW\n$NOW" | nc localhost $DAEMONPORT
+exit

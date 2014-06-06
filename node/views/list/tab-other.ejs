@@ -1,22 +1,25 @@
 <div class="form-group">
-	<label for="UserID" class="col-sm-3 control-label no-padding-right">
+  <label for="UserID" class="col-sm-3 control-label no-padding-right">
     <%= __('BuyerRequirements') %>
   </label>
-	<div class="col-sm-8">
+  <div class="col-sm-8">
     <div>
-	    <label>
-		    <input type="checkbox" class="ace" value="true"
-               name="mod.BuyerRequirementDetails.LinkedPayPalAccount"
-               id="_id.BuyerRequirementDetails.LinkedPayPalAccount" />
-		    <span class="lbl">Don't have a PayPal account</span>
-	    </label>
+      Block buyers who:
     </div>
     <div>
-	    <label>
-		    <input type="checkbox" class="ace" value="true"
+	  <label>
+		<input type="checkbox" class="ace" value="true"
+               name="mod.BuyerRequirementDetails.LinkedPayPalAccount"
+                 id="_id.BuyerRequirementDetails.LinkedPayPalAccount" />
+		<span class="lbl">Don't have a PayPal account</span>
+	  </label>
+    </div>
+    <div>
+	  <label>
+		<input type="checkbox" class="ace" value="true"
                name="mod.BuyerRequirementDetails.MaximumUnpaidItemStrikesInfo.checkbox"
-               id="_id.BuyerRequirementDetails.MaximumUnpaidItemStrikesInfo.checkbox" />
-		    <span class="lbl">
+                 id="_id.BuyerRequirementDetails.MaximumUnpaidItemStrikesInfo.checkbox" />
+		<span class="lbl">
           Have received
           
           <select name="mod.BuyerRequirementDetails.MaximumUnpaidItemStrikesInfo.Count">
@@ -43,20 +46,20 @@
     </div>
     <div>
       <label>
-		    <input type="checkbox" class="ace" value="true"
+		<input type="checkbox" class="ace" value="true"
                name="mod.BuyerRequirementDetails.ShipToRegistrationCountry"
                  id="_id.BuyerRequirementDetails.ShipToRegistrationCountry"/>
-		    <span class="lbl">
+		<span class="lbl">
           Have a primary shipping address in countries that I don't ship to
         </span>
       </label>
     </div>
     <div>
       <label>
-		    <input type="checkbox" class="ace" value="true"
-               name="BuyerRequirementDetails.MaximumBuyerPolicyViolations.checkbox"
+		<input type="checkbox" class="ace" value="true"
+               name="mod.BuyerRequirementDetails.MaximumBuyerPolicyViolations.checkbox"
                  id="_id.BuyerRequirementDetails.MaximumBuyerPolicyViolations.checkbox"/>
-		    <span class="lbl">
+		<span class="lbl">
           Have
           <select name="mod.BuyerRequirementDetails.MaximumBuyerPolicyViolations.Count">
             <option value=""></option>
@@ -77,10 +80,10 @@
     </div>
     <div>
       <label>
-		    <input type="checkbox" class="ace" value="true"
+		<input type="checkbox" class="ace" value="true"
                name="mod.BuyerRequirementDetails.MinimumFeedbackScore.checkbox"
                  id="_id.BuyerRequirementDetails.MinimumFeedbackScore.checkbox" />
-		    <span class="lbl">
+		<span class="lbl">
           Have a feedback score equal to or lower than
           <select name="mod.BuyerRequirementDetails.MinimumFeedbackScore">
             <option value=""></option>
@@ -93,10 +96,10 @@
     </div>
     <div>
       <label>
-		    <input type="checkbox" class="ace" value="true"
+		<input type="checkbox" class="ace" value="true"
                name="mod.BuyerRequirementDetails.MaximumItemRequirements.checkbox"
                  id="_id.BuyerRequirementDetails.MaximumItemRequirements.checkbox"/>
-		    <span class="lbl">
+		<span class="lbl">
           Have bid on or bought my items within the last 10 days and met my limit of
           <select name="mod.BuyerRequirementDetails.MaximumItemRequirements.MaximumItemCount">
             <option value=""></option>
@@ -121,7 +124,7 @@
     <div>
       <label>
         &nbsp;&nbsp;&nbsp;
-		    <input type="checkbox" class="ace" value="true"
+		<input type="checkbox" class="ace" value="true"
          name="mod.BuyerRequirementDetails.MaximumItemRequirements.MinimumFeedbackScore.checkbox"
            id="_id.BuyerRequirementDetails.MaximumItemRequirements.MinimumFeedbackScore.checkbox"/>
 		    <span class="lbl">

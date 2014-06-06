@@ -168,7 +168,7 @@ function docall() {
     }
     
     if (queueelm.requestjson.callname == 'downloadFile') {
-      
+        
       dopost2(queueelm.requestjson, function(err, resultjson) {
         
         running--;
@@ -247,9 +247,11 @@ function dopost(postjson, openapiflag, callback) {
     };
     
   } else {
-    
-    http_or_https = require('https');
-    
+      
+      http_or_https = require('https');
+      
+      console.log('dopost siteid: ' + postjson.siteid);
+      
     options = {
       host: config.apihost,
       port: 443,
@@ -344,62 +346,76 @@ function dopost(postjson, openapiflag, callback) {
 
 function dopost2(postjson, callback) {
 	
-  var zlib = require('zlib');
-  var fs = require('fs');
-  var js2xmlparser = require('js2xmlparser');
-  
-  /* json -> xml */
-  var requestxml = js2xmlparser(postjson.callname + 'Request', postjson.params);
-  
-  requestxml = requestxml.replace
-  (/<downloadFileRequest>/, 
-   '<downloadFileRequest xmlns="http://www.ebay.com/marketplace/services">');
-  
-  /* post request */
-  var https = require('https');
-  
-  var options = {
-    host: config.apiftshost,
-    port: 443,
-    path: config.apiftspath,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'text/xml',
-      'X-EBAY-SOA-OPERATION-NAME': 'downloadFile',
+    var zlib = require('zlib');
+    var fs = require('fs');
+    var js2xmlparser = require('js2xmlparser');
+    
+    /* json -> xml */
+    var requestxml = js2xmlparser(postjson.callname + 'Request', postjson.params);
+    
+    requestxml = requestxml.replace
+    (/<downloadFileRequest>/, 
+     '<downloadFileRequest xmlns="http://www.ebay.com/marketplace/services">');
+    
+    /* post request */
+    var https = require('https');
+    
+    var options = {
+        host: config.apiftshost,
+        port: 443,
+        path: config.apiftspath,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'text/xml',
+            'X-EBAY-SOA-OPERATION-NAME': 'downloadFile',
 			'X-EBAY-SOA-SECURITY-TOKEN': config.admintoken
+        }
+    };
+    
+    var logdir = '/var/www/listers.in/logs/apicall/downloadFile';
+    var reqfile = logdir + '/' + postjson.email + '_' + postjson.site + '.req';
+    var rawfile = logdir + '/' + postjson.email + '_' + postjson.site + '.raw';
+    var zipfile = logdir + '/' + postjson.email + '_' + postjson.site + '.zip';
+    
+    //fs.writeFile(reqfile, requestxml);
+    
+    if (fs.existsSync(zipfile)) {
+        callback(null, {zipfile: zipfile});
+        return;
     }
-  };
-  
-  var logdir = '/var/www/listers.in/logs/apicall/downloadFile';
-  var reqfile = logdir + '/' + postjson.email + '_' + postjson.site + '.req';
-  var rawfile = logdir + '/' + postjson.email + '_' + postjson.site + '.raw';
-  var zipfile = logdir + '/' + postjson.email + '_' + postjson.site + '.zip';
-  
-  fs.writeFile(reqfile, requestxml);
-  
-  if (fs.existsSync(zipfile)) {
-    callback(null, {zipfile: zipfile});
-    return;
-  }
-  
-  var req = https.request(options, function(apires) {
     
-    fs.writeFile(rawfile, apires);
-    
-    var formidable = require('formidable');
-    var form = new formidable.IncomingForm();
-    form.uploadDir = logdir;
-    
-    form.parse(apires, function(err, fields, files) {
-      fs.renameSync(files[null].path, zipfile);
-      callback(null, {zipfile: zipfile});
+    var req = https.request(options, function(apires) {
+        
+        // ebay production server doesn't send this header.
+        apires.headers['transfer-encoding'] = 'chunked';
+        
+        console.dir(apires.headers);
+        
+        if (false) {
+            var rawdata = '';
+            apires.on('data', function (chunk) {
+                rawdata += chunk;
+            });
+            apires.on('end', function (chunk) {
+                fs.writeFile(rawfile, rawdata);
+            });
+            return;
+        }
+        
+        var formidable = require('formidable');
+        var form = new formidable.IncomingForm();
+        form.uploadDir = logdir;
+        
+        form.parse(apires, function(err, fields, files) {
+            fs.renameSync(files[null].path, zipfile);
+            callback(null, {zipfile: zipfile});
+        });
+        
     });
     
-  });
-  
-  req.write(requestxml);
-  
-  req.end();
+    req.write(requestxml);
+    
+    req.end();
 	
 } // dopost2()
 

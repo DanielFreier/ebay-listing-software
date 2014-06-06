@@ -1,0 +1,66 @@
+[[ for(i = 0; i < transactions.length; i++) { ]]
+[[ if (transactions[i] == null) continue; ]]
+
+<tr class="row-transaction" data-id="{{id}}">
+  <td colspan="4" style="background-color:#fff; text-align:right;">
+  </td>
+  <td>
+    {{transactions[i].Buyer.UserID}}
+    ({{transactions[i].Buyer.FeedbackScore}})
+  </td>
+  <td colspan="2" style="text-align:right;">
+    <a href="#" class="show-transaction-message-form">Contact buyer</a>
+  </td>
+  <td style="text-align:right;">
+    {{transactions[i].QuantityPurchased}}
+  </td>
+  <td style="text-align:right;">
+    [[ if (transactions[i].TransactionPrice['@'].currencyID == 'USD') { ]]
+    <i class="icon-usd"></i>
+    [[ } else if (transactions[i].TransactionPrice['@'].currencyID == 'GBP') { ]]
+    <i class="icon-gbp"></i>
+    [[ } else if (transactions[i].TransactionPrice['@'].currencyID == 'EUR') { ]]
+    <i class="icon-eur"></i>
+    [[ } else if (transactions[i].TransactionPrice['@'].currencyID == 'INR') { ]]
+    <i class="icon-inr"></i>
+    [[ } else if (transactions[i].TransactionPrice['@'].currencyID == 'CNY') { ]]
+    <i class="icon-cny"></i>
+    [[ } else { ]]
+    {{transactions[i].TransactionPrice['@'].currencyID}}
+    [[ } ]]
+    {{transactions[i].TransactionPrice['#text'] * transactions[i].QuantityPurchased}}
+  </td>
+  <td style="text-align:right;">
+    {{transactions[i].CreatedDate}}
+  </td>
+</tr>
+<tr class="row-transaction-message" data-id="{{id}}" style="display:none;">
+  <td colspan="4" style="background-color:#fff; text-align:right;">
+  </td>
+  <td colspan="6">
+    <!--
+    Question Type
+    <select name="QuestionType">
+      <option value="General">General</option>
+      <option value="MultipleItemShipping">MultipleItemShipping</option>
+      <option value="Payment">Payment</option>
+      <option value="Shipping">Shipping</option>
+    </select>
+    <input type="text" name="Subject" class="form-control" placeholder="Subject">
+    -->
+    <textarea name="Body" class="form-control" rows="2"
+              placeholder="Enter your question here..."></textarea>
+	<input type="hidden" name="ItemID" value="{{org.ItemID}}">
+	<input type="hidden" name="UserID" value="{{UserID}}">
+	<input type="hidden" name="RecipientID" value="{{transactions[i].Buyer.UserID}}">
+	<input type="hidden" name="QuestionType" value="General">
+	<input type="hidden" name="Subject" value="">
+	
+    <button class="btn btn-xs send-transaction-message-button"
+			data-id="{{id}}">
+      <%= __('SendMessage') %>
+    </button>
+  </td>
+</tr>
+
+[[ } ]]

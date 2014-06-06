@@ -10,7 +10,7 @@
 	        </label>
         </div>
       </td>
-      <td>
+      <td width="40%">
         <div class="title" data-field="mod.Title">
           Title
           <i class=""></i>
@@ -60,7 +60,7 @@
       </td>
       <td>
         <div class="EndTime" data-field="org.ListingDetails.EndTime">
-          <i class=""></i>
+          <i class="icon-chevron-up"></i>
           End
         </div>
       </td>
@@ -76,23 +76,23 @@
     
     <tr id="{{id}}" class="row1">
       <td>
-	      <label class="inline">
+	    <label class="inline">
           
           [[ if (typeof(status) == 'string' && status != '') { ]]
           
-		      <input type="checkbox" class="ace" name="id" value="{{id}}"
+		  <input type="checkbox" class="ace" name="id" value="{{id}}"
                  checked="checked" style="display:none;"/>
           <i class="icon-spinner icon-spin"></i>
-		      <span class="lbl"></span>
+		  <span class="lbl"></span>
           
           [[ } else { ]]
           
-		      <input type="checkbox" class="ace" name="id" value="{{id}}" />
-		      <span class="lbl"></span>
-
+		  <input type="checkbox" class="ace" name="id" value="{{id}}" />
+		  <span class="lbl"></span>
+          
           [[ } ]]
           
-	      </label>
+	    </label>
       </td>
       <td>
         [[ if (typeof(org) == 'object') { ]]
@@ -248,6 +248,16 @@
           [[ } ]]
           {{mod.StartPrice['#text']}}
           [[ } ]]
+
+          [[ if (mod.ListingType == 'FixedPriceItem') { ]]
+          <div class="light-grey smaller-80">
+            Buy it Now
+          </div>
+          [[ } else if (mod.ListingType == 'PersonalOffer') { ]]
+          <div class="light-grey smaller-80">
+            Personal Offer
+          </div>
+          [[ } ]]
         </div>
       </td>
       <td>
@@ -256,61 +266,146 @@
           {{endtime}}
           [[ } ]]
         </div>
-        <div class="StartTime">
-          
+        <div class="StartTime smaller-80">
+          [[ if (typeof(scheduletime) == 'string') { ]]
+          Start {{scheduletime}}
+          [[ } ]]
         </div>
       </td>
     </tr>
+    
+    [[ if (typeof(transactions) == 'object') { ]]
+    <% include items-table-transactions %>
+    [[ } ]]
+    
+    [[ if (typeof(bids) == 'object') { ]]
+    [[ for(i = 0; i < bids.length; i++) { ]]
+    [[ if (bids[i] == null) continue; ]]
+    <tr class="rowbid" data-id="{{id}}"
+        [[ if (i >= 1) { ]]
+        style="display:none;"
+        [[ } ]]
+        >
+      <td colspan="4" style="background-color:#fff; text-align:right;">
+        [[ if (bids.length > 1 && i == 0) { ]]
+        <a href="#" class="showbids" data-id="{{id}}">
+          [[ if (bids.length == 2) { ]]
+          show {{(bids.length-1)}} bid
+          [[ } else { ]]
+          show {{(bids.length-1)}} bids
+          [[ } ]]
+        </a>
+        [[ } ]]
+      </td>
+      <td>
+        {{bids[i].User.UserID}}
+        ({{bids[i].User.FeedbackScore}})
+      </td>
+      <td colspan="2" style="text-align:right;">
+        <a href="#" class="show-2nd-offer-form">2nd offer</a>
+      </td>
+      <td style="text-align:right;">
+        {{bids[i].User.BuyerInfo.ShippingAddress.Country}}
+      </td>
+      <td style="text-align:right;">
+        
+        [[ if (bids[i].HighestBid['@'].currencyID == 'USD') { ]]
+        <i class="icon-usd"></i>
+        [[ } else if (bids[i].HighestBid['@'].currencyID == 'GBP') { ]]
+        <i class="icon-gbp"></i>
+        [[ } else if (bids[i].HighestBid['@'].currencyID == 'EUR') { ]]
+        <i class="icon-eur"></i>
+        [[ } else if (bids[i].HighestBid['@'].currencyID == 'INR') { ]]
+        <i class="icon-inr"></i>
+        [[ } else if (bids[i].HighestBid['@'].currencyID == 'CNY') { ]]
+        <i class="icon-cny"></i>
+        [[ } else { ]]
+        {{bids[i].HighestBid['@'].currencyID}}
+        [[ } ]]
+        {{bids[i].HighestBid['#text']}}
+        
+      </td>
+      <td style="text-align:right;">
+        {{bids[i].TimeBid}}
+      </td>
+    </tr>
+    <tr class="row-2nd-offer-form" data-id="{{id}}" style="display:none;">
+      <td colspan="4" style="background-color:#fff; text-align:right;">
+      </td>
+      <td colspan="6">
+        
+        <textarea name="SellerMessage" class="form-control" rows="2"
+                  placeholder="Add a personal message"></textarea>
+        
+        Offer duration
+        <select name="Duration">
+          <option value="Days_1">1 day</option>
+          <option value="Days_3">3 days</option>
+          <option value="Days_5">5 days</option>
+          <option value="Days_7">7 days</option>
+        </select>
+        
+				<input type="hidden" name="ItemID" value="{{org.ItemID}}">
+				<input type="hidden" name="UserID" value="{{UserID}}">
+				<input type="hidden" name="RecipientBidderUserID" value="{{bids[i].User.UserID}}">
+				
+        <button class="btn btn-xs send-2nd-chance-offer-button"
+								data-id="{{id}}">
+          <%= __('SendSecondChanceOffer') %>
+        </button>
+        
+      </td>
+    </tr>
+    [[ } ]]
+    [[ } ]]
+    
+    [[ if (typeof(membermessages) == 'object') { ]]
+    [[ for(i = 0; i < membermessages.length; i++) { ]]
+    [[ if (membermessages[i].MessageStatus == 'Answered') continue; ]]
+    <tr class="rowmembermessages">
+      <td colspan="4" style="background-color:#fff; text-align:right;">
+      </td>
+      <td>
+        {{membermessages[i].Question.SenderID}}
+      </td>
+      <td colspan="2" style="text-align:right;">
+				<a href="#" class="replybutton">Reply</a>
+      </td>
+      <td colspan="2" style="text-align:right;">
+        <span class="label label-sm label-danger">
+          {{membermessages[i].MessageStatus}}
+        </span>
+      </td>
+      <td style="text-align:right;">
+        {{membermessages[i].CreationDate}}
+      </td>
+    </tr>
+    <tr class="rowmembermessages-body">
+      <td colspan="4" style="background-color:#fff; text-align:right; border:0px none;">
+      </td>
+      <td colspan="6">
+        <i>{{membermessages[i].Question.Body.replace(/[\n]/g, '<br/>')}}</i>
+        <textarea name="body" class="form-control" rows="3"
+									style="display:none;"></textarea>
+        <button class="btn btn-xs respondbutton"
+								style="display:none;"
+                data-id="{{id}}"
+                data-userid="{{UserID}}"
+                data-itemid="{{org.ItemID}}"
+                data-parent="{{membermessages[i].Question.MessageID}}"
+                data-sender="{{membermessages[i].Question.SenderID}}">
+          <%= __('Respond') %>
+        </button>
+      </td>
+    </tr>
+    [[ } ]]
+    [[ } ]]
+                      
     <tr id="{{id}}-row2" style="border-bottom:1px solid #ccc;" class="row2">
       <td colspan="10" id="{{id}}-detail">
 				<div class="message-loading-overlay hide" id="{{id}}-loading">
 					<i class="icon-spin icon-spinner orange2 bigger-160"></i>
 				</div>
-        
-        [[ if (typeof(membermessages) == 'object') { ]]
-        [[ for(i = 0; i < membermessages.length; i++) { ]]
-        [[ if (membermessages[i].MessageStatus == 'Answered') continue; ]]
-        <div class="well well-sm membermessage">
-          <div class="row">
-            
-            <div class="col-xs-6">
-              <span class="label label-sm label-danger">
-                {{membermessages[i].MessageStatus}}
-              </span>
-              <strong style="margin-left:10px;">
-                {{membermessages[i].Question.SenderID}}
-              </strong>
-              <span style="margin-left:10px;">
-                <i>{{membermessages[i].CreationDate}}</i>
-              </span>
-              
-              <p style="background-color:#fff; padding:5px; margin-top:10px; border:1px solid #ddd;">
-                {{membermessages[i].Question.Body.replace(/[\n]/g, '<br/>')}}
-              </p>
-            </div>
-            
-            <div class="col-xs-1 pull-right">
-              <button class="btn btn-xs respondbutton"
-                      data-id="{{id}}"
-                      data-userid="{{UserID}}"
-                      data-itemid="{{org.ItemID}}"
-                      data-parent="{{membermessages[i].Question.MessageID}}"
-                      data-sender="{{membermessages[i].Question.SenderID}}">
-                <%= __('Respond') %>
-              </button>
-            </div>
-            
-            <div class="col-xs-5 pull-right">
-              <div class="form">
-                <textarea name="body" class="form-control" rows="3"></textarea>
-              </div>
-            </div>
-            
-          </div>
-        </div>
-        [[ } ]]
-        [[ } ]]
-        
       </td>
     </tr>
     

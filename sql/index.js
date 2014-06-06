@@ -25,6 +25,7 @@ db.getCollectionNames().forEach(
 			db[coll].ensureIndex({'org.ListingDetails.EndTime':1});
 			db[coll].ensureIndex({'membermessages.MessageStatus':1});
 			db[coll].ensureIndex({'statustags':1});
+			db[coll].ensureIndex({'opt.template':1});
       
 			db[coll].ensureIndex(
         {

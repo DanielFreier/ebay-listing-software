@@ -1,170 +1,184 @@
 <div class="form-group">
-	<label for="UserID" class="col-sm-3 control-label no-padding-right">
+  <label for="UserID" class="col-sm-3 control-label no-padding-right">
     <%= __('ShippingType') %>
   </label>
-	<div class="col-sm-4">
+  <div class="col-sm-4">
     <select name="mod.ShippingDetails.ShippingType.domestic">
       <option value="Flat">Flat: same cost to all buyers</option>
       <option value="Calculated">Calculated: Cost varies by buyer location</option>
       <option value="FreightFlat">Freight: large items over 150 lbs.</option>
       <option value="" selected="selected">No shipping: Local pickup only</option>
     </select>
-	</div>
+  </div>
 </div>
 <div class="shippingmainrows">
-<div class="form-group">
+  <div class="form-group">
 	<label for="UserID" class="col-sm-3 control-label no-padding-right">
-    <%= __('PackageType') %>
-  </label>
+      <%= __('PackageType') %>
+    </label>
 	<div class="col-sm-3">
-    <select name="mod.<%= __('_SDCSR') %>.ShippingPackage"></select>
-    <input type="checkbox"
-           name="mod.<%= __('_SDCSR') %>.ShippingIrregular"
+      <select name="mod.<%= __('_SDCSR') %>.ShippingPackage"></select>
+      <input type="checkbox"
+             name="mod.<%= __('_SDCSR') %>.ShippingIrregular"
              id="_id.<%= __('_SDCSR') %>.ShippingIrregular"/>
-    <label  for="_id.<%= __('_SDCSR') %>.ShippingIrregular">
-      Irregular package
-    </label>
-	</div>
-</div>
-<div class="form-group">
-	<label for="UserID" class="col-sm-3 control-label no-padding-right">
-    <%= __('Dimensions') %>
-  </label>
-	<div class="col-sm-9" data-form="dimensions">
-    <input name="mod.<%= __('_SDCSR') %>.PackageLength.#text" type="text" size="3"> in.
-    X
-    <input name="mod.<%= __('_SDCSR') %>.PackageWidth.#text" type="text" size="3"> in.
-    X
-    <input name="mod.<%= __('_SDCSR') %>.PackageDepth.#text" type="text" size="3"> in.
-	</div>
-</div>
-<div class="form-group">
-	<label for="UserID" class="col-sm-3 control-label no-padding-right">
-    <%= __('Weight') %>
-  </label>
-	<div class="col-sm-9" data-form="dimensions">
-    <input name="mod.<%= __('_SDCSR') %>.WeightMajor.#text" type="text" size="3"> lbs.
-    <input name="mod.<%= __('_SDCSR') %>.WeightMinor.#text" type="text" size="3"> oz.
-	</div>
-</div>
-<div class="form-group">
-	<label for="UserID" class="col-sm-3 control-label no-padding-right">
-    <%= __('Services') %>
-  </label>
-	<div class="col-sm-9" data-form="shippingservices">
-
-    <div class="ShippingService0">
-      
-      <input name="mod.<%= __('_SDSSO') %>.0.ShippingServicePriority" type="text" size="1"/>
-      
-      <select name="mod.<%= __('_SDSSO') %>.0.ShippingService"
-              class="ShippingService"></select>
-      
-      <input name="mod.<%= __('_SDSSO') %>.0.ShippingServiceCost.@currencyID"
-             type="text" size="3" class="aslabel"/>
-      
-      <input name="mod.<%= __('_SDSSO') %>.0.ShippingServiceCost.#text"
-             type="text" size="5" placeholder="Cost"/>
-      
-      <input value="true" type="checkbox"
-             name="mod.<%= __('_SDSSO') %>.0.FreeShipping"
-             id="_id.<%= __('_SDSSO') %>.0.FreeShipping"/>
-      <label  for="_id.<%= __('_SDSSO') %>.0.FreeShipping">
-        Free shipping
+      <label  for="_id.<%= __('_SDCSR') %>.ShippingIrregular">
+        Irregular package
       </label>
-      
-      <a href="#" class="removesso">Remove service</a>
-      
-    </div>
-    
-    <a href="#" class="addsso">Offer additional service</a>
-		
 	</div>
-</div>
-<div class="form-group">
+  </div>
+  <div class="form-group">
 	<label for="UserID" class="col-sm-3 control-label no-padding-right">
-    <%= __('HandlingTime') %>
-  </label>
-	<div class="col-sm-9">
-		<select name="mod.DispatchTimeMax"></select>
-	</div>
-</div>
-<div class="form-group">
-	<label for="UserID" class="col-sm-3 control-label no-padding-right">
-    <%= __('Options') %>
-  </label>
-	<div class="col-sm-9">
-    <input type="checkbox" value="true" name="mod.GetItFast" id="_id.GetItFast"/>
-    <label for="_id.GetItFast">
-      GetItFast
+      <%= __('Dimensions') %>
     </label>
+	<div class="col-sm-9" data-form="dimensions">
+      <input name="mod.<%= __('_SDCSR') %>.PackageLength.#text" type="text" size="3"> in.
+      X
+      <input name="mod.<%= __('_SDCSR') %>.PackageWidth.#text" type="text" size="3"> in.
+      X
+      <input name="mod.<%= __('_SDCSR') %>.PackageDepth.#text" type="text" size="3"> in.
 	</div>
-</div>
-
-<div class="form-group">
+  </div>
+  <div class="form-group">
 	<label for="UserID" class="col-sm-3 control-label no-padding-right">
-    <%= __('ShippingType') %>
-  </label>
-	<div class="col-sm-9">
-    <select name="mod.ShippingDetails.ShippingType.international">
-      <option value="Flat">Flat: same cost to all buyers</option>
-      <option value="Calculated">Calculated: Cost varies by buyer location</option>
-      <option value="" selected="selected">No international shipping</option>
-    </select>
+      <%= __('Weight') %>
+    </label>
+	<div class="col-sm-9" data-form="dimensions">
+      <input name="mod.<%= __('_SDCSR') %>.WeightMajor.#text" type="text" size="3"> lbs.
+      <input name="mod.<%= __('_SDCSR') %>.WeightMinor.#text" type="text" size="3"> oz.
 	</div>
-</div>
+  </div>
+  <div class="form-group">
+	<label for="UserID" class="col-sm-3 control-label no-padding-right">
+      <%= __('Services') %>
+    </label>
+	<div class="col-sm-9" data-form="shippingservices">
+      
+      <div class="ShippingService0">
+        
+        <input name="mod.<%= __('_SDSSO') %>.0.ShippingServicePriority" type="text" size="1"/>
+        
+        <select name="mod.<%= __('_SDSSO') %>.0.ShippingService"
+                class="ShippingService"></select>
+        
+        <input name="mod.<%= __('_SDSSO') %>.0.ShippingServiceCost.@currencyID"
+               type="text" size="3" class="aslabel"/>
+        
+        <input name="mod.<%= __('_SDSSO') %>.0.ShippingServiceCost.#text"
+               type="text" size="5" placeholder="Cost"/>
+        
+        <input value="true" type="checkbox"
+               name="mod.<%= __('_SDSSO') %>.0.FreeShipping"
+               id="_id.<%= __('_SDSSO') %>.0.FreeShipping"/>
+        <label  for="_id.<%= __('_SDSSO') %>.0.FreeShipping">
+          Free shipping
+        </label>
+        
+        <a href="#" class="removesso">Remove service</a>
+        
+      </div>
+      
+      <a href="#" class="addsso">Offer additional service</a>
+	  
+	</div>
+  </div>
+  <div class="form-group">
+	<label for="UserID" class="col-sm-3 control-label no-padding-right">
+      <%= __('HandlingTime') %>
+    </label>
+	<div class="col-sm-9">
+	  <select name="mod.DispatchTimeMax"></select>
+	</div>
+  </div>
+  <div class="form-group">
+	<label for="UserID" class="col-sm-3 control-label no-padding-right">
+      <%= __('Options') %>
+    </label>
+	<div class="col-sm-9">
+      <input type="checkbox" value="true" name="mod.GetItFast" id="_id.GetItFast"/>
+      <label for="_id.GetItFast">
+        GetItFast
+      </label>
+	</div>
+  </div>
+
+  <div class="form-group">
+    <label for="UserID" class="col-sm-3 control-label no-padding-right lighter blue bolder">
+      International shipping
+    </label>
+	<div class="col-sm-9">
+	</div>
+  </div>
+  <div class="form-group">
+	<label for="UserID" class="col-sm-3 control-label no-padding-right">
+      <%= __('ShippingType') %>
+    </label>
+	<div class="col-sm-9">
+      <select name="mod.ShippingDetails.ShippingType.international">
+        <option value="Flat">Flat: same cost to all buyers</option>
+        <option value="Calculated">Calculated: Cost varies by buyer location</option>
+        <option value="" selected="selected">No international shipping</option>
+      </select>
+	</div>
+  </div>
 </div><!-- /.shippingmainrows -->
 
 <div class="internationalshippingmainrows">
-<div class="form-group">
+  <div class="form-group">
 	<label for="UserID" class="col-sm-3 control-label no-padding-right">
-    <%= __('Services') %>
-  </label>
+      <%= __('Services') %>
+    </label>
 	<div class="col-sm-9" data-form="internationalshippingservices">
-
-    <div class="ShippingService0 clearfix">
-      <input name="mod.<%= __('_SDISSO') %>.0.ShippingServicePriority" type="hidden" />
-      <select name="mod.<%= __('_SDISSO') %>.0.ShippingService" class="ShippingService"></select>
       
-      <%= __('Cost') %>
-      <input name="mod.<%= __('_SDISSO') %>.0.ShippingServiceCost.@currencyID"
-             type="text" size="3" class="aslabel">
-      <input name="mod.<%= __('_SDISSO') %>.0.ShippingServiceCost.#text"
-             type="text" size="5">
+      <div class="ShippingService0 clearfix">
+        <input name="mod.<%= __('_SDISSO') %>.0.ShippingServicePriority" type="hidden" />
+        <select name="mod.<%= __('_SDISSO') %>.0.ShippingService" class="ShippingService"></select>
+        
+        <%= __('Cost') %>
+        <input name="mod.<%= __('_SDISSO') %>.0.ShippingServiceCost.@currencyID"
+               type="text" size="3" class="aslabel">
+        <input name="mod.<%= __('_SDISSO') %>.0.ShippingServiceCost.#text"
+               type="text" size="5">
+        
+        <a href="#" class="removesso">Remove service</a>
+        <br />
+        
+        <s:text name="ShipTo"/><br />
+        <ul class="ShipToLocation clearfix"></ul>
+      </div>
       
-      <a href="#" class="removesso">Remove service</a>
-      <br />
-      
-      <s:text name="ShipTo"/><br />
-      <ul class="ShipToLocation clearfix"></ul>
-    </div>
-    
-    <a href="#" class="addsso">Offer additional service</a>
+      <a href="#" class="addsso">Offer additional service</a>
 	</div>
-</div>
+  </div>
 </div><!-- /.internationalshippingmainrows -->
 
 <div class="form-group">
-	<label for="UserID" class="col-sm-3 control-label no-padding-right">
+  <label for="UserID" class="col-sm-3 control-label no-padding-right lighter blue bolder">
+    Item location
+  </label>
+  <div class="col-sm-9">
+  </div>
+</div>
+<div class="form-group">
+  <label for="UserID" class="col-sm-3 control-label no-padding-right">
     <%= __('Country') %>
   </label>
-	<div class="col-sm-4">
+  <div class="col-sm-4">
     <select name="mod.Country"></select>
-	</div>
+  </div>
 </div>
 <div class="form-group">
-	<label for="UserID" class="col-sm-3 control-label no-padding-right">
+  <label for="UserID" class="col-sm-3 control-label no-padding-right">
     <%= __('PostalCode') %>
   </label>
-	<div class="col-sm-4">
+  <div class="col-sm-4">
     <input type="text" name="mod.PostalCode" size="10" class="form-control" />
-	</div>
+  </div>
 </div>
 <div class="form-group">
-	<label for="UserID" class="col-sm-3 control-label no-padding-right">
+  <label for="UserID" class="col-sm-3 control-label no-padding-right">
     <%= __('Location') %>
   </label>
-	<div class="col-sm-4">
+  <div class="col-sm-4">
     <input type="text" name="mod.Location" size="10" class="form-control" />
-	</div>
+  </div>
 </div>

@@ -1,17 +1,17 @@
 <script id="settingTemplate" type="text/template">
-
+  
   <div class="form-horizontal" role="form">
     
     <div class="form-group">
-	    <label for="Email" class="col-sm-2 control-label no-padding-right">
+	  <label for="Email" class="col-sm-2 control-label no-padding-right">
         <%= __('Plan') %>
       </label>
-	    <div class="col-sm-6">
+	  <div class="col-sm-6">
         
         <b class="bigger-120">
           [[ if (email == 'demo@listers.in') { ]]
           Demo
-          [[ } else if (status == 'trial') { ]]
+          [[ } else if (status == 'trial' || status == 'temporary registration') { ]]
           Free Trial
           [[ } else if (status == 'starter') { ]]
           Starter
@@ -24,7 +24,7 @@
           {{period.start}} - {{period.end}}
         </div>
         
-        [[ if (status == 'trial' || expired) { ]]
+        [[ if (status == 'trial' || expired || status == 'temporary registration') { ]]
         <table class="table table-bordered">
           <thead>
             <tr>
@@ -79,19 +79,19 @@
     </div>
     
     <div class="form-group">
-	    <label for="Email" class="col-sm-2 control-label no-padding-right">
+	  <label for="Email" class="col-sm-2 control-label no-padding-right">
         <%= __('Email') %>
       </label>
-	    <div class="col-sm-10">
+	  <div class="col-sm-10">
         <b class="bigger-120">{{email}}</b>
-	    </div>
+	  </div>
     </div>
     
     <div class="form-group">
-	    <label for="Email" class="col-sm-2 control-label no-padding-right">
+	  <label for="Email" class="col-sm-2 control-label no-padding-right">
         Time zone
       </label>
-	    <div class="col-sm-6">
+	  <div class="col-sm-6">
         
 <select name="TimeZone" class="form-control">
   <option value="GMT-12:00">UTC -12:00 (Eniwetok, Kwajalein)</option>
@@ -122,14 +122,14 @@
   <option value="GMT+13:00">UTC +13:00 (Nuku'alofa)</option>
 </select>
 
-	    </div>
+	  </div>
     </div>
     
     <div class="form-group">
-	    <label for="Email" class="col-sm-2 control-label no-padding-right">
+	  <label for="Email" class="col-sm-2 control-label no-padding-right">
         eBay accounts
       </label>
-	    <div class="col-sm-6">
+	  <div class="col-sm-6">
         
         <table class="table table-bordered" style="margin:0;">
           <tr>
@@ -143,16 +143,16 @@
               {{userid.username}}
             </td>
             <td>
-							<label>
-								<input name="sync-{{userid.username}}"
+			  <label>
+				<input name="sync-{{userid.username}}"
                        class="ace ace-switch ace-switch-2 synctoggle"
                        type="checkbox"
                        [[ if (userid.sync) { ]]
                        checked="checked"
                        [[ } ]]
                        />
-								<span class="lbl"></span>
-							</label>
+				<span class="lbl"></span>
+			  </label>
             </td>
             <td>
               <button class="btn btn-xs removeaccount" data-userid="{{userid.username}}">
@@ -184,9 +184,10 @@
           </tr>
         </table>
         
-	    </div>
+	  </div>
     </div>
     
+    [[ if (userids2.length > 0) { ]]
     <div class="form-group" id="syncitemsform">
 	    <label for="Email" class="col-sm-2 control-label no-padding-right">
         Import items from eBay
@@ -227,62 +228,83 @@
           </td>
         </tr>
         </table>
-        
-	    </div>
-    </div>
+	  </div>
+    </div><!-- #syncitemsform -->
+    [[ } ]]
     
+    [[ if (userids2.length > 0) { ]]
     <div class="form-group">
-	    <label for="Email" class="col-sm-2 control-label no-padding-right">
+	  <label for="Email" class="col-sm-2 control-label no-padding-right">
         Import items from CSV
       </label>
-	    <div class="col-sm-6">
+	  <div class="col-sm-6">
         
         <table class="table table-bordered" style="margin:0;">
           <tr>
             <td>
               
-        <form method="post" action="/node/file/csvupload" id="csvform"
-              target="posttarget" enctype="multipart/form-data">
-          
-          Import items from Turbo Lister &quot;File Exchange Format(CSV file)&quot;<br/>
-          <img src="/img/turbolistercsvexport.png" />
-          <br/>
-          <br/>
-          Import to
-          <select name="userid">
-            [[ _.each(userids2, function(userid) { ]]
-            <option value="{{userid.username}}">{{userid.username}}</option>
-            [[ }); ]]
-          </select>
-          <br/>
-          CSV file
-          <input type="file" id="csvfile" name="fileUpload" />
-          
-          <button class="btn btn-sm">
-            <%= __('Import') %>
-          </button>
-        </form>
-        <div id="csvimportmessage"></div>
-        
-          </td>
-        </tr>
+              <form method="post" action="/node/file/csvupload" id="csvform"
+                    target="posttarget" enctype="multipart/form-data">
+                
+                Import items from Turbo Lister &quot;File Exchange Format(CSV file)&quot;<br/>
+                <img src="/img/turbolistercsvexport.png" />
+                <br/>
+                <br/>
+                Import to
+                <select name="userid">
+                  [[ _.each(userids2, function(userid) { ]]
+                  <option value="{{userid.username}}">{{userid.username}}</option>
+                  [[ }); ]]
+                </select>
+                <br/>
+                CSV file
+                <input type="file" id="csvfile" name="fileUpload" />
+                
+                <button class="btn btn-sm">
+                  <%= __('Import') %>
+                </button>
+              </form>
+              <div id="csvimportmessage"></div>
+              
+            </td>
+          </tr>
         </table>
         
-	    </div>
+	  </div>
+    </div>
+    [[ } ]]
+    
+    <div class="form-group">
+	  <label for="Email" class="col-sm-2 control-label no-padding-right">
+        <%= __('Information') %>
+      </label>
+	  <div class="col-sm-10">
+		<label>
+		  <input name="receiveinfo"
+                 class="ace ace-switch ace-switch-2"
+                 type="checkbox"
+                 [[ if (receiveinfo) { ]]
+                 checked="checked"
+                 [[ } ]]
+                 />
+		  <span class="lbl"></span>
+		</label>
+        <%= __('ReceiveInformationEmails') %>
+	  </div>
     </div>
     
     <div class="form-group">
-	    <label for="Email" class="col-sm-2 control-label no-padding-right">
+	  <label for="Email" class="col-sm-2 control-label no-padding-right">
         Cancel account
       </label>
-	    <div class="col-sm-3">
+	  <div class="col-sm-3">
         
         <a href="/node/cancelaccount" class="btn btn-danger btn-sm" id="cancelaccountlink">
           <i class="icon-remove"></i>
           Cancel account
         </a>
         
-	    </div>
+	  </div>
     </div>
     
   </div><!-- /.form-horizontal -->

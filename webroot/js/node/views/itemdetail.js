@@ -79,7 +79,34 @@ define([
       'click a.addvariationrow': 'clickAddVariationRow',
       'change select[name^="mod.Variations.Variation"][name$="Value.selector"]': 'changeSelectSelector',
       'change select[name="mod.Variations.Pictures.VariationSpecificName"]': 'changeVPVSN',
-      'click a.deletepicture': 'clickDeletePicture'
+      'click a.deletepicture': 'clickDeletePicture',
+      
+      'change select[name="opt.ScheduleType"]': function(e) {
+        if ($(e.currentTarget).val() != '') {
+          $('input[name^="mod.ScheduleTime"]', this.el).show();
+        } else {
+          $('input[name^="mod.ScheduleTime"]', this.el).hide();
+        }
+      },
+        
+        'change select[name="mod.ListingType"]': function(e) {
+
+		    var id = this.model.get('id');
+            var idstr = '#' + id + '-detail';
+            
+		    var formarr =
+			    $('input[type="text"], input:checked, input[type="hidden"], select, textarea', 
+                  idstr);
+            
+		    var item_modifing = ebayjs.extractObject(formarr);
+		    
+		    item_modifing.id = id;
+		    ebayjs.setformelements_listingtype(item_modifing);
+            ebayjs.setformelements_listingduration(item_modifing);
+            
+		    return;
+        }
+      
     },
     
     newItem: function() {
@@ -130,6 +157,20 @@ define([
       }
       
       $('input[name="opt.tags"]', this.el).tag();
+      
+      $('input[name="mod.ScheduleTime.date"]', this.el).datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        todayBtn: 'linked',
+        todayHighlight: true
+      });
+      
+      $('input[name="mod.ScheduleTime.time"]', this.el).timepicker({
+				minuteStep: 5,
+				showSeconds: false,
+				showMeridian: false,
+        showInputs: true
+      });
       
       return this;
     },
@@ -208,6 +249,9 @@ define([
 		    });
 	    });
       
+        /* BuyerRequirementDetails */
+        $('input[name^="mod.BuyerRequirementDetails"][name$="checkbox"]', this.el).remove();
+        
 	    // remove empty value forms
 	    var _dsso = 'mod.ShippingDetails.ShippingServiceOptions';
 	    var _isso = 'mod.ShippingDetails.InternationalShippingServiceOption';

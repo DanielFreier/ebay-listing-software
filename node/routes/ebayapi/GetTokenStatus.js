@@ -14,7 +14,10 @@ module.exports = {
           db.collection('users', function(err, collection) {
             collection.find(
               {
-                userids2: {$exists: true}
+                  email: 'yong_liu@me.com',
+                userids2: {
+                    $exists: true
+                }
               }
             ).toArray(function(err, users) {
               
