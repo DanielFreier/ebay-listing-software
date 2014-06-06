@@ -225,66 +225,7 @@ app.all('*', function(req, res, next) {
 
 app.get('/', function(req, res) {
     
-    var url = require('url');
-    var url_parts = url.parse(req.url, true);
-    var query = url_parts.query;
-    
-    var newlook = 1;
-    
-    if (req.cookies.hasOwnProperty('admin')) {
-        
-        if (query.hasOwnProperty('newlook')) {
-            newlook = query.newlook;
-            res.cookie('newlook', newlook, {maxAge: 86400*365});
-        } else if (req.cookies.hasOwnProperty('newlook')) {
-            newlook = req.cookies.newlook;
-        }
-        
-    } else {
-        
-        if (query.hasOwnProperty('newlook')) {
-            
-            newlook = query.newlook;
-            
-            mongo(function(db) {
-                db.collection('users', function(err, collection) {
-                    collection.findOne(
-                        {
-                            _id: req.user._id,
-                        },
-                        function(err, user) {
-                            
-                            collection.update(
-                                {
-                                    _id: req.user._id,
-                                },
-                                {
-                                    $set: {
-                                        newlook: newlook
-                                    }
-                                },
-                                {
-                                    safe: true
-                                },
-                                function(err) {
-                                    res.redirect('/');
-                                }
-                            );
-                        }
-                    ); // findOne
-                }); // collection
-            }); // mongo
-            
-            return;
-            
-        } else if (req.isAuthenticated() && req.user.hasOwnProperty('newlook')) {
-            
-            newlook = req.user.newlook;
-            
-        }
-    }
-    
-    if (newlook == 1 && req.isAuthenticated()) {
+    if (req.isAuthenticated()) {
         
         index.list(req, res);
         
