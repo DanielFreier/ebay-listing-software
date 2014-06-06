@@ -137,5 +137,11 @@
 	"Plan": "Plan",
 	"30DaysFree": "30DaysFree",
 	"30DaysFreeTrial": "30DaysFreeTrial",
-	"FreeTrial": "Free Trial"
+	"FreeTrial": "Free Trial",
+	"SendSecondChanceOffer": "SendSecondChanceOffer",
+	"Information": "Information",
+	"ReceiveInformationEmails": "ReceiveInformationEmails",
+	"RecentActivity": "RecentActivity",
+	"History": "History",
+	"SendMessage": "SendMessage"
 }

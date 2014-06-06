@@ -132,5 +132,9 @@
 	"SecondaryCategory": "SecondaryCategory",
 	"Home": "ホーム",
 	"FreeTrial": "FreeTrial",
-	"Plan": "Plan"
+	"Plan": "Plan",
+	"SendSecondChanceOffer": "SendSecondChanceOffer",
+	"Information": "Information",
+	"ReceiveInformationEmails": "ReceiveInformationEmails",
+	"History": "History"
 }
