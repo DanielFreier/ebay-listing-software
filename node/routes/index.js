@@ -543,31 +543,72 @@ exports.accept = function(req, res) {
     var email     = req.user.email;
     var sessionid = req.user.sessionid;
     
-    /* FetchToken */
-    var args = ['FetchToken', email, sessionid, username];
-    writesocket(args, function() {}); // wait
-    
-    /* SetNotificationPreferences */
-    var args = ['SetNotificationPreferences', email, username];
-    writesocket_async(args); // not wait
-    
-    updatemessage(email, true, 'Importing ' + username + '\'s items from eBay'
-                  + ' which end between ' + moment().subtract('days', 59).format('YYYY-MM-DD')
-                  + ' and ' + moment().add('days', 60).format('YYYY-MM-DD') + '.');
-    
-    /* GetSellerList */
-    var args = [
-        'GetSellerList',
-        email,
-        username,
-        'End',
-        moment().subtract('days', 59).format('YYYY-MM-DD'),
-        moment().add('days', 60).format('YYYY-MM-DD'),
-        'ReturnAll'
-    ];
-    writesocket_async(args); // not wait
-    
-    res.redirect('/');
+    async.series([
+        
+        /* FetchToken */
+        function(callback) {
+            
+            var apimodule = require('./ebayapi/FetchToken');
+            
+	        var reqjson = {
+                callname: 'FetchToken',
+                email: req.user.email,
+                sessionid: sessionid,
+                username: username
+            };
+            
+            apimodule.call(reqjson, callback);
+        },
+        
+        /* GetUser */
+        function(callback) {
+            
+            var apimodule = require('./ebayapi/GetUser');
+            
+	        var reqjson = {
+                callname: 'GetUser',
+                email: req.user.email,
+                username: username
+            };
+            
+            apimodule.call(reqjson, callback);
+        },
+        
+        /* SetNotificationPreferences */
+        function(callback) {
+            
+            var apimodule = require('./ebayapi/SetNotificationPreferences');
+            
+	        var reqjson = {
+                callname: 'SetNotificationPreferences',
+                email: req.user.email,
+                username: username
+            };
+            
+            apimodule.call(reqjson, callback);
+        },
+        
+        /* GetNotificationPreferences */
+        function(callback) {
+            
+            console.log('GNP call');
+            
+            var apimodule = require('./ebayapi/GetNotificationPreferences');
+            
+	        var reqjson = {
+                callname: 'GetNotificationPreferences',
+                email: req.user.email,
+                username: username
+            };
+            
+            apimodule.call(reqjson, callback);
+        }
+        
+    ], function(err, results) {
+        
+        res.redirect('/#/settings');
+        
+    });
     
 } // exports.accept
 

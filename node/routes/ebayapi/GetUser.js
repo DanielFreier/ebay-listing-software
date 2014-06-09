@@ -7,86 +7,84 @@ module.exports = {
 	
     call: function(request, callback) {
 		
+        console.log('GetUser');
+        console.dir(request);
+        
         async.waterfall([
             
             function(callback) {
-                mongo(function(db) {
-                    db.collection('users', function(err, collection) {
-                        collection.find(
-                            {
-                                userids2: {
-                                    $exists: true
-                                }
-                            }
-                        ).toArray(function(err, users) {
-                            callback(null, users, collection);
-                        }); // find
-                    }); // collection
-                }); // mongo
+                task.getnewtokenmap(request.email, callback);
             },
             
-            function(users, collection, callback) {
+            function(token, callback) {
+                task.getebayauthtoken(request.email, 
+                                      request.username, 
+                                      function(err, ebayauthtoken) {
+                                          callback(null, token, ebayauthtoken);
+                                      });
+            },
+            
+            function(token, ebayauthtoken, callback) {
                 
-                users.forEach(function(user) {
-                    user.userids2.forEach(function(userid) {
-                        if (!userid.hasOwnProperty('eBayAuthToken')) return;
-                        if (userid.eBayAuthToken == 'dummytoken') return;
+                var requestjson = {
+                    email: request.email,
+                    callname: 'GetUser',
+                    site: 'US',
+                    siteid: 0,
+                    params: {
+                        RequesterCredentials: {
+                            eBayAuthToken: ebayauthtoken
+                        },
+                        MessageID: token + ' ' + request.username
+                    }
+                };
+                
+                task.addqueue(requestjson, function(err, resultjson) {
+                    callback(null, token, ebayauthtoken, resultjson);
+                });
+            },
+            
+            function (token, ebayauthtoken, resultjson, callback) {
+                if (!resultjson.hasOwnProperty('User')) {
+                    callback(null, null);
+                    return;
+                }
+                    
+                mongo(function(db) {
+                    db.collection('users', function(err, collection) {
                         
-                        task.getnewtokenmap(user.email, function(err, token) {
+                        if (request.username != resultjson.User.UserID) {
+                            console.log(request.username + ' -> ' + resultjson.User.UserID);
                             
-                            var requestjson = {
-                                email: user.email,
-                                callname: 'GetUser',
-                                site: 'US',
-                                siteid: 0,
-                                params: {
-                                    RequesterCredentials: {
-                                        eBayAuthToken: userid.eBayAuthToken
-                                    },
-                                    MessageID: token + ' ' + userid.username
-                                }
-                            };
-                            
-                            task.addqueue(requestjson, function(err, resultjson) {
-                                
-                                if (resultjson.hasOwnProperty('User')) {
-                                    if (userid.username != resultjson.User.UserID) {
-                                        console.log(userid.username + ':' + resultjson.User.UserID);
-                                        
-                                        /* Update if username is changed */
-                                        collection.update(
-                                            {
-                                                email: user.email,
-                                                'userids2.username': userid.username
-                                            },
-                                            {
-                                                $set: {
-                                                    'userids2.$.username': resultjson.User.UserID
-                                                }
-                                            }
-                                        );
+                            /* Update if username is changed */
+                            collection.update(
+                                {
+                                    email: request.email,
+                                    'userids2.username': request.username
+                                },
+                                {
+                                    $set: {
+                                        'userids2.$.username': resultjson.User.UserID
                                     }
-                                    
-                                    collection.update(
-                                        {
-                                            email: user.email,
-                                            'userids2.username': userid.username
-                                        },
-                                        {
-                                            $set: {
-                                                'userids2.$.User': resultjson.User
-                                            }
-                                        }
-                                    );
                                 }
-                                
-                                callback(null, null);
-                            });
-                            
-                        }); // getnewtokenmap
+                            );
+                        }
                         
-                    }); // userids2.forEach
-                }); // users.forEach
+                        collection.update(
+                            {
+                                email: request.email,
+                                'userids2.username': request.username
+                            },
+                            {
+                                $set: {
+                                    'userids2.$.User': resultjson.User
+                                }
+                            }
+                        );
+                        
+                        callback(null, null);
+                    });
+                });
                 
             }
             

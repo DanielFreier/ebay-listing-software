@@ -1,9 +1,9 @@
+var async  = require('async');
+var config = require('../../config');
 var mongo  = require('../mongoconnect');
 var task   = require('./task');
-var config = require('../../config');
-var async  = require('async');
 
-module.exports = {
+var methods = {
 	
     call: function(request, callback) {
 		
@@ -15,7 +15,7 @@ module.exports = {
             
             function(token, callback) {
                 task.getebayauthtoken(request.email,
-                                      request.username, 
+                                      request.username,
                                       function(err, ebayauthtoken) {
                                           callback(null, token, ebayauthtoken);
                                       });
@@ -86,31 +86,6 @@ module.exports = {
                 };
                 
                 task.addqueue(requestjson, callback);
-            },
-            
-            function(resultjson, callback) {
-                
-                callback(null, null);
-                /*
-                  mongo(function(db) {
-                  db.collection('users', function(err, collection) {
-                  
-                  collection.update(
-                  {
-                  email: request.email
-                  },
-                  {
-                  $set: {
-                  sessionid: resultjson.SessionID
-                  }
-                  }
-                  );
-                  
-                  callback(null, resultjson.SessionID);
-                  
-                  });
-                  }); // mongo
-                */
             }
             
         ], function(err, result) {
@@ -121,4 +96,6 @@ module.exports = {
         
     } // call
 	
-}
+} // methods
+
+module.exports = methods;
