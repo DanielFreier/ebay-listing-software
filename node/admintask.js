@@ -11,16 +11,8 @@ var crypto = require('crypto');
 mongo(function(db) {
     db.collection('users', function(err, coll) {
         
-        /*
         var activeusers = {
-            'period.end': {
-                $gte: moment()._d
-            }
-        };
-        */
-
-        var activeusers = {
-            email: 'yong_liu@me.com',
+            email: 'ebehay@gmail.com',
             'lastused_at': {
                 $gte: moment('2014-06-01')._d
             }
@@ -30,13 +22,15 @@ mongo(function(db) {
             
             users.forEach(function(user) {
                 
+                console.log(user.email);
+                
                 if (!user.hasOwnProperty('userids2')) return;
                 if (user.email == 'demo@listers.in') return;
                 
                 user.userids2.forEach(function(account) {
                     
-                    if (!account.hasOwnProperty('TokenStatus')) return;
-                    if (account.TokenStatus.Status != 'Active') return;
+                    //if (!account.hasOwnProperty('TokenStatus')) return;
+                    //if (account.TokenStatus.Status != 'Active') return;
                     
                     console.log(user.email + ' ' + account.username);
                     
