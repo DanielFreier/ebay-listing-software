@@ -1,8 +1,0 @@
-- Categories where your listing will appear
-- Help buyers find your item with a great title
-- Bring your item to life with pictures
-- Describe the item you're selling
-- Choose how you'd like to sell your item
-- Decide how you'd like to be paid
-- Give buyers shipping details
-- Other things you'd like buyers to know
